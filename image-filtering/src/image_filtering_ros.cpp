@@ -19,6 +19,7 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions & options) : No
     this->declare_parameter<int>("filter_params.ebus.erosion_size", 2);
     this->declare_parameter<int>("filter_params.ebus.blur_size", 30);
     this->declare_parameter<int>("filter_params.ebus.mask_weight", 5);
+    this->declare_parameter<int>("filter_params.otsu.otsu_segmentation", 1);
 
     // Set up the QoS profile for the image subscriber
     rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
@@ -49,6 +50,7 @@ void ImageFilteringNode::set_filter_params(){
     params.ebus.erosion_size = this->get_parameter("filter_params.ebus.erosion_size").as_int();
     params.ebus.blur_size = this->get_parameter("filter_params.ebus.blur_size").as_int();
     params.ebus.mask_weight = this->get_parameter("filter_params.ebus.mask_weight").as_int();
+    params.otsu.otsu_segmentation = this->get_parameter("filter_params.otsu.otsu_segmentation").as_int();
     filter_params_ = params;
     RCLCPP_INFO(this->get_logger(), "Filter parameters updated.");
 }

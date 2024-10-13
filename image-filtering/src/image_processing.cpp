@@ -1,5 +1,6 @@
 #include <image_filters/image_processing.hpp>
 #include <iostream>
+#include <stdio.h>
 
 namespace vortex::image_processing
 {
@@ -91,6 +92,14 @@ void ebus_filter(const FilterParams& params, const cv::Mat &original, cv::Mat &f
 	// Higher weight of mask will create a sharper but more noisy image
 	addWeighted(eroded, 1, mask, mask_weight, 0, filtered);
 }
+
+void otsu_segmentation_filter(const FilterParams& params, const cv::Mat &original, cv::Mat &filtered) 
+{
+	(void)params;
+	(void)original;
+	(void)filtered;
+}
+
 
 void apply_filter(const std::string& filter, const FilterParams& params, const cv::Mat &original, cv::Mat &filtered)
 {

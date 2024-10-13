@@ -1,9 +1,9 @@
 image_filtering_node:
   ros__parameters:
-    sub_topic: "/flir_camera/image_raw"
+    sub_topic: "/gripper_camera/image_raw"
     pub_topic: "/filtered_image"
     filter_params:
-      filter_type: "ebus"
+      filter_type: "otsu"
       flip:
         flip_code: 1
       unsharpening:
@@ -18,6 +18,8 @@ image_filtering_node:
         erosion_size: 2
         blur_size: 30
         mask_weight: 5
+      otsu:
+        otsu_segmentation: 1
 
 # Filter params should reflect the FilterParams struct 
 # defined in /include/image_filters/image_processing.hpp

@@ -37,6 +37,10 @@ struct EbusParams {
     int mask_weight;
 };
 
+struct OtsuParams {
+    int otsu_segmentation;
+};
+
 struct FilterParams {
     FlipParams flip;
     UnsharpeningParams unsharpening;
@@ -44,6 +48,7 @@ struct FilterParams {
     DilatingParams dilating;
     WhiteBalancingParams white_balancing;
     EbusParams ebus;
+    OtsuParams otsu;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -90,10 +95,11 @@ void dilating_filter(const FilterParams& params, const cv::Mat &original, cv::Ma
 void white_balance_filter(const FilterParams& params, const cv::Mat &original, cv::Mat &filtered);
 
 /**
- * A filter that worked well-ish in the mc-lab conditions easter 2023
- * Uses a combination of dilation and unsharpening
+ * A filter based on Otsu's method
  */
 void ebus_filter(const FilterParams& params, const cv::Mat &original, cv::Mat &filtered);
+
+void otsu_segmentation_filter(const FilterParams& params, const cv::Mat &original, cv::Mat &filtered);
 
 const static std::map<std::string, FilterFunction> filter_functions ={
 	{"no_filter", no_filter},
@@ -103,7 +109,8 @@ const static std::map<std::string, FilterFunction> filter_functions ={
 	{"eroding", eroding_filter},
 	{"dilating", dilating_filter},
 	{"white_balancing", white_balance_filter},
-	{"ebus", ebus_filter}};
+	{"ebus", ebus_filter},
+    {"otsu_segmentation", otsu_segmentation_filter}};
 
 
 } // namespace image_processing
