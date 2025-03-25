@@ -66,7 +66,7 @@ Implement your filter function. This function should take the `cv::Mat` objects 
 void your_filter_function(const cv::Mat &original, cv::Mat &filtered, const FilterParams& filter_params) {
     // Access your filter-specific parameters like this:
     int example_param = filter_params.your_filter.example_param;
-    
+
     // Implement your filtering logic here
 }
 ```
