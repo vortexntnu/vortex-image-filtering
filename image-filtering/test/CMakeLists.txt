@@ -1,7 +1,7 @@
 find_package(ament_cmake_gtest REQUIRED)
-ament_add_gtest(${PROJECT_NAME}_test 
+ament_add_gtest(${PROJECT_NAME}_test
     image_processing_test.cpp
-    ../src/image_processing.cpp 
+    ../src/image_processing.cpp
 )
 target_link_libraries(${PROJECT_NAME}_test
   ${OpenCV_LIBS} # Link OpenCV libraries
