@@ -19,5 +19,5 @@ image_filtering_node:
         blur_size: 30
         mask_weight: 5
 
-# Filter params should reflect the FilterParams struct 
+# Filter params should reflect the FilterParams struct
 # defined in /include/image_filters/image_processing.hpp
