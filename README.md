@@ -1,4 +1,7 @@
 # Image Filtering Node
+[![Industrial CI](https://github.com/vortexntnu/vortex-image-filtering/actions/workflows/industrial-ci.yml/badge.svg)](https://github.com/vortexntnu/vortex-image-filtering/actions/workflows/industrial-ci.yml)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/vortexntnu/vortex-image-filtering/main.svg)](https://results.pre-commit.ci/latest/github/vortexntnu/vortex-image-filtering/main)
+[![codecov](https://codecov.io/github/vortexntnu/vortex-image-filtering/graph/badge.svg?token=6XHprkpUsR)](https://codecov.io/github/vortexntnu/vortex-image-filtering)
 
 The `image_filtering_node` is a ROS 2 node developed in the `vortex::image_filters` namespace. It is designed to subscribe to image topics, apply various image filters using OpenCV, and publish the filtered images back to ROS.
 
