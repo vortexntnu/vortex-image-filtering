@@ -13,7 +13,7 @@ def generate_launch_description():
         parameters=[
             os.path.join(
                 get_package_share_directory('image_filtering'),
-                'params',
+                'config',
                 'image_filtering_params.yaml',
             )
         ],

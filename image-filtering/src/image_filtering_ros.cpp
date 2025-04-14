@@ -3,24 +3,31 @@
 
 using std::placeholders::_1;
 
-namespace vortex::image_processing {
-
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
-    this->declare_parameter<std::string>("sub_topic", "/flir_camera/image_raw");
-    this->declare_parameter<std::string>("pub_topic", "/filtered_image");
-    this->declare_parameter<std::string>("filter_params.filter_type", "ebus");
-    this->declare_parameter<int>("filter_params.flip.flip_code", 0);
-    this->declare_parameter<int>("filter_params.unsharpening.blur_size", 8);
-    this->declare_parameter<int>("filter_params.erosion.size", 1);
-    this->declare_parameter<int>("filter_params.dilation.size", 1);
+    this->declare_parameter<std::string>("sub_topic");
+    this->declare_parameter<std::string>("pub_topic");
+    this->declare_parameter<std::string>("output_encoding");
+    this->declare_parameter<std::string>("filter_params.filter_type");
+    this->declare_parameter<int>("filter_params.flip.flip_code");
+    this->declare_parameter<int>("filter_params.unsharpening.blur_size");
+    this->declare_parameter<int>("filter_params.erosion.size");
+    this->declare_parameter<int>("filter_params.dilation.size");
     this->declare_parameter<double>(
-        "filter_params.white_balancing.contrast_percentage", 0.8);
-    this->declare_parameter<int>("filter_params.ebus.erosion_size", 2);
-    this->declare_parameter<int>("filter_params.ebus.blur_size", 30);
-    this->declare_parameter<int>("filter_params.ebus.mask_weight", 5);
+        "filter_params.white_balancing.contrast_percentage");
+    this->declare_parameter<int>("filter_params.ebus.erosion_size");
+    this->declare_parameter<int>("filter_params.ebus.blur_size");
+    this->declare_parameter<int>("filter_params.ebus.mask_weight");
+    this->declare_parameter<bool>("filter_params.otsu.gamma_auto_correction");
+    this->declare_parameter<double>(
+        "filter_params.otsu.gamma_auto_correction_weight");
+    this->declare_parameter<bool>("filter_params.otsu.otsu_segmentation");
+    this->declare_parameter<double>("filter_params.otsu.gsc_weight_r");
+    this->declare_parameter<double>("filter_params.otsu.gsc_weight_g");
+    this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
+    this->declare_parameter<int>("filter_params.otsu.erosion_size");
+    this->declare_parameter<int>("filter_params.otsu.dilation_size");
 
-    // Set up the QoS profile for the image subscriber
     rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
     auto qos_sensor_data = rclcpp::QoS(
         rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
@@ -30,8 +37,9 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
 
     initialize_parameter_handler();
 
+    std::string pub_topic = this->get_parameter("pub_topic").as_string();
     image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
-        "/filtered_image", qos_sensor_data);
+        pub_topic, qos_sensor_data);
 }
 
 void ImageFilteringNode::set_filter_params() {
@@ -39,9 +47,9 @@ void ImageFilteringNode::set_filter_params() {
     std::string filter =
         this->get_parameter("filter_params.filter_type").as_string();
     if (!filter_functions.contains(filter)) {
-        RCLCPP_ERROR_STREAM_THROTTLE(
-            this->get_logger(), *this->get_clock(), 1000,
-            "Invalid filter type: " << filter << " Setting to no_filter.");
+        spdlog::warn(
+            "Invalid filter type received: {}. Using default: no_filter.",
+            filter);
         filter_ = "no_filter";
     } else {
         filter_ = filter;
@@ -63,46 +71,63 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.ebus.blur_size").as_int();
     params.ebus.mask_weight =
         this->get_parameter("filter_params.ebus.mask_weight").as_int();
+    params.otsu.gamma_auto_correction =
+        this->get_parameter("filter_params.otsu.gamma_auto_correction")
+            .as_bool();
+    params.otsu.gamma_auto_correction_weight =
+        this->get_parameter("filter_params.otsu.gamma_auto_correction_weight")
+            .as_double();
+    params.otsu.otsu_segmentation =
+        this->get_parameter("filter_params.otsu.otsu_segmentation").as_bool();
+    params.otsu.gsc_weight_r =
+        this->get_parameter("filter_params.otsu.gsc_weight_r").as_double();
+    params.otsu.gsc_weight_g =
+        this->get_parameter("filter_params.otsu.gsc_weight_g").as_double();
+    params.otsu.gsc_weight_b =
+        this->get_parameter("filter_params.otsu.gsc_weight_b").as_double();
+    params.otsu.erosion_size =
+        this->get_parameter("filter_params.otsu.erosion_size").as_int();
+    params.otsu.dilation_size =
+        this->get_parameter("filter_params.otsu.dilation_size").as_int();
     filter_params_ = params;
-    RCLCPP_INFO(this->get_logger(), "Filter parameters updated.");
+    spdlog::info("Filter parameters set: {}", filter);
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     std::string image_topic = this->get_parameter("sub_topic").as_string();
     if (image_topic_ != image_topic) {
+        rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
+        auto qos_sensor_data = rclcpp::QoS(
+            rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
+
         image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-            image_topic, 10,
+            image_topic, qos_sensor_data,
             std::bind(&ImageFilteringNode::image_callback, this, _1));
         image_topic_ = image_topic;
-        RCLCPP_INFO(this->get_logger(), "Subscribed to image topic: %s",
-                    image_topic.c_str());
+        spdlog::info("Subscribed to image topic: {}", image_topic);
     }
 }
 
 void ImageFilteringNode::initialize_parameter_handler() {
     param_handler_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
 
-    // Register the parameter event callback with the correct signature
     auto parameter_event_callback =
         [this](const rcl_interfaces::msg::ParameterEvent& event) -> void {
         this->on_parameter_event(event);
     };
 
-    // Register the callback with the parameter event handler
     param_cb_handle_ =
         param_handler_->add_parameter_event_callback(parameter_event_callback);
 }
 
 void ImageFilteringNode::on_parameter_event(
     const rcl_interfaces::msg::ParameterEvent& event) {
-    // Get the fully qualified name of the current node
     auto node_name = this->get_fully_qualified_name();
 
-    // Filter out events not related to this node
     if (event.node != node_name) {
-        return;  // Early return if the event is not from this node
+        return;
     }
-    RCLCPP_INFO(this->get_logger(), "Received parameter event");
+    spdlog::info("Parameter event for node: {}", node_name);
     for (const auto& changed_parameter : event.changed_parameters) {
         if (changed_parameter.name.find("sub_topic") == 0)
             check_and_subscribe_to_image_topic();
@@ -113,22 +138,18 @@ void ImageFilteringNode::on_parameter_event(
 
 void ImageFilteringNode::image_callback(
     const sensor_msgs::msg::Image::SharedPtr msg) {
-    RCLCPP_INFO_ONCE(this->get_logger(), "Received image message.");
     cv_bridge::CvImagePtr cv_ptr;
 
     try {
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 
         if (cv_ptr->image.empty()) {
-            RCLCPP_WARN_STREAM_THROTTLE(
-                this->get_logger(), *this->get_clock(), 1000,
-                "Empty image received, skipping processing.");
+            spdlog::error("Received empty image, skipping processing.");
             return;
         }
 
     } catch (cv_bridge::Exception& e) {
-        RCLCPP_WARN_STREAM_THROTTLE(this->get_logger(), *this->get_clock(),
-                                    1000, "cv_bridge exception: " << e.what());
+        spdlog::error("cv_bridge exception: {}", e.what());
         return;
     }
 
@@ -136,24 +157,13 @@ void ImageFilteringNode::image_callback(
     cv::Mat filtered_image;
     apply_filter(filter_, filter_params_, input_image, filtered_image);
 
-    //     auto message = cv_bridge::CvImage(msg->header, "bgr8",
-    //     filtered_image).toImageMsg();
-
-    //     image_pub_->publish(*message);
-    // Create a unique pointer for the message
-    // RCLCPP_INFO_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
-    // "Addr of image message: " << msg.get());
+    std::string output_encoding =
+        this->get_parameter("output_encoding").as_string();
     auto message = std::make_unique<sensor_msgs::msg::Image>();
-    cv_bridge::CvImage(msg->header, "bgr8", filtered_image)
+    cv_bridge::CvImage(msg->header, output_encoding, filtered_image)
         .toImageMsg(*message);
 
-    // RCLCPP_INFO_STREAM_THROTTLE(this->get_logger(), *this->get_clock(), 1000,
-    // "Addr of image message filtering: " << message.get());
-
-    // Publish the message using a unique pointer
     image_pub_->publish(std::move(message));
 }
 
-RCLCPP_COMPONENTS_REGISTER_NODE(vortex::image_processing::ImageFilteringNode)
-
-}  // namespace vortex::image_processing
+RCLCPP_COMPONENTS_REGISTER_NODE(ImageFilteringNode)

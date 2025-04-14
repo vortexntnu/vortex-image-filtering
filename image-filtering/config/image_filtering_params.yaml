@@ -1,0 +1,33 @@
+/**:
+  ros__parameters:
+    sub_topic: "/downwards_camera/image_raw"
+    pub_topic: "/filtered_image"
+    output_encoding: "mono8"
+    filter_params:
+      filter_type: "otsu"
+      flip:
+        flip_code: 1
+      unsharpening:
+        blur_size: 8
+      erosion:
+        size: 1
+      dilation:
+        size: 1
+      white_balancing:
+        contrast_percentage: 0.1
+      ebus:
+        erosion_size: 2
+        blur_size: 30
+        mask_weight: 5
+      otsu:
+        gsc_weight_r: 1.0  # Grayscale red weight
+        gsc_weight_g: 0.0  # Grayscale green weight
+        gsc_weight_b: 0.0   # Grayscale blue weight
+        gamma_auto_correction: true
+        gamma_auto_correction_weight: 4.0
+        otsu_segmentation: true
+        erosion_size: 10
+        dilation_size: 10
+
+# Filter params should reflect the FilterParams struct
+# defined in /include/image_filters/image_processing.hpp
