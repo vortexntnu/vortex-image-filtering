@@ -2,13 +2,13 @@
 #define IMAGE_FILTERING_ROS_HPP
 
 #include <cv_bridge/cv_bridge.h>
+#include <spdlog/spdlog.h>
 #include <rclcpp/parameter_event_handler.hpp>
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include "image_processing.hpp"
 
-namespace vortex::image_processing {
 class ImageFilteringNode : public rclcpp::Node {
    public:
     explicit ImageFilteringNode(const rclcpp::NodeOptions& options);
@@ -102,7 +102,5 @@ class ImageFilteringNode : public rclcpp::Node {
      */
     std::string filter_;
 };
-
-}  // namespace vortex::image_processing
 
 #endif  // IMAGE_FILTERING_ROS_HPP
