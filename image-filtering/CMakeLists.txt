@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(image_filtering)
 
-# === C++ standard ===
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 20)
 endif()
@@ -10,13 +9,14 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(OpenCV 4.5.4 REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(cv_bridge REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(fmt REQUIRED)
 
 include_directories(include)
 
@@ -42,11 +42,13 @@ ament_target_dependencies(${LIB_NAME} PUBLIC
   rclcpp_components
   cv_bridge
   sensor_msgs
+  spdlog
+  fmt
 )
 
 rclcpp_components_register_node(
     ${LIB_NAME}
-    PLUGIN "vortex::image_processing::ImageFilteringNode"
+    PLUGIN "ImageFilteringNode"
     EXECUTABLE ${PROJECT_NAME}_node
 )
 
@@ -67,12 +69,8 @@ install(
 
 install(DIRECTORY
   launch
-  params
+  config
   DESTINATION share/${PROJECT_NAME}/
 )
-
-if(BUILD_TESTING)
-    add_subdirectory(test)
-endif()
 
 ament_package()

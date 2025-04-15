@@ -3,13 +3,12 @@
 
 #include <iostream>
 #include <map>
+#include <numeric>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
-
-namespace vortex::image_processing {
 
 struct FlipParams {
     int flip_code;
@@ -36,6 +35,17 @@ struct EbusParams {
     int mask_weight;
 };
 
+struct OtsuParams {
+    bool gamma_auto_correction;
+    double gamma_auto_correction_weight;
+    bool otsu_segmentation;
+    double gsc_weight_r;
+    double gsc_weight_g;
+    double gsc_weight_b;
+    int erosion_size;
+    int dilation_size;
+};
+
 struct FilterParams {
     FlipParams flip;
     UnsharpeningParams unsharpening;
@@ -43,6 +53,7 @@ struct FilterParams {
     DilatingParams dilating;
     WhiteBalancingParams white_balancing;
     EbusParams ebus;
+    OtsuParams otsu;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -87,14 +98,14 @@ void unsharpening_filter(const FilterParams& params,
 /**
  * Expands the dark areas of the image
  */
-void eroding_filter(const FilterParams& params,
+void erosion_filter(const FilterParams& params,
                     const cv::Mat& original,
                     cv::Mat& modified);
 
 /**
  * Expands the bright areas of the image
  */
-void dilating_filter(const FilterParams& params,
+void dilation_filter(const FilterParams& params,
                      const cv::Mat& original,
                      cv::Mat& modified);
 
@@ -113,15 +124,22 @@ void ebus_filter(const FilterParams& params,
                  const cv::Mat& original,
                  cv::Mat& filtered);
 
+/**
+ * A filter based on Otsu's method
+ */
+void otsu_segmentation_filter(const FilterParams& params,
+                              const cv::Mat& original,
+                              cv::Mat& output);
+
 const static std::map<std::string, FilterFunction> filter_functions = {
     {"no_filter", no_filter},
     {"flip", flip_filter},
     {"sharpening", sharpening_filter},
     {"unsharpening", unsharpening_filter},
-    {"eroding", eroding_filter},
-    {"dilating", dilating_filter},
+    {"erosion", erosion_filter},
+    {"dilation", dilation_filter},
     {"white_balancing", white_balance_filter},
-    {"ebus", ebus_filter}};
+    {"ebus", ebus_filter},
+    {"otsu", otsu_segmentation_filter}};
 
-}  // namespace vortex::image_processing
 #endif  // IMAGE_PROCESSING_HPP
