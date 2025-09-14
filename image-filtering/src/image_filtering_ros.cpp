@@ -5,6 +5,22 @@ using std::placeholders::_1;
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
+
+    declare_parameters();
+    check_and_subscribe_to_image_topic();
+    set_filter_params();
+    initialize_parameter_handler();
+        
+    rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
+    auto qos_sensor_data = rclcpp::QoS(
+        rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
+
+    std::string pub_topic = this->get_parameter("pub_topic").as_string();
+    image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
+        pub_topic, qos_sensor_data);
+}
+
+void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<std::string>("sub_topic");
     this->declare_parameter<std::string>("pub_topic");
     this->declare_parameter<std::string>("output_encoding");
@@ -27,19 +43,6 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
     this->declare_parameter<int>("filter_params.otsu.erosion_size");
     this->declare_parameter<int>("filter_params.otsu.dilation_size");
-
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
-    auto qos_sensor_data = rclcpp::QoS(
-        rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
-
-    check_and_subscribe_to_image_topic();
-    set_filter_params();
-
-    initialize_parameter_handler();
-
-    std::string pub_topic = this->get_parameter("pub_topic").as_string();
-    image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
-        pub_topic, qos_sensor_data);
 }
 
 void ImageFilteringNode::set_filter_params() {
