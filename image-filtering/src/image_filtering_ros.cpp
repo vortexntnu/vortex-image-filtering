@@ -5,12 +5,11 @@ using std::placeholders::_1;
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
-
     declare_parameters();
     check_and_subscribe_to_image_topic();
     set_filter_params();
     initialize_parameter_handler();
-        
+
     rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
     auto qos_sensor_data = rclcpp::QoS(
         rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
