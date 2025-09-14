@@ -34,6 +34,12 @@ class ImageFilteringNode : public rclcpp::Node {
     void check_and_subscribe_to_image_topic();
 
     /**
+     * @brief Declare the ros2 parameters used by the node.
+     *
+     */
+    void declare_parameters();
+
+    /**
      * @brief Set the filter parameters for the FilterParams struct.
      *
      */
