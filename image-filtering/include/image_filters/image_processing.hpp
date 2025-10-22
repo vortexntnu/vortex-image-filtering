@@ -46,6 +46,12 @@ struct OtsuParams {
     int dilation_size;
 };
 
+// Thomas' masterpiece
+struct GaussianBlurParams{
+    int blur_strength;
+
+};
+
 struct FilterParams {
     FlipParams flip;
     UnsharpeningParams unsharpening;
@@ -54,6 +60,7 @@ struct FilterParams {
     WhiteBalancingParams white_balancing;
     EbusParams ebus;
     OtsuParams otsu;
+    GaussianBlurParams gausian_blur;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -131,6 +138,11 @@ void otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
                               cv::Mat& output);
 
+void gaussian_blur(const FilterParams& filter_params,
+                          const cv::Mat &original, 
+                          cv::Mat &filtered);
+
+
 const static std::map<std::string, FilterFunction> filter_functions = {
     {"no_filter", no_filter},
     {"flip", flip_filter},
@@ -140,6 +152,7 @@ const static std::map<std::string, FilterFunction> filter_functions = {
     {"dilation", dilation_filter},
     {"white_balancing", white_balance_filter},
     {"ebus", ebus_filter},
-    {"otsu", otsu_segmentation_filter}};
+    {"otsu", otsu_segmentation_filter},
+    {"gaussian_blur", gaussian_blur}};
 
 #endif  // IMAGE_PROCESSING_HPP

@@ -236,6 +236,20 @@ void otsu_segmentation_filter(const FilterParams& params,
     }
 }
 
+void your_filter_function(const FilterParams& filter_params,
+                          const cv::Mat &original, 
+                          cv::Mat &filtered){
+    // Access your filter-specific parameters like this:
+    int example_param = filter_params.your_filter.example_param;
+
+    // Implement your filtering logic here
+
+    int flip_code = params.flip.flip_code;  // !!  for testing only
+    cv::flip(original, filtered, flip_code);
+
+                        
+}
+
 void apply_filter(const std::string& filter,
                   const FilterParams& params,
                   const cv::Mat& original,
