@@ -47,9 +47,9 @@ struct OtsuParams {
 };
 
 // Thomas' masterpiece
-struct GaussianBlurParams{
-    int blur_strength;
-
+struct OverlapParams{
+    bool is_first=true;
+    cv::Mat previous_image;
 };
 
 struct FilterParams {
@@ -60,7 +60,7 @@ struct FilterParams {
     WhiteBalancingParams white_balancing;
     EbusParams ebus;
     OtsuParams otsu;
-    GaussianBlurParams gausian_blur;
+    OverlapParams overlap;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -138,7 +138,8 @@ void otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
                               cv::Mat& output);
 
-void gaussian_blur(const FilterParams& filter_params,
+
+void overlap_filter(const FilterParams& filter_params,
                           const cv::Mat &original, 
                           cv::Mat &filtered);
 
@@ -153,6 +154,10 @@ const static std::map<std::string, FilterFunction> filter_functions = {
     {"white_balancing", white_balance_filter},
     {"ebus", ebus_filter},
     {"otsu", otsu_segmentation_filter},
-    {"gaussian_blur", gaussian_blur}};
+    {"overlap", overlap_filter} // This was done by the one and only Thomas
+};
 
 #endif  // IMAGE_PROCESSING_HPP
+
+
+

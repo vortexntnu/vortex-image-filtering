@@ -23,6 +23,7 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<std::string>("sub_topic");
     this->declare_parameter<std::string>("pub_topic");
     this->declare_parameter<std::string>("output_encoding");
+    this->declare_parameter<std::string>("input_encoding");
     this->declare_parameter<std::string>("filter_params.filter_type");
     this->declare_parameter<int>("filter_params.flip.flip_code");
     this->declare_parameter<int>("filter_params.unsharpening.blur_size");
@@ -42,6 +43,9 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
     this->declare_parameter<int>("filter_params.otsu.erosion_size");
     this->declare_parameter<int>("filter_params.otsu.dilation_size");
+    
+    // this->declare_parameter<int>(//Thomas has left a mark here
+    //     "filter_params.gaussian_blur.blur_strength");
 }
 
 void ImageFilteringNode::set_filter_params() {
@@ -91,6 +95,8 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.otsu.erosion_size").as_int();
     params.otsu.dilation_size =
         this->get_parameter("filter_params.otsu.dilation_size").as_int();
+    // params.gaussian_blur.blur_strength = // Thomas is everyware
+    //     this->get_parameter("filter_params.gaussian_blur.blur_strength").as_int();
     filter_params_ = params;
     spdlog::info("Filter parameters set: {}", filter);
 }
@@ -141,6 +147,9 @@ void ImageFilteringNode::on_parameter_event(
 void ImageFilteringNode::image_callback(
     const sensor_msgs::msg::Image::SharedPtr msg) {
     cv_bridge::CvImagePtr cv_ptr;
+
+    std::string input_encoding = 
+        this->get_parameter("input_encoding").as_string();
 
     try {
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);

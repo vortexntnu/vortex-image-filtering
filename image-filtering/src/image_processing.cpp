@@ -236,18 +236,36 @@ void otsu_segmentation_filter(const FilterParams& params,
     }
 }
 
-void your_filter_function(const FilterParams& filter_params,
+// Thomas was here
+void overlap_filter(const FilterParams& filter_params,
                           const cv::Mat &original, 
                           cv::Mat &filtered){
+    static cv::Mat prev;
+    static bool has_prev = false;
+
+    if (!has_prev) {
+        original.copyTo(filtered);      // first call: just pass through
+        prev = original.clone();        // snapshot (clone so it’s independent)
+        has_prev = true;
+        return;
+    }
+    
+    
+    // cv::add(original, prev, filtered);
+    cv::cvtColor(original, gray, cv::COLOR_BGR2GRAY);
+
+    cv::addWeighted(prev, 0.5, original, 0.5, 0.0, filtered);
+    
     // Access your filter-specific parameters like this:
-    int example_param = filter_params.your_filter.example_param;
+    // int example_param = filter_params.gaussian_blur.blur_strength;
 
     // Implement your filtering logic here
 
-    int flip_code = params.flip.flip_code;  // !!  for testing only
-    cv::flip(original, filtered, flip_code);
+    
+    // int flip_code = filter_params.flip.flip_code;  // 0: x-axis, 1: y-axis, -1: both
+    // cv::flip(original, filtered, flip_code);
+    
 
-                        
 }
 
 void apply_filter(const std::string& filter,
