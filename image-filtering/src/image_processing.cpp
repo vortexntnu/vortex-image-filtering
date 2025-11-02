@@ -238,35 +238,113 @@ void otsu_segmentation_filter(const FilterParams& params,
 
 // Thomas was here
 void overlap_filter(const FilterParams& filter_params,
-                          const cv::Mat &original, 
-                          cv::Mat &filtered){
-    static cv::Mat prev;
+                    const cv::Mat& original,
+                    cv::Mat& filtered)
+{
+    static cv::Mat prevR;      // store previous R channel only
     static bool has_prev = false;
 
-    if (!has_prev) {
-        original.copyTo(filtered);      // first call: just pass through
-        prev = original.clone();        // snapshot (clone so it’s independent)
+    // Extract current R channel
+    cv::Mat curR;
+    cv::extractChannel(original, curR, 2); // 0=B,1=G,2=R
+
+    if (!has_prev || prevR.empty() || prevR.size()!=curR.size() || prevR.type()!=curR.type()) {
+        original.copyTo(filtered);   // first call (or size/type change): pass through
+        prevR = curR.clone();        // cache R channel
         has_prev = true;
         return;
     }
-    
-    
-    // cv::add(original, prev, filtered);
-    cv::cvtColor(original, gray, cv::COLOR_BGR2GRAY);
 
-    cv::addWeighted(prev, 0.5, original, 0.5, 0.0, filtered);
-    
-    // Access your filter-specific parameters like this:
-    // int example_param = filter_params.gaussian_blur.blur_strength;
+    // |cur - prev| on the R channel
+    cv::Mat diff8u;
+    cv::absdiff(curR, prevR, diff8u);
 
-    // Implement your filtering logic here
+    // % of full 8-bit range
+    cv::Mat percent32f;
+    diff8u.convertTo(percent32f, CV_32F, 100.0 / 255.0);
 
-    
-    // int flip_code = filter_params.flip.flip_code;  // 0: x-axis, 1: y-axis, -1: both
-    // cv::flip(original, filtered, flip_code);
-    
+    // Mask: pixels whose % change > threshold
+    cv::Mat mask;
+    cv::threshold(percent32f, mask, filter_params.overlap.percentage_threshold, 255.0, cv::THRESH_BINARY);
+    mask.convertTo(mask, CV_8U);
 
+    // Zero out those pixels in the R channel
+    filtered = original.clone();
+    std::vector<cv::Mat> ch;
+    cv::split(filtered, ch);      // ch[2] is R
+    ch[2].setTo(0, mask);
+    cv::merge(ch, filtered);
+
+    // Update history (R channel only)
+    prevR = curR.clone();
 }
+
+void median_filter(const FilterParams& filter_params,
+                    const cv::Mat& original,
+                    cv::Mat& filtered){
+
+    CV_Assert(!original.empty());
+
+    // Validate & sanitize kernel size (must be odd and >= 3)
+    int k = filter_params.median.kernel_size;
+    if (k < 3) k = 3;
+    if ((k & 1) == 0) ++k; // make odd if even
+
+    // cv::medianBlur is not suported for all depths "sais chat"
+    // (works for CV_8U, CV_16U, CV_32F)
+    const int depth = original.depth();
+    const bool supported = (depth == CV_8U || depth == CV_16U || depth == CV_32F);
+
+    const cv::Mat* src = &original;
+    cv::Mat tmp;
+    if (!supported) {
+        // Simple, safe conversion to 8-bit
+        original.convertTo(tmp, CV_8U);
+        src = &tmp;
+    }
+
+    cv::medianBlur(*src, filtered, k);
+
+    // If converted to 8U and want to preserve original depth, converts back here:
+    if (!supported) filtered.convertTo(filtered, depth);
+}
+
+
+
+void binary_threshold(const FilterParams& filter_params,
+                      const cv::Mat& original,
+                      cv::Mat& filtered)
+{
+
+    CV_Assert(!original.empty());
+
+    const double thresh = filter_params.binary.threshold;
+    const double maxval = filter_params.binary.maxval;
+    const bool   invert = filter_params.binary.invert;
+
+    // 1) Ensure single-channel
+    cv::Mat gray;
+    if (original.channels() == 1) {
+        gray = original;
+    } else {
+        cv::cvtColor(original, gray, cv::COLOR_BGR2GRAY);
+    }
+
+    // Standardize to 8-bit (safe for thresholding)
+    cv::Mat src8;
+    if (gray.depth() != CV_8U) {
+        // Adjust scaling here if grayscale is not already 0–255
+        gray.convertTo(src8, CV_8U);
+    } else {
+        src8 = gray;
+    }
+
+    // Apply fixed threshold
+    const int type = invert ? cv::THRESH_BINARY_INV : cv::THRESH_BINARY;
+    cv::threshold(src8, filtered, thresh, maxval, type);
+}
+
+
 
 void apply_filter(const std::string& filter,
                   const FilterParams& params,

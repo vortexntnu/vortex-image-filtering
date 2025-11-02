@@ -48,8 +48,16 @@ struct OtsuParams {
 
 // Thomas' masterpiece
 struct OverlapParams{
-    bool is_first=true;
-    cv::Mat previous_image;
+    double percentage_threshold;
+};
+struct MedianParams{
+    int kernel_size;
+};
+
+struct BinaryParams{
+    double threshold;
+    double maxval;
+    bool invert;
 };
 
 struct FilterParams {
@@ -61,6 +69,8 @@ struct FilterParams {
     EbusParams ebus;
     OtsuParams otsu;
     OverlapParams overlap;
+    MedianParams median;
+    BinaryParams binary;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -123,7 +133,7 @@ void white_balance_filter(const FilterParams& params,
                           const cv::Mat& original,
                           cv::Mat& filtered);
 
-/**
+/**￼
  * A filter that worked well-ish in the mc-lab conditions easter 2023
  * Uses a combination of dilation and unsharpening
  */
@@ -144,6 +154,14 @@ void overlap_filter(const FilterParams& filter_params,
                           cv::Mat &filtered);
 
 
+void median_filter(const FilterParams& filter_params,
+                    const cv::Mat& original,
+                    cv::Mat& filtered);
+
+void binary_threshold(const FilterParams& filter_params,
+                      const cv::Mat& original,
+                      cv::Mat& filtered);
+
 const static std::map<std::string, FilterFunction> filter_functions = {
     {"no_filter", no_filter},
     {"flip", flip_filter},
@@ -154,7 +172,9 @@ const static std::map<std::string, FilterFunction> filter_functions = {
     {"white_balancing", white_balance_filter},
     {"ebus", ebus_filter},
     {"otsu", otsu_segmentation_filter},
-    {"overlap", overlap_filter} // This was done by the one and only Thomas
+    {"overlap", overlap_filter}, // This was done by the one and only Thomas
+    {"median", median_filter},
+    {"binary", binary_threshold},
 };
 
 #endif  // IMAGE_PROCESSING_HPP

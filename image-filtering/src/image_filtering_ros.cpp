@@ -44,8 +44,15 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<int>("filter_params.otsu.erosion_size");
     this->declare_parameter<int>("filter_params.otsu.dilation_size");
     
-    // this->declare_parameter<int>(//Thomas has left a mark here
-    //     "filter_params.gaussian_blur.blur_strength");
+    this->declare_parameter<double>("filter_params.overlap.percentage_threshold"); //Thomas has left a mark here
+    
+    this->declare_parameter<int>("filter_params.median.kernel_size");
+    
+    this->declare_parameter<double>("filter_params.binary.threshold");
+    this->declare_parameter<double>("filter_params.binary.maxval");
+    this->declare_parameter<bool>("filter_params.binary.invert");
+
+
 }
 
 void ImageFilteringNode::set_filter_params() {
@@ -69,8 +76,7 @@ void ImageFilteringNode::set_filter_params() {
     params.dilating.size =
         this->get_parameter("filter_params.dilation.size").as_int();
     params.white_balancing.contrast_percentage =
-        this->get_parameter("filter_params.white_balancing.contrast_percentage")
-            .as_double();
+        this->get_parameter("filter_params.white_balancing.contrast_percentage").as_double();
     params.ebus.erosion_size =
         this->get_parameter("filter_params.ebus.erosion_size").as_int();
     params.ebus.blur_size =
@@ -78,11 +84,9 @@ void ImageFilteringNode::set_filter_params() {
     params.ebus.mask_weight =
         this->get_parameter("filter_params.ebus.mask_weight").as_int();
     params.otsu.gamma_auto_correction =
-        this->get_parameter("filter_params.otsu.gamma_auto_correction")
-            .as_bool();
+        this->get_parameter("filter_params.otsu.gamma_auto_correction").as_bool();
     params.otsu.gamma_auto_correction_weight =
-        this->get_parameter("filter_params.otsu.gamma_auto_correction_weight")
-            .as_double();
+        this->get_parameter("filter_params.otsu.gamma_auto_correction_weight").as_double();
     params.otsu.otsu_segmentation =
         this->get_parameter("filter_params.otsu.otsu_segmentation").as_bool();
     params.otsu.gsc_weight_r =
@@ -95,8 +99,16 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.otsu.erosion_size").as_int();
     params.otsu.dilation_size =
         this->get_parameter("filter_params.otsu.dilation_size").as_int();
-    // params.gaussian_blur.blur_strength = // Thomas is everyware
-    //     this->get_parameter("filter_params.gaussian_blur.blur_strength").as_int();
+    params.overlap.percentage_threshold = // Thomas is everyware
+        this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
+    params.median.kernel_size = 
+        this->get_parameter("filter_params.median.kernel_size").as_int();
+    params.binary.threshold = 
+        this->get_parameter("filter_params.binary.threshold").as_double();
+    params.binary.maxval = 
+        this->get_parameter("filter_params.binary.maxval").as_double();
+    params.binary.invert = 
+        this->get_parameter("filter_params.binary.invert").as_bool();
     filter_params_ = params;
     spdlog::info("Filter parameters set: {}", filter);
 }
@@ -150,9 +162,13 @@ void ImageFilteringNode::image_callback(
 
     std::string input_encoding = 
         this->get_parameter("input_encoding").as_string();
+    
+    if (input_encoding.empty()){
+        input_encoding = msg->encoding; // Default to the input image encoding
+    }
 
     try {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        cv_ptr = cv_bridge::toCvCopy(msg, input_encoding);
 
         if (cv_ptr->image.empty()) {
             spdlog::error("Received empty image, skipping processing.");

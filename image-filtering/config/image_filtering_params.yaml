@@ -2,11 +2,11 @@
   ros__parameters:
     sub_topic: "/fls_publisher/display"
     pub_topic: "/filtered_image"
-    output_encoding: "bgr8"
-    input_encoding: "bgr8"
+    output_encoding: "mono8"
+    input_encoding: ""
   
     filter_params:
-      filter_type: "overlap"
+      filter_type: "binary"
       flip:
         flip_code: 1
       unsharpening:
@@ -28,8 +28,17 @@
         gamma_auto_correction: true
         gamma_auto_correction_weight: 4.0
         otsu_segmentation: true
-        erosion_size: 1
+        erosion_size: 2
         dilation_size: 2
+      overlap:
+        percentage_threshold: 100.0 # Percentage to cap the picel intensity differance
+      median: # finds the median of each n x n square around each pixel 
+        kernel_size: 5 # must be odd >= 3
+      binary: 
+        threshold: 20.
+        maxval: 255.
+        invert: false
+
 
 # Filter params should reflect the FilterParams struct
 # defined in /include/image_filters/image_processing.hpp
