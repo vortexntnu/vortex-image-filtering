@@ -116,18 +116,17 @@ void otsu_segmentation_filter(const FilterParams& params,
 
     bool otsu_segmentation = params.otsu.otsu_segmentation;
 
-    cv::Mat grayImage;
 
-    cv::Matx13f customWeights(params.otsu.gsc_weight_b,
+    toWeightedGray(original, filtered, params.otsu.gsc_weight_b,
                               params.otsu.gsc_weight_g,
                               params.otsu.gsc_weight_r);
-    cv::transform(original, filtered, customWeights);
 
-    if (gamma_auto_correction) {
+
+    if (gamma_auto_correction) { 
         applyAutoGamma(filtered, gamma_auto_correction_weight);
-    }
-
-    if (otsu_segmentation) {
+    } 
+ 
+    if (otsu_segmentation) { 
         // Calculate the histogram
         int histSize = 256;
         float range[] = {0, 256};
@@ -139,38 +138,7 @@ void otsu_segmentation_filter(const FilterParams& params,
         // Normalize histogram to get probabilities
         hist /= filtered.total();
 
-        // Initialize variables for Otsu's method
-        std::vector<float> sigma2_list(256, 0.0);
-        std::vector<float> p(hist.begin<float>(),
-                             hist.end<float>());  // Probabilities
-
-        for (int th = 1; th < 256; ++th) {
-            // Calculate omega (weights) for foreground and background
-            float omega_fg = std::accumulate(p.begin(), p.begin() + th, 0.0f);
-            float omega_bg = std::accumulate(p.begin() + th, p.end(), 0.0f);
-
-            // Calculate mu (means) for foreground and background
-            float mu_fg = 0, mu_bg = 0;
-            for (int i = 0; i < th; ++i) {
-                mu_fg += i * p[i];
-            }
-            for (int i = th; i < 256; ++i) {
-                mu_bg += i * p[i];
-            }
-
-            if (omega_fg > 0)
-                mu_fg /= omega_fg;
-            if (omega_bg > 0)
-                mu_bg /= omega_bg;
-
-            // Calculate sigma squared and store in list
-            sigma2_list[th] = omega_fg * omega_bg * pow(mu_fg - mu_bg, 2);
-        }
-
-        // Find the threshold corresponding to the maximum sigma squared
-        int optimalThreshold =
-            std::max_element(sigma2_list.begin(), sigma2_list.end()) -
-            sigma2_list.begin();
+        int optimalThreshold = computeOtsuThreshold(hist);
 
         // Apply the threshold to the image
         // cv::Mat binaryImage;
