@@ -124,10 +124,7 @@ void otsu_segmentation_filter(const FilterParams& params,
     cv::transform(original, filtered, customWeights);
 
     if (gamma_auto_correction) {
-        double autoGamma =
-            calculateAutoGamma(filtered) * gamma_auto_correction_weight;
-
-        applyGammaCorrection(filtered, autoGamma);
+        applyAutoGamma(filtered, gamma_auto_correction_weight);
     }
 
     if (otsu_segmentation) {

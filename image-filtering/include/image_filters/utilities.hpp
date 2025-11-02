@@ -10,8 +10,10 @@
 
 
 
-double calculateAutoGamma(const cv::Mat& image);
-void applyGammaCorrection(cv::Mat& image, double gamma);
+
+void applyAutoGamma(cv::Mat& image, double correction_weight);
+
+// weighted transform, gamma correction, thresholding, erosion og dilation
 
 
 
