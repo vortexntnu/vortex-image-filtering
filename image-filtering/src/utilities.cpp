@@ -119,7 +119,7 @@ int computeOtsuThreshold(const cv::Mat& hist_prob)
 
 //                               _.-.
 //                              /  66\
-//                             (      `\
+//                             (      `\          Hi, how you doin :)
 //                             |\\ ,  ,|
 //                     __      | \\____/
 //               ,.--"`-.".   /   `---'
