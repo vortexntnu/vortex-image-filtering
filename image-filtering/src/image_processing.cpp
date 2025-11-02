@@ -1,4 +1,5 @@
 #include <image_filters/image_processing.hpp>
+#include <image_filters/utilities.hpp>
 #include <iostream>
 
 void no_filter([[maybe_unused]] const FilterParams& params,
@@ -104,47 +105,7 @@ void ebus_filter(const FilterParams& params,
     addWeighted(eroded, 1, mask, mask_weight, 0, filtered);
 }
 
-void applyGammaCorrection(cv::Mat& image, double gamma) {
-    // Create a lookup table for gamma correction
-    cv::Mat lookup(1, 256, CV_8U);
-    uchar* p = lookup.ptr();
-    for (int i = 0; i < 256; ++i) {
-        p[i] = cv::saturate_cast<uchar>(pow(i / 255.0, gamma) * 255.0);
-    }
 
-    // Apply the gamma correction using the lookup table
-    cv::LUT(image, lookup, image);
-}
-
-double calculateAutoGamma(const cv::Mat& image) {
-    // Convert the image to grayscale if it's not already
-    cv::Mat grayImage;
-    if (image.channels() == 3) {
-        cv::cvtColor(image, grayImage, cv::COLOR_BGR2GRAY);
-    } else {
-        grayImage = image;
-    }
-
-    // Calculate the mean intensity
-    cv::Scalar meanIntensity = mean(grayImage);
-
-    // The ideal mean intensity is 128 (midpoint for 8-bit grayscale images)
-    double idealMean = 128.0;
-    double currentMean = meanIntensity[0];
-
-    // Automatically set gamma value based on the mean intensity
-    double gamma;
-    if (currentMean > 0) {
-        gamma = log(idealMean / 255.0) / log(currentMean / 255.0);
-    } else {
-        gamma = 1.0;  // Default gamma if the image has no intensity
-    }
-
-    // Ensure gamma is within a reasonable range (e.g., between 0.1 and 3.0)
-    gamma = std::max(0.1, std::min(gamma, 3.0));
-
-    return gamma;
-}
 
 void otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
