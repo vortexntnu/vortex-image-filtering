@@ -113,6 +113,56 @@ int computeOtsuThreshold(const cv::Mat& hist_prob)
 
 
 
+// // Basic erosion
+// void apply_erosion(const cv::Mat& src,
+//                    cv::Mat& dst,
+//                    int size,
+//                    int shape = cv::MORPH_RECT) {
+//     cv::Mat kernel = cv::getStructuringElement(
+//         shape,
+//         cv::Size(2 * size + 1, 2 * size + 1),
+//         cv::Point(size, size));
+//     cv::erode(src, dst, kernel);
+// }
+
+// // Basic dilation
+// void apply_dilation(const cv::Mat& src,
+//                     cv::Mat& dst,
+//                     int size,
+//                     int shape = cv::MORPH_RECT) {
+//     cv::Mat kernel = cv::getStructuringElement(
+//         shape,
+//         cv::Size(2 * size + 1, 2 * size + 1),
+//         cv::Point(size, size));
+//     cv::dilate(src, dst, kernel);
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
