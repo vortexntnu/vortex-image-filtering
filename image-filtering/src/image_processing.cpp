@@ -69,13 +69,7 @@ void ebus_filter(const FilterParams& params,
     cv::Mat eroded;
 
     int erosion_size = params.eroding.size;
-    // Create a structuring element for dilation and erosion
-    cv::Mat element = cv::getStructuringElement(
-        cv::MORPH_RECT, cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-        cv::Point(erosion_size, erosion_size));
-
-    // Apply erosion to the image
-    cv::erode(original, eroded, element);
+    apply_erosion(original, eroded, erosion_size);
 
     // Make an unsharp mask from original image
     cv::Mat blurred;
@@ -113,32 +107,12 @@ void otsu_segmentation_filter(const FilterParams& params,
     } 
  
     if (otsu_segmentation) { 
-        // Calculate the histogram
-        int histSize = 256;
-        float range[] = {0, 256};
-        const float* histRange = {range};
-        cv::Mat hist;
-        calcHist(&filtered, 1, 0, cv::Mat(), hist, 1, &histSize, &histRange,
-                 true, false);
-
-        // Normalize histogram to get probabilities
-        hist /= filtered.total();
-
-        int optimalThreshold = computeOtsuThreshold(hist);
-
-        // Apply the threshold to the image
-        cv::threshold(filtered, filtered, optimalThreshold, 255,
-                      cv::THRESH_BINARY);
-
-        
+        applyOtsu(filtered, filtered, false, 255);
 
         // Apply erosion followed by dilation (opening)
 
-        int erosionSize = params.otsu.erosion_size;
-        apply_erosion(filtered, filtered, erosionSize);
-
-        int dilation_size = params.otsu.dilation_size;
-        apply_dilation(filtered, filtered, dilation_size);
+        apply_erosion(filtered, filtered, params.otsu.erosion_size, cv::MORPH_CROSS);
+        apply_dilation(filtered, filtered, params.otsu.dilation_size, cv::MORPH_CROSS);
     }
 }
 

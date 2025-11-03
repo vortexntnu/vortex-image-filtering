@@ -112,6 +112,20 @@ int computeOtsuThreshold(const cv::Mat& hist_prob)
 
 
 
+// Returns the Otsu threshold value chosen by OpenCV (0..255) and outputs the thresholded binary image
+int applyOtsu(const cv::Mat& gray8u, cv::Mat& out, bool invert, double maxval)
+{
+    CV_Assert(gray8u.type() == CV_8UC1 && "applyOtsu expects 8-bit single-channel input");
+
+    int ttype = invert ? (cv::THRESH_BINARY_INV | cv::THRESH_OTSU)
+                       : (cv::THRESH_BINARY     | cv::THRESH_OTSU);
+
+    double thresh = cv::threshold(gray8u, out, /*thresh ignored*/0.0, maxval, ttype);
+    return static_cast<int>(std::round(thresh));
+}
+
+
+
 
 // Basic erosion
 void apply_erosion(const cv::Mat& src,

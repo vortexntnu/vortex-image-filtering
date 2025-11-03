@@ -16,8 +16,10 @@ void toWeightedGray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, dou
 
 int computeOtsuThreshold(const cv::Mat& hist_prob);
 
-void apply_erosion(const cv::Mat& src, cv::Mat& dst, int size, int shape = cv::MORPH_CROSS); // TODO Apply these to the erotion and dilation filters
-void apply_dilation(const cv::Mat& src, cv::Mat& dst, int size, int shape=cv::MORPH_CROSS);
+int applyOtsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double maxval = 255.0);
+
+void apply_erosion(const cv::Mat& src, cv::Mat& dst, int size, int shape = cv::MORPH_RECT);
+void apply_dilation(const cv::Mat& src, cv::Mat& dst, int size, int shape=cv::MORPH_RECT);
 
 
 #endif
