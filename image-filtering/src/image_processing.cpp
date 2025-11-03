@@ -145,20 +145,15 @@ void otsu_segmentation_filter(const FilterParams& params,
         cv::threshold(filtered, filtered, optimalThreshold, 255,
                       cv::THRESH_BINARY);
 
+        
+
         // Apply erosion followed by dilation (opening)
-        cv::Mat openedImage;
+
         int erosionSize = params.otsu.erosion_size;
-        cv::Mat erosionKernel = getStructuringElement(
-            cv::MORPH_CROSS, cv::Size(2 * erosionSize + 1, 2 * erosionSize + 1),
-            cv::Point(erosionSize, erosionSize));
-        cv::erode(filtered, filtered, erosionKernel);
+        apply_erosion(filtered, filtered, erosionSize);
 
         int dilation_size = params.otsu.dilation_size;
-        cv::Mat dilationKernel = getStructuringElement(
-            cv::MORPH_CROSS,
-            cv::Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-            cv::Point(dilation_size, dilation_size));
-        cv::dilate(filtered, filtered, dilationKernel);
+        apply_dilation(filtered, filtered, dilation_size);
     }
 }
 
