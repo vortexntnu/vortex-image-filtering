@@ -42,29 +42,13 @@ void unsharpening_filter(const FilterParams& params,
 void erosion_filter(const FilterParams& params,
                     const cv::Mat& original,
                     cv::Mat& filtered) {
-    int erosion_size = params.eroding.size;
-    // Create a structuring element for dilation and erosion
-    cv::Mat element = cv::getStructuringElement(
-        cv::MORPH_RECT, cv::Size(2 * erosion_size + 1, 2 * erosion_size + 1),
-        cv::Point(erosion_size, erosion_size));
-
-    // Apply erosion to the image
-    cv::erode(original, filtered, element);
-
-    // apply_erosion(original, filtered, erosion_size, cv::MORPH_RECT);
+    apply_erosion(original, filtered, params.eroding.size, cv::MORPH_RECT);
 }
 
 void dilation_filter(const FilterParams& params,
                      const cv::Mat& original,
                      cv::Mat& filtered) {
-    int dilation_size = params.dilating.size;
-    // Create a structuring element for dilation and erosion
-    cv::Mat element = cv::getStructuringElement(
-        cv::MORPH_RECT, cv::Size(2 * dilation_size + 1, 2 * dilation_size + 1),
-        cv::Point(dilation_size, dilation_size));
-
-    // Apply dilation to the image
-    cv::dilate(original, filtered, element);
+    apply_dilation(original, filtered, params.dilating.size, cv::MORPH_RECT);
 }
 
 void white_balance_filter(const FilterParams& params,

@@ -1,12 +1,12 @@
 /**:
   ros__parameters:
-    sub_topic: "/fls_publisher/display"
+    sub_topic: "/fls_publisher/display_mono"
     pub_topic: "/filtered_image"
     output_encoding: "mono8"
     input_encoding: "mono8"
   
     filter_params:
-      filter_type: "erosion"
+      filter_type: "dilation"
       flip:
         flip_code: 1
       unsharpening:
