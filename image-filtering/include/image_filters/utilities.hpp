@@ -11,15 +11,22 @@
 
 
 
-void applyAutoGamma(cv::Mat& image, double correction_weight);
-void toWeightedGray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR);
+void apply_auto_gamma(cv::Mat& image, double correction_weight);
+void to_weighted_gray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR);
 
 // int computeOtsuThreshold(const cv::Mat& hist_prob);
 
-int applyOtsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double maxval = 255.0);
+int apply_otsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double maxval = 255.0);
 
 void apply_erosion(const cv::Mat& src, cv::Mat& dst, int size, int shape = cv::MORPH_RECT);
 void apply_dilation(const cv::Mat& src, cv::Mat& dst, int size, int shape=cv::MORPH_RECT);
 
+void apply_median(const cv::Mat& original, cv::Mat& filtered, int kernel_size);
+
+void apply_fixed_threshold(const cv::Mat& img, cv::Mat& filtered, int thresh, bool invert = false);
+
+
+// TODO Fix, does not work properly (Chat has failed me)
+void distance_field(const cv::Mat& binObstacles, cv::Mat& dist, bool obstaclesAreWhite = true, int type = cv::DIST_L2, int maskSize = 3);
 
 #endif

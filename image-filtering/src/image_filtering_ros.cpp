@@ -46,7 +46,9 @@ void ImageFilteringNode::declare_parameters() {
     
     this->declare_parameter<double>("filter_params.overlap.percentage_threshold"); //Thomas has left a mark here
     
-    this->declare_parameter<int>("filter_params.median.kernel_size");
+    this->declare_parameter<int>("filter_params.median_binary.kernel_size");
+    this->declare_parameter<int>("filter_params.median_binary.threshold");
+    this->declare_parameter<bool>("filter_params.median_binary.invert");
     
     this->declare_parameter<double>("filter_params.binary.threshold");
     this->declare_parameter<double>("filter_params.binary.maxval");
@@ -101,8 +103,12 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.otsu.dilation_size").as_int();
     params.overlap.percentage_threshold = // Thomas is everyware
         this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
-    params.median.kernel_size = 
-        this->get_parameter("filter_params.median.kernel_size").as_int();
+    params.median_binary.kernel_size = 
+        this->get_parameter("filter_params.median_binary.kernel_size").as_int();
+    params.median_binary.threshold = 
+        this->get_parameter("filter_params.median_binary.threshold").as_int();
+    params.median_binary.invert = 
+        this->get_parameter("filter_params.median_binary.invert").as_bool();
     params.binary.threshold = 
         this->get_parameter("filter_params.binary.threshold").as_double();
     params.binary.maxval = 

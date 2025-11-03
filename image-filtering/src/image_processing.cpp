@@ -97,17 +97,17 @@ void otsu_segmentation_filter(const FilterParams& params,
     bool otsu_segmentation = params.otsu.otsu_segmentation;
 
 
-    toWeightedGray(original, filtered, params.otsu.gsc_weight_b,
+    to_weighted_gray(original, filtered, params.otsu.gsc_weight_b,
                               params.otsu.gsc_weight_g,
                               params.otsu.gsc_weight_r);
 
 
     if (gamma_auto_correction) { 
-        applyAutoGamma(filtered, gamma_auto_correction_weight);
+        apply_auto_gamma(filtered, gamma_auto_correction_weight);
     } 
  
     if (otsu_segmentation) { 
-        applyOtsu(filtered, filtered, false, 255);
+        apply_otsu(filtered, filtered, false, 255);
 
         // Apply erosion followed by dilation (opening)
 
@@ -159,34 +159,12 @@ void overlap_filter(const FilterParams& filter_params,
     prevR = curR.clone();
 }
 
-void median_filter(const FilterParams& filter_params,
+void median_binary_filter(const FilterParams& filter_params,
                     const cv::Mat& original,
                     cv::Mat& filtered){
 
-    CV_Assert(!original.empty());
-
-    // Validate & sanitize kernel size (must be odd and >= 3)
-    int k = filter_params.median.kernel_size;
-    if (k < 3) k = 3;
-    if ((k & 1) == 0) ++k; // make odd if even
-
-    // cv::medianBlur is not suported for all depths "sais chat"
-    // (works for CV_8U, CV_16U, CV_32F)
-    const int depth = original.depth();
-    const bool supported = (depth == CV_8U || depth == CV_16U || depth == CV_32F);
-
-    const cv::Mat* src = &original;
-    cv::Mat tmp;
-    if (!supported) {
-        // Simple, safe conversion to 8-bit
-        original.convertTo(tmp, CV_8U);
-        src = &tmp;
-    }
-
-    cv::medianBlur(*src, filtered, k);
-
-    // If converted to 8U and want to preserve original depth, converts back here:
-    if (!supported) filtered.convertTo(filtered, depth);
+    apply_median(original, filtered, filter_params.median_binary.kernel_size);
+    apply_fixed_threshold(filtered, filtered, filter_params.median_binary.threshold, filter_params.median_binary.invert);
 }
 
 
@@ -236,3 +214,5 @@ void apply_filter(const std::string& filter,
         original.copyTo(filtered);  // Default to no filter
     }
 }
+
+

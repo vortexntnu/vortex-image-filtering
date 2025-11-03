@@ -53,7 +53,7 @@ double computeAutoGammaFromMean(const cv::Mat& image) {
 // Auto-choose a gamma so dark images get lifted and bright images get toned down (expects mono8)
 // - It sets the mean intensity to 255/2 ≃ 128
 // - The weight makes makes all the values weeker(<1) or stronger(>1)
-void applyAutoGamma(cv::Mat& image, double correction_weight) {
+void apply_auto_gamma(cv::Mat& image, double correction_weight) {
     double gamma = computeAutoGammaFromMean(image) * correction_weight;
     applyGammaLUT(image, gamma);
 }
@@ -63,7 +63,7 @@ void applyAutoGamma(cv::Mat& image, double correction_weight) {
 
 // Convert BGR image to single-channel grayscale using custom B,G,R weights
 // weights = (b, g, r), e.g. (0.114f, 0.587f, 0.299f)
-void toWeightedGray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR) {
+void to_weighted_gray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR) {
     cv::Matx13f customWeights(wB, wG, wR);
     cv::transform(bgr, gray, customWeights);
 }
@@ -113,7 +113,7 @@ void toWeightedGray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, dou
 
 
 // Returns the Otsu threshold value chosen by OpenCV (0..255) and outputs the thresholded binary image
-int applyOtsu(const cv::Mat& gray8u, cv::Mat& out, bool invert, double maxval)
+int apply_otsu(const cv::Mat& gray8u, cv::Mat& out, bool invert, double maxval)
 {
     CV_Assert(gray8u.type() == CV_8UC1 && "applyOtsu expects 8-bit single-channel input");
 
@@ -154,6 +154,81 @@ void apply_dilation(const cv::Mat& src,
 
 
 
+// Median filter that preserves original depth if it's unsupported by cv::medianBlur.
+// Supported depths: CV_8U, CV_16U, CV_32F
+// For others (e.g., CV_16S, CV_32S, CV_64F) we convert to CV_32F, filter, then convert back.
+void apply_median(const cv::Mat& original, cv::Mat& filtered, int kernel_size) {
+    CV_Assert(!original.empty());
+
+
+    // If caller passed 1, just copy
+    if (kernel_size == 1) {
+        original.copyTo(filtered);
+        return;
+    }
+
+    // Sanitize kernel size: must be odd and >= 3
+    if (kernel_size < 3) kernel_size = 3;
+    if ((kernel_size & 1) == 0) ++kernel_size;
+
+    const int depth = original.depth();
+    const bool supported = (depth == CV_8U || depth == CV_16U || depth == CV_32F);
+
+    const cv::Mat* src = &original;
+    cv::Mat work, out;
+
+    if (!supported) {
+        // Convert unsupported depths to CV_32F to avoid clipping (better than going to 8U).
+        original.convertTo(work, CV_32F);
+        src = &work;
+    }
+
+    // Do the median blur (OpenCV supports multi-channel for these depths)
+    cv::medianBlur(*src, out, kernel_size);
+
+    // Convert back to original depth if we promoted
+    if (!supported) {
+        out.convertTo(filtered, depth);
+    } else {
+        filtered = std::move(out);
+    }
+}
+
+
+
+// Apply a fixed binary threshold.
+// - Accepts grayscale or color input (auto-converts to gray).
+// - Ensures 8-bit depth for thresholding.
+// - Returns a 0/255 mask (CV_8U).
+// - Set `invert=true` to get white background & black foreground.
+void apply_fixed_threshold(const cv::Mat& img, cv::Mat& filtered, int thresh, bool invert)
+{
+    if (img.empty()) {
+        throw std::invalid_argument("applyFixedThreshold: input image is empty");
+    }
+    if (thresh < 0 || thresh > 255) {
+        throw std::out_of_range("applyFixedThreshold: thresh must be in [0, 255]");
+    }
+
+    // Convert to grayscale
+    cv::Mat gray;
+    if (img.channels() == 3 || img.channels() == 4) {
+        cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+    } else {
+        gray = img;
+    }
+
+    // Ensure 8-bit
+    if (gray.depth() != CV_8U) {
+        cv::Mat tmp;
+        cv::normalize(gray, tmp, 0, 255, cv::NORM_MINMAX);
+        tmp.convertTo(gray, CV_8U);
+    }
+
+    // Threshold
+    int type = invert ? (cv::THRESH_BINARY_INV) : (cv::THRESH_BINARY);
+    cv::threshold(gray, filtered, thresh, 255, type);
+}
 
 
 
@@ -163,12 +238,59 @@ void apply_dilation(const cv::Mat& src,
 
 
 
+// Takes a strict binary obstacle mask (0/255) and returns a float image 
+// where each pixel is the distance (in pixels) to the nearest obstacle.
+// Requirements:
+// - binObstacles: single-channel CV_8U with values in {0, 255} only.
+// - obstaclesAreWhite:
+//     true  -> obstacles = 255, free = 0
+//     false -> obstacles = 0,   free = 255
+// Output:
+// - dist: CV_32F distances to nearest obstacle (0 at obstacle pixels).
+// Params:
+// - type: CV_DIST_L1, CV_DIST_L2, CV_DIST_C, ...
+// - maskSize: 3, 5, or CV_DIST_MASK_PRECISE (0)
+void distance_field(const cv::Mat& binObstacles,
+                           cv::Mat& dist,
+                           bool obstaclesAreWhite,
+                           int type,
+                           int maskSize)
+{
+    if (binObstacles.empty())
+        throw std::invalid_argument("distance_field_binary: input is empty");
 
+    if (binObstacles.channels() != 1)
+        throw std::invalid_argument("distance_field_binary: input must be single-channel");
 
+    if (binObstacles.depth() != CV_8U)
+        throw std::invalid_argument("distance_field_binary: input must be CV_8U (0/255)");
 
+    // Validate strict binary: values must be only 0 or 255
+    {
+        cv::Mat notZero = (binObstacles != 0);
+        cv::Mat not255 = (binObstacles != 255);
+        cv::Mat invalid = notZero & not255; // pixels that are neither 0 nor 255
+        if (cv::countNonZero(invalid) > 0)
+            throw std::invalid_argument("distance_field_binary: input must contain only 0 or 255 values");
+    }
 
+    // OpenCV distanceTransform computes distance TO the nearest ZERO pixel
+    // for NON-ZERO regions. We want distance FROM obstacles.
+    // Build freeMask (255 = free, 0 = obstacles).
+    cv::Mat freeMask;
+    if (obstaclesAreWhite) {
+        // obstacles=255 -> free=0, invert to get free=255
+        freeMask = 255 - binObstacles;
+    } else {
+        // obstacles=0, free=255 already correct
+        freeMask = binObstacles;
+    }
 
+    if (!(maskSize == 3 || maskSize == 5 || maskSize == cv::DIST_MASK_PRECISE))
+        maskSize = 3;
 
+    cv::distanceTransform(freeMask, dist, type, maskSize); // dist is CV_32F
+}
 
 
 

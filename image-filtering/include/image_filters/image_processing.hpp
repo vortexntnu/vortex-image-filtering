@@ -50,8 +50,10 @@ struct OtsuParams {
 struct OverlapParams{
     double percentage_threshold;
 };
-struct MedianParams{
+struct MedianBinaryParams{
     int kernel_size;
+    int threshold;
+    bool invert;
 };
 
 struct BinaryParams{
@@ -69,7 +71,7 @@ struct FilterParams {
     EbusParams ebus;
     OtsuParams otsu;
     OverlapParams overlap;
-    MedianParams median;
+    MedianBinaryParams median_binary;
     BinaryParams binary;
 };
 
@@ -154,7 +156,7 @@ void overlap_filter(const FilterParams& filter_params,
                           cv::Mat &filtered);
 
 
-void median_filter(const FilterParams& filter_params,
+void median_binary_filter(const FilterParams& filter_params,
                     const cv::Mat& original,
                     cv::Mat& filtered);
 
@@ -173,7 +175,7 @@ const static std::map<std::string, FilterFunction> filter_functions = {
     {"ebus", ebus_filter},
     {"otsu", otsu_segmentation_filter},
     {"overlap", overlap_filter}, // This was done by the one and only Thomas
-    {"median", median_filter},
+    {"median_binary", median_binary_filter},
     {"binary", binary_threshold},
 };
 
