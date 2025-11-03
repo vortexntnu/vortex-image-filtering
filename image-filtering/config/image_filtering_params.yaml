@@ -3,10 +3,10 @@
     sub_topic: "/fls_publisher/display"
     pub_topic: "/filtered_image"
     output_encoding: "mono8"
-    input_encoding: "bgr8"
+    input_encoding: "mono8"
   
     filter_params:
-      filter_type: "otsu"
+      filter_type: "erosion"
       flip:
         flip_code: 1
       unsharpening:
@@ -14,7 +14,7 @@
       erosion:
         size: 1
       dilation:
-        size: 1
+        size: 3
       white_balancing:
         contrast_percentage: 0.1
       ebus:

@@ -50,6 +50,8 @@ void erosion_filter(const FilterParams& params,
 
     // Apply erosion to the image
     cv::erode(original, filtered, element);
+
+    // apply_erosion(original, filtered, erosion_size, cv::MORPH_RECT);
 }
 
 void dilation_filter(const FilterParams& params,
@@ -141,7 +143,6 @@ void otsu_segmentation_filter(const FilterParams& params,
         int optimalThreshold = computeOtsuThreshold(hist);
 
         // Apply the threshold to the image
-        // cv::Mat binaryImage;
         cv::threshold(filtered, filtered, optimalThreshold, 255,
                       cv::THRESH_BINARY);
 
