@@ -14,7 +14,7 @@
 void applyAutoGamma(cv::Mat& image, double correction_weight);
 void toWeightedGray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR);
 
-int computeOtsuThreshold(const cv::Mat& hist_prob);
+// int computeOtsuThreshold(const cv::Mat& hist_prob);
 
 int applyOtsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double maxval = 255.0);
 
