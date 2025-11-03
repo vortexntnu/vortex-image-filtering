@@ -149,7 +149,6 @@ void ImageFilteringNode::image_callback(
             spdlog::error("Received empty image, skipping processing.");
             return;
         }
-
     } catch (cv_bridge::Exception& e) {
         spdlog::error("cv_bridge exception: {}", e.what());
         return;

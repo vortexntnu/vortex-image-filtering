@@ -1,5 +1,5 @@
-#ifndef IMAGE_PROCESSING_HPP
-#define IMAGE_PROCESSING_HPP
+#ifndef IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
+#define IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
 
 #include <iostream>
 #include <map>
@@ -9,6 +9,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
+#include <string>
 
 struct FlipParams {
     int flip_code;
@@ -131,7 +132,7 @@ void otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
                               cv::Mat& output);
 
-const static std::map<std::string, FilterFunction> filter_functions = {
+static const std::map<std::string, FilterFunction> filter_functions = {
     {"no_filter", no_filter},
     {"flip", flip_filter},
     {"sharpening", sharpening_filter},
@@ -142,4 +143,4 @@ const static std::map<std::string, FilterFunction> filter_functions = {
     {"ebus", ebus_filter},
     {"otsu", otsu_segmentation_filter}};
 
-#endif  // IMAGE_PROCESSING_HPP
+#endif  // IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
