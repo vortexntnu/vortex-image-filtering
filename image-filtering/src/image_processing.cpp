@@ -2,20 +2,21 @@
 #include <image_filters/utilities.hpp>
 #include <iostream>
 
-void no_filter([[maybe_unused]] const FilterParams& params,
-               const cv::Mat& original,
-               cv::Mat& filtered) {
+
+void NoFilter::no_filter([[maybe_unused]] const FilterParams& params,
+            const cv::Mat& original,
+            cv::Mat& filtered) {
     original.copyTo(filtered);
 }
 
-void flip_filter([[maybe_unused]] const FilterParams& params,
+void Flip::flip_filter([[maybe_unused]] const FilterParams& params,
                  const cv::Mat& original,
                  cv::Mat& filtered) {
     int flip_code = params.flip.flip_code;  // 0: x-axis, 1: y-axis, -1: both
     cv::flip(original, filtered, flip_code);
 }
 
-void sharpening_filter([[maybe_unused]] const FilterParams& params,
+void Sharpening::sharpening_filter([[maybe_unused]] const FilterParams& params,
                        const cv::Mat& original,
                        cv::Mat& filtered) {
     // Sharpen image
@@ -23,7 +24,7 @@ void sharpening_filter([[maybe_unused]] const FilterParams& params,
     cv::filter2D(original, filtered, -1, kernel);
 }
 
-void unsharpening_filter(const FilterParams& params,
+void Unsharpening::unsharpening_filter(const FilterParams& params,
                          const cv::Mat& original,
                          cv::Mat& filtered) {
     int blur_size = params.unsharpening.blur_size;
@@ -39,19 +40,19 @@ void unsharpening_filter(const FilterParams& params,
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
 
-void erosion_filter(const FilterParams& params,
+void Erosion::erosion_filter(const FilterParams& params,
                     const cv::Mat& original,
                     cv::Mat& filtered) {
     apply_erosion(original, filtered, params.eroding.size, cv::MORPH_RECT);
 }
 
-void dilation_filter(const FilterParams& params,
+void Dilation::dilation_filter(const FilterParams& params,
                      const cv::Mat& original,
                      cv::Mat& filtered) {
     apply_dilation(original, filtered, params.dilating.size, cv::MORPH_RECT);
 }
 
-void white_balance_filter(const FilterParams& params,
+void WhiteBalance::white_balance_filter(const FilterParams& params,
                           const cv::Mat& original,
                           cv::Mat& filtered) {
     double contrast_percentage = params.white_balancing.contrast_percentage;
@@ -60,7 +61,7 @@ void white_balance_filter(const FilterParams& params,
     balance->balanceWhite(original, filtered);
 }
 
-void ebus_filter(const FilterParams& params,
+void Ebus::ebus_filter(const FilterParams& params,
                  const cv::Mat& original,
                  cv::Mat& filtered) {
     int blur_size = params.ebus.blur_size;
@@ -87,7 +88,7 @@ void ebus_filter(const FilterParams& params,
 
 
 
-void otsu_segmentation_filter(const FilterParams& params,
+void Otsu::otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
                               cv::Mat& filtered) {
     bool gamma_auto_correction = params.otsu.gamma_auto_correction;
@@ -117,59 +118,62 @@ void otsu_segmentation_filter(const FilterParams& params,
 }
 
 // Thomas was here
-void overlap_filter(const FilterParams& filter_params,
+void Overlap::overlap_filter(const FilterParams& filter_params,
                     const cv::Mat& original,
                     cv::Mat& filtered)
 {
-    static cv::Mat prevR;      // store previous R channel only
+    static cv::Mat prev;     // previous mono frame
     static bool has_prev = false;
 
-    // Extract current R channel
-    cv::Mat curR;
-    cv::extractChannel(original, curR, 2); // 0=B,1=G,2=R
+    // Basic checks (keep it simple; require mono8)
+    if (original.empty())
+        throw std::invalid_argument("overlap_filter_mono: input is empty");
+    if (original.type() != CV_8UC1)
+        throw std::invalid_argument("overlap_filter_mono: input must be CV_8UC1 (mono8)");
 
-    if (!has_prev || prevR.empty() || prevR.size()!=curR.size() || prevR.type()!=curR.type()) {
-        original.copyTo(filtered);   // first call (or size/type change): pass through
-        prevR = curR.clone();        // cache R channel
+    if (!has_prev || prev.empty()
+        || prev.size() != original.size()
+        || prev.type() != original.type())
+    {
+        original.copyTo(filtered);   // pass-through on first frame / size change
+        prev = original.clone();
         has_prev = true;
         return;
     }
 
-    // |cur - prev| on the R channel
+    // |cur - prev|
     cv::Mat diff8u;
-    cv::absdiff(curR, prevR, diff8u);
+    cv::absdiff(original, prev, diff8u);
 
-    // % of full 8-bit range
-    cv::Mat percent32f;
-    diff8u.convertTo(percent32f, CV_32F, 100.0 / 255.0);
+    // Convert percentage threshold to an 8-bit delta threshold
+    double pct = std::clamp<double>(filter_params.overlap.percentage_threshold, 0.0, 100.0);
+    int delta_thr = static_cast<int>(std::round(pct * 255.0 / 100.0));
 
-    // Mask: pixels whose % change > threshold
+    // Mask: changed pixels
     cv::Mat mask;
-    cv::threshold(percent32f, mask, filter_params.overlap.percentage_threshold, 255.0, cv::THRESH_BINARY);
-    mask.convertTo(mask, CV_8U);
+    cv::threshold(diff8u, mask, delta_thr, 255, cv::THRESH_BINARY);
 
-    // Zero out those pixels in the R channel
+    // Zero out changed pixels
     filtered = original.clone();
-    std::vector<cv::Mat> ch;
-    cv::split(filtered, ch);      // ch[2] is R
-    ch[2].setTo(0, mask);
-    cv::merge(ch, filtered);
+    filtered.setTo(0, mask);
 
-    // Update history (R channel only)
-    prevR = curR.clone();
+    // Update history
+    prev = original.clone();
+
 }
 
-void median_binary_filter(const FilterParams& filter_params,
+void MedianBinary::median_binary_filter(const FilterParams& filter_params,
                     const cv::Mat& original,
                     cv::Mat& filtered){
 
     apply_median(original, filtered, filter_params.median_binary.kernel_size);
     apply_fixed_threshold(filtered, filtered, filter_params.median_binary.threshold, filter_params.median_binary.invert);
+    distance_field(filtered, filtered);
 }
 
 
 
-void binary_threshold(const FilterParams& filter_params,
+void BinaryThreshold::binary_threshold(const FilterParams& filter_params,
                       const cv::Mat& original,
                       cv::Mat& filtered)
 {
@@ -204,8 +208,7 @@ void binary_threshold(const FilterParams& filter_params,
 
 
 
-void apply_filter(const std::string& filter,
-                  const FilterParams& params,
+void Filter::apply_filter(const std::string& filter,
                   const cv::Mat& original,
                   cv::Mat& filtered) {
     if (filter_functions.contains(filter)) {

@@ -3,10 +3,10 @@
     sub_topic: "/fls_publisher/display_mono"
     pub_topic: "/filtered_image"
     output_encoding: "mono8"
-    input_encoding: "mono8"
+    input_encoding: "mono8" 
   
     filter_params:
-      filter_type: "median_binary"
+      filter_type: "ebus"
       flip:
         flip_code: 1
       unsharpening:
@@ -37,9 +37,9 @@
         threshold: 100 # [0, 255]
         invert: false
       binary: 
-        threshold: 20.
+        threshold: 0.1 # in percent
         maxval: 255.
-        invert: false
+        invert: true
 
 
 # Filter params should reflect the FilterParams struct

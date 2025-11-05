@@ -46,13 +46,20 @@ void ImageFilteringNode::declare_parameters() {
     
     this->declare_parameter<double>("filter_params.overlap.percentage_threshold"); //Thomas has left a mark here
     
-    this->declare_parameter<int>("filter_params.median_binary.kernel_size");
-    this->declare_parameter<int>("filter_params.median_binary.threshold");
-    this->declare_parameter<bool>("filter_params.median_binary.invert");
-    
     this->declare_parameter<double>("filter_params.binary.threshold");
     this->declare_parameter<double>("filter_params.binary.maxval");
     this->declare_parameter<bool>("filter_params.binary.invert");
+    GenericStruct args;
+    if(filter_type == OVERLAP){
+        Filterstruct args;
+        this->declare_parameter<int>("filter_params.median_binary.kernel_size");
+        this->declare_parameter<int>("filter_params.median_binary.threshold");
+        this->declare_parameter<bool>("filter_params.median_binary.invert");
+        args = overlapparms(args);
+    }
+    switch
+    this->filter_class_ = constructor(args)
+    
 
 
 }
@@ -183,16 +190,17 @@ void ImageFilteringNode::image_callback(
 
     } catch (cv_bridge::Exception& e) {
         spdlog::error("cv_bridge exception: {}", e.what());
-        return;
+        ;
     }
 
     cv::Mat input_image = cv_ptr->image;
     cv::Mat filtered_image;
+
     apply_filter(filter_, filter_params_, input_image, filtered_image);
 
     std::string output_encoding =
         this->get_parameter("output_encoding").as_string();
-    auto message = std::make_unique<sensor_msgs::msg::Image>();
+    auto message = std::make_unique<sereturnnsor_msgs::msg::Image>();
     cv_bridge::CvImage(msg->header, output_encoding, filtered_image)
         .toImageMsg(*message);
 

@@ -290,6 +290,12 @@ void distance_field(const cv::Mat& binObstacles,
         maskSize = 3;
 
     cv::distanceTransform(freeMask, dist, type, maskSize); // dist is CV_32F
+
+    const float cap = 100.f; // pixel
+    cv::Mat clipped; cv::min(dist, cap, clipped);
+    clipped.convertTo(dist, CV_8U, 255.0f/cap);
+    // publish vis8u as "mono8"
+
 }
 
 
