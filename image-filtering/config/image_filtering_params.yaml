@@ -14,7 +14,7 @@
       erosion:
         size: 1
       dilation:
-        size: 2
+        size: 3
       white_balancing:
         contrast_percentage: 0.1
       ebus:
