@@ -24,9 +24,8 @@
 //     BinaryParams binary;
 // };
 
-struct NoFilterStruct{};
 
-struct FlipFiltersTructer {
+struct FlipFilterParams {
     int flip_code;
 };
 
@@ -42,6 +41,8 @@ virtual class Filter{
 /**
  * No filter, just copy the image
  */
+struct NoFilterParams{};
+
 class NoFilter(const NoFilterStruct& args): public Filter{
     void no_filter(const FilterParams& params,
                    const cv::Mat& original,
