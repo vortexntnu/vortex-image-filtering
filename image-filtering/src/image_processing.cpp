@@ -19,6 +19,7 @@ void Unsharpening::apply_filter(const cv::Mat& original, cv::Mat& filtered) cons
 }
 
 
+
 // void Filter::apply_filter(const std::string& filter,
 //                   const cv::Mat& original,
 //                   cv::Mat& filtered) {

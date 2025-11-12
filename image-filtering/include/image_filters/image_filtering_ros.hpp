@@ -100,7 +100,7 @@ class ImageFilteringNode : public rclcpp::Node {
      * @brief Pointer to the filter object
      *
      */
-    std::unique_ptr<Filter> filter_;
+    std::unique_ptr<Filter> filter_ptr;
 
 };
 

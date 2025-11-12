@@ -49,18 +49,12 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<double>("filter_params.binary.threshold");
     this->declare_parameter<double>("filter_params.binary.maxval");
     this->declare_parameter<bool>("filter_params.binary.invert");
-    GenericStruct args;
-    if(filter_type == OVERLAP){
-        Filterstruct args;
-        this->declare_parameter<int>("filter_params.median_binary.kernel_size");
-        this->declare_parameter<int>("filter_params.median_binary.threshold");
-        this->declare_parameter<bool>("filter_params.median_binary.invert");
-        args = overlapparms(args);
-    }
-    switch
-    this->filter_class_ = constructor(args)
-    
 
+    this->declare_parameter<int>("filter_params.median_binary.kernel_size");
+    this->declare_parameter<int>("filter_params.median_binary.threshold");
+    this->declare_parameter<bool>("filter_params.median_binary.invert");
+    
+    // TODO: Declare the parameters set for your filter here
 
 }
 
@@ -68,12 +62,6 @@ void ImageFilteringNode::set_filter_params() {
     std::string filter_type_string = this->get_parameter("filter_params.filter_type").as_string();
     FilterType filter_type = parse_filter_type(filter_type_string);
 
-    // if () {
-    //     spdlog::warn("Invalid filter type received: {}. Using default: no_filter.", filter_type_string);
-    //     filter_ = "no_filter";
-    // } else {
-    //     filter_ = filter;
-    // }
     
     switch (filter_type)
     {
@@ -86,17 +74,15 @@ void ImageFilteringNode::set_filter_params() {
     
     case FilterType::NoFilter:
     {
-        NoFilter filter_object;
-        filter_ = std::make_unique<NoFilter>(filter_object);
+        filter_ptr = std::make_unique<NoFilter>();
         break;
     }
     case FilterType::Unsharpening:
     {
         UnsharpeningParams params;
         params.blur_size = this->get_parameter("filter_params.unsharpening.blur_size").as_int();
-        Unsharpening filter_object(params);
         
-        filter_ = std::make_unique<NoFilter>(filter_object);
+        filter_ptr = std::make_unique<Unsharpening>(params);
         break;
     }
 
@@ -225,11 +211,11 @@ void ImageFilteringNode::image_callback(
     cv::Mat input_image = cv_ptr->image;
     cv::Mat filtered_image;
 
-    apply_filter(filter_, filter_params_, input_image, filtered_image);
+    filter_ptr->apply_filter(input_image, filtered_image);
 
     std::string output_encoding =
         this->get_parameter("output_encoding").as_string();
-    auto message = std::make_unique<sereturnnsor_msgs::msg::Image>();
+    auto message = std::make_unique<sensor_msgs::msg::Image>();
     cv_bridge::CvImage(msg->header, output_encoding, filtered_image)
         .toImageMsg(*message);
 
