@@ -97,16 +97,11 @@ class ImageFilteringNode : public rclcpp::Node {
     std::string image_topic_;
 
     /**
-     * @brief The filter parameters
+     * @brief Pointer to the filter object
      *
      */
-    FilterParams filter_params_;
+    std::unique_ptr<Filter> filter_;
 
-    /**
-     * @brief filter to apply
-     *
-     */
-    std::string filter_;
 };
 
 #endif  // IMAGE_FILTERING_ROS_HPP

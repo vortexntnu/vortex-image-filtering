@@ -7,39 +7,39 @@
   
     filter_params:
       filter_type: "ebus"
-      flip:
-        flip_code: 1
+      # flip:
+      #   flip_code: 1
       unsharpening:
         blur_size: 8
-      erosion:
-        size: 1
-      dilation:
-        size: 3
-      white_balancing:
-        contrast_percentage: 0.1
-      ebus:
-        erosion_size: 2
-        blur_size: 30
-        mask_weight: 5
-      otsu:
-        gsc_weight_r: 1.0  # Grayscale red weight
-        gsc_weight_g: 0.0  # Grayscale green weight
-        gsc_weight_b: 0.0   # Grayscale blue weight
-        gamma_auto_correction: true
-        gamma_auto_correction_weight: 4.0
-        otsu_segmentation: true
-        erosion_size: 2
-        dilation_size: 2
-      overlap:
-        percentage_threshold: 100.0 # Percentage to cap the picel intensity differance
-      median_binary: # finds the median of each n x n square around each pixel 
-        kernel_size: 3 # must be odd >= 1
-        threshold: 100 # [0, 255]
-        invert: false
-      binary: 
-        threshold: 0.1 # in percent
-        maxval: 255.
-        invert: true
+      # erosion:
+      #   size: 1
+      # dilation:
+      #   size: 3
+      # white_balancing:
+      #   contrast_percentage: 0.1
+      # ebus:
+      #   erosion_size: 2
+      #   blur_size: 30
+      #   mask_weight: 5
+      # otsu:
+      #   gsc_weight_r: 1.0  # Grayscale red weight
+      #   gsc_weight_g: 0.0  # Grayscale green weight
+      #   gsc_weight_b: 0.0   # Grayscale blue weight
+      #   gamma_auto_correction: true
+      #   gamma_auto_correction_weight: 4.0
+      #   otsu_segmentation: true
+      #   erosion_size: 2
+      #   dilation_size: 2
+      # overlap:
+      #   percentage_threshold: 100.0 # Percentage to cap the picel intensity differance
+      # median_binary: # finds the median of each n x n square around each pixel 
+      #   kernel_size: 3 # must be odd >= 1
+      #   threshold: 100 # [0, 255]
+      #   invert: false
+      # binary: 
+      #   threshold: 0.1 # in percent
+      #   maxval: 255.
+      #   invert: true
 
 
 # Filter params should reflect the FilterParams struct
