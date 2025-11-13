@@ -86,59 +86,128 @@ void ImageFilteringNode::set_filter_params() {
         break;
     }
 
+    case FilterType::Flip:
+    {
+        FlipParams params;
+        params.flip_code =
+            this->get_parameter("filter_params.flip.flip_code").as_int();
+
+        filter_ptr = std::make_unique<Flip>(params);
+        break;
+    }
+
+    case FilterType::Erosion:
+    {
+        ErosionParams params;
+        params.kernel_size =
+            this->get_parameter("filter_params.erosion.size").as_int();
+
+        filter_ptr = std::make_unique<Erosion>(params);
+        break;
+    }
+
+    case FilterType::Dilation:
+    {
+        DilationParams params;
+        params.kernel_size =
+            this->get_parameter("filter_params.dilation.size").as_int();
+
+        filter_ptr = std::make_unique<Dilation>(params);
+        break;
+    }
+
+    case FilterType::WhiteBalancing:
+    {
+        WhiteBalanceParams params;
+        params.contrast_percentage =
+            this->get_parameter("filter_params.white_balancing.contrast_percentage").as_double();
+
+        filter_ptr = std::make_unique<WhiteBalance>(params);
+        break;
+    }
+
+    case FilterType::Ebus:
+    {
+        EbusParams params;
+        params.erosion_size =
+            this->get_parameter("filter_params.ebus.erosion_size").as_int();
+        params.blur_size =
+            this->get_parameter("filter_params.ebus.blur_size").as_int();
+        params.mask_weight =
+            this->get_parameter("filter_params.ebus.mask_weight").as_int();
+
+        filter_ptr = std::make_unique<Ebus>(params);
+        break;
+    }
+
+    case FilterType::Otsu:
+    {
+        OtsuSegmentationParams params;
+        params.gamma_auto_correction =
+            this->get_parameter("filter_params.otsu.gamma_auto_correction").as_bool();
+        params.gamma_auto_correction_weight =
+            this->get_parameter("filter_params.otsu.gamma_auto_correction_weight").as_double();
+        params.otsu_segmentation =
+            this->get_parameter("filter_params.otsu.otsu_segmentation").as_bool();
+        params.gsc_weight_r =
+            this->get_parameter("filter_params.otsu.gsc_weight_r").as_double();
+        params.gsc_weight_g =
+            this->get_parameter("filter_params.otsu.gsc_weight_g").as_double();
+        params.gsc_weight_b =
+            this->get_parameter("filter_params.otsu.gsc_weight_b").as_double();
+        params.erosion_size =
+            this->get_parameter("filter_params.otsu.erosion_size").as_int();
+        params.dilation_size =
+            this->get_parameter("filter_params.otsu.dilation_size").as_int();
+
+        filter_ptr = std::make_unique<OtsuSegmentation>(params);
+        break;
+    }
+
+    case FilterType::Overlap:
+    {
+        OverlapParams params;
+        params.percentage_threshold = // Thomas is everyware
+            this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
+
+        filter_ptr = std::make_unique<Overlap>(params);
+        break;
+    }
+
+    case FilterType::MedianBinary:
+    {
+        MedianBinaryParams params;
+        params.kernel_size =
+            this->get_parameter("filter_params.median_binary.kernel_size").as_int();
+        params.threshold =
+            this->get_parameter("filter_params.median_binary.threshold").as_int();
+        params.invert =
+            this->get_parameter("filter_params.median_binary.invert").as_bool();
+
+        filter_ptr = std::make_unique<MedianBinary>(params);
+        break;
+    }
+
+    case FilterType::Binary:
+    {
+        BinaryThresholdParams params;
+        params.threshold =
+            this->get_parameter("filter_params.binary.threshold").as_double();
+        params.maxval =
+            this->get_parameter("filter_params.binary.maxval").as_double();
+        params.invert =
+            this->get_parameter("filter_params.binary.invert").as_bool();
+
+        filter_ptr = std::make_unique<BinaryThreshold>(params);
+        break;
+    }
+
+
     default:
         spdlog::warn("Filterparams has not been set for your chosen filter {}. To fix this add your filter to ImageFilteringNode::set_filter_params()", filter_type_string);
         break;
     };
-    spdlog::info("Filter parameters set: {}", filter_type_string);
 
-
-//     params.flip.flip_code =
-//         this->get_parameter("filter_params.flip.flip_code").as_int();
-//     params.eroding.size =
-//         this->get_parameter("filter_params.erosion.size").as_int();
-//     params.dilating.size =
-//         this->get_parameter("filter_params.dilation.size").as_int();
-//     params.white_balancing.contrast_percentage =
-//         this->get_parameter("filter_params.white_balancing.contrast_percentage").as_double();
-//     params.ebus.erosion_size =
-//         this->get_parameter("filter_params.ebus.erosion_size").as_int();
-//     params.ebus.blur_size =
-//         this->get_parameter("filter_params.ebus.blur_size").as_int();
-//     params.ebus.mask_weight =
-//         this->get_parameter("filter_params.ebus.mask_weight").as_int();
-//     params.otsu.gamma_auto_correction =
-//         this->get_parameter("filter_params.otsu.gamma_auto_correction").as_bool();
-//     params.otsu.gamma_auto_correction_weight =
-//         this->get_parameter("filter_params.otsu.gamma_auto_correction_weight").as_double();
-//     params.otsu.otsu_segmentation =
-//         this->get_parameter("filter_params.otsu.otsu_segmentation").as_bool();
-//     params.otsu.gsc_weight_r =
-//         this->get_parameter("filter_params.otsu.gsc_weight_r").as_double();
-//     params.otsu.gsc_weight_g =
-//         this->get_parameter("filter_params.otsu.gsc_weight_g").as_double();
-//     params.otsu.gsc_weight_b =
-//         this->get_parameter("filter_params.otsu.gsc_weight_b").as_double();
-//     params.otsu.erosion_size =
-//         this->get_parameter("filter_params.otsu.erosion_size").as_int();
-//     params.otsu.dilation_size =
-//         this->get_parameter("filter_params.otsu.dilation_size").as_int();
-//     params.overlap.percentage_threshold = // Thomas is everyware
-//         this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
-//     params.median_binary.kernel_size = 
-//         this->get_parameter("filter_params.median_binary.kernel_size").as_int();
-//     params.median_binary.threshold = 
-//         this->get_parameter("filter_params.median_binary.threshold").as_int();
-//     params.median_binary.invert = 
-//         this->get_parameter("filter_params.median_binary.invert").as_bool();
-//     params.binary.threshold = 
-//         this->get_parameter("filter_params.binary.threshold").as_double();
-//     params.binary.maxval = 
-//         this->get_parameter("filter_params.binary.maxval").as_double();
-//     params.binary.invert = 
-//         this->get_parameter("filter_params.binary.invert").as_bool();
-//     filter_params_ = params;
-//     spdlog::info("Filter parameters set: {}", filter);
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
