@@ -14,8 +14,6 @@
 void apply_auto_gamma(cv::Mat& image, double correction_weight);
 void to_weighted_gray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, double wR);
 
-// int computeOtsuThreshold(const cv::Mat& hist_prob);
-
 int apply_otsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double maxval = 255.0);
 
 void apply_erosion(const cv::Mat& src, cv::Mat& dst, int size, int shape = cv::MORPH_RECT);

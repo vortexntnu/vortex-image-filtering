@@ -54,7 +54,7 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<int>("filter_params.median_binary.threshold");
     this->declare_parameter<bool>("filter_params.median_binary.invert");
     
-    // TODO: Declare the parameters set for your filter here
+    // TODO: Declare parameters set for your filter here
 
 }
 
@@ -167,7 +167,7 @@ void ImageFilteringNode::set_filter_params() {
     case FilterType::Overlap:
     {
         OverlapParams params;
-        params.percentage_threshold = // Thomas is everyware
+        params.percentage_threshold = 
             this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
 
         filter_ptr = std::make_unique<Overlap>(params);
@@ -202,12 +202,25 @@ void ImageFilteringNode::set_filter_params() {
         break;
     }
 
+    // TODO: Add your filter case here as such:
+    // case FilterType::Example:
+    // {
+    //     ExampleParams params;
+    //     params.example_variable =
+    //         this->get_parameter("filter_params.example.example_variable").as_int();
+    //     params.example_string =
+    //         this->get_parameter("filter_params.example.example_string").as_string();
+
+    //     filter_ptr = std::make_unique<Example>(params);
+    //     break;
+    // }
+
 
     default:
-        spdlog::warn("Filterparams has not been set for your chosen filter {}. To fix this add your filter to ImageFilteringNode::set_filter_params()", filter_type_string);
+        spdlog::warn("Filterparams has not been set for your chosen filter {}. To fix this add your filter to ImageFilteringNode::set_filter_params(). Defaulting to no_filter", filter_type_string);
+        filter_ptr = std::make_unique<NoFilter>();
         break;
     };
-
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {

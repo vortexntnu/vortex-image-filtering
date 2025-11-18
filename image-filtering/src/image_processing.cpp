@@ -4,21 +4,6 @@
 
 
 
-void Unsharpening::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
-    int blur_size = this->filter_params.blur_size;
-    // Create a blurred version of the image
-    cv::Mat blurred;
-    GaussianBlur(original, blurred,
-                 cv::Size(2 * blur_size + 1, 2 * blur_size + 1), 0);
-
-    // Compute the unsharp mask
-    cv::Mat mask = original - blurred;
-    cv::Mat unsharp;
-
-    addWeighted(original, 1, mask, 3, 0, filtered);
-}
-
-
 
 void Flip::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     int flip_code = this->filter_params.flip_code;  // 0: x-axis, 1: y-axis, -1: both
