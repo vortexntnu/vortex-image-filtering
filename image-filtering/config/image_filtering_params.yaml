@@ -16,7 +16,7 @@
       dilation:
         size: 3
       white_balancing:
-        contrast_percentage: 0.1
+        contrast_percentage: 10.0
       ebus:
         erosion_size: 2
         blur_size: 30
@@ -31,20 +31,20 @@
         erosion_size: 2
         dilation_size: 2
       overlap:
-        percentage_threshold: 100.0 # Percentage to cap the picel intensity differance
+        percentage_threshold: 20.0 # Percentage (0-100) to cap the pixcel intensity differance
       median_binary: # finds the median of each n x n square around each pixel 
         kernel_size: 3 # must be odd >= 1
         threshold: 100 # [0, 255]
         invert: false
       binary: 
-        threshold: 0.1 # in percent
+        threshold: 20. # in percent
         maxval: 255.
         invert: true
       
       # TODO: add your filterparameters here
       example:
-        example_int: 5
-        example_string: "This is an example"
+        example_int: 1
+        example_string: "Get filtered"
 
 
 # Filter params should reflect the FilterParams struct

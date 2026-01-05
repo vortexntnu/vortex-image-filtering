@@ -71,47 +71,6 @@ void to_weighted_gray(const cv::Mat& bgr, cv::Mat& gray, double wB, double wG, d
 
 
 
-// // Computes the Otsu optimal threshold from a 256-bin normalized grayscale histogram.
-// // `hist_prob` must contain probabilities (sum ≈ 1). For every possible threshold t,
-// // the function splits the histogram into foreground [0, t) and background [t, 255],
-// // computes their weights and means, evaluates the between-class variance, and returns
-// // the t that maximizes it. A good threshold is one that makes two sizeable groups that
-// // are well separated in intensity:
-// //    - Best regards ChatGPT
-// int computeOtsuThreshold(const cv::Mat& hist_prob) // TODO it is time for you to go, its been nice knowing you, but you have been replased by opencv
-// {
-//     // Initialize variables for Otsu's method
-//     std::vector<float> sigma2_list(256, 0.0);
-//     std::vector<float> p(hist_prob.begin<float>(), hist_prob.end<float>());  // Probabilities
-
-//     for (int th = 1; th < 256; ++th) {
-//             // Calculate omega (weights) for foreground and background
-//             float omega_fg = std::accumulate(p.begin(), p.begin() + th, 0.0f);
-//             float omega_bg = std::accumulate(p.begin() + th, p.end(), 0.0f);
-
-//             // Calculate mu (means) for foreground and background
-//             float mu_fg = 0, mu_bg = 0;
-//             for (int i = 0; i < th; ++i) {
-//                 mu_fg += i * p[i];
-//             }
-//             for (int i = th; i < 256; ++i) {
-//                 mu_bg += i * p[i];
-//             }
-
-//             if (omega_fg > 0)
-//                 mu_fg /= omega_fg;
-//             if (omega_bg > 0)
-//                 mu_bg /= omega_bg;
-
-//             // Calculate sigma squared and store in list
-//             sigma2_list[th] = omega_fg * omega_bg * pow(mu_fg - mu_bg, 2);
-//         }
-
-//     return int(std::max_element(sigma2_list.begin(), sigma2_list.end()) - sigma2_list.begin());
-// }
-
-
-
 // Returns the Otsu threshold value chosen by OpenCV (0..255) and outputs the thresholded binary image
 int apply_otsu(const cv::Mat& gray8u, cv::Mat& out, bool invert, double maxval)
 {

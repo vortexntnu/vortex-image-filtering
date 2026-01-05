@@ -81,6 +81,7 @@ void OtsuSegmentation::apply_filter(const cv::Mat& original, cv::Mat& filtered) 
     to_weighted_gray(original, filtered, this->filter_params.gsc_weight_b,
                               this->filter_params.gsc_weight_g,
                               this->filter_params.gsc_weight_r);
+    original.copyTo(filtered);
 
 
     if (gamma_auto_correction) { 
@@ -97,45 +98,47 @@ void OtsuSegmentation::apply_filter(const cv::Mat& original, cv::Mat& filtered) 
     }
 }
 
-// Thomas was here
-void Overlap::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
-    static cv::Mat prevR;      // store previous R channel only
-    static bool has_prev = false;
 
-    // Extract current R channel
-    cv::Mat curR;
-    cv::extractChannel(original, curR, 2); // 0=B,1=G,2=R
 
-    if (!has_prev || prevR.empty() || prevR.size()!=curR.size() || prevR.type()!=curR.type()) {
-        original.copyTo(filtered);   // first call (or size/type change): pass through
-        prevR = curR.clone();        // cache R channel
+void Overlap::apply_filter(const cv::Mat& original, cv::Mat& filtered) const
+{
+    // mono8 only
+    CV_Assert(!original.empty());
+    CV_Assert(original.type() == CV_8UC1);
+
+    double thr_percent = filter_params.percentage_threshold;
+
+    // First frame (or size/type change): passthrough + cache
+    if (!has_prev || prev.empty() ||
+        prev.size() != original.size() || prev.type() != original.type())
+    {
+        original.copyTo(filtered);
+        prev = original.clone();
         has_prev = true;
         return;
     }
 
-    // |cur - prev| on the R channel
+    // Absolute difference (still mono8)
     cv::Mat diff8u;
-    cv::absdiff(curR, prevR, diff8u);
+    cv::absdiff(original, prev, diff8u);
 
-    // % of full 8-bit range
+    // Convert to percent of 8-bit range (0..100)
     cv::Mat percent32f;
     diff8u.convertTo(percent32f, CV_32F, 100.0 / 255.0);
 
-    // Mask: pixels whose % change > threshold
-    cv::Mat mask;
-    cv::threshold(percent32f, mask, this->filter_params.percentage_threshold, 255.0, cv::THRESH_BINARY);
-    mask.convertTo(mask, CV_8U);
+    // Build mask where change > threshold
+    cv::Mat mask8u;
+    cv::threshold(percent32f, mask8u, thr_percent, 255.0, cv::THRESH_BINARY);
+    mask8u.convertTo(mask8u, CV_8U);
 
-    // Zero out those pixels in the R channel
+    // Output: same as original except zero-out "changed" pixels
     filtered = original.clone();
-    std::vector<cv::Mat> ch;
-    cv::split(filtered, ch);      // ch[2] is R
-    ch[2].setTo(0, mask);
-    cv::merge(ch, filtered);
+    filtered.setTo(0, mask8u);
 
-    // Update history (R channel only)
-    prevR = curR.clone();
+    // Update history (write to cached previous)
+    prev = original.clone();
 }
+
 
 void MedianBinary::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
 

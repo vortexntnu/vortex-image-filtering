@@ -222,17 +222,25 @@ private:
 // Overlap (blend/composite)
 /////////////////////////////
 
-struct OverlapParams{
-    double percentage_threshold;
+struct OverlapParams {
+    double percentage_threshold; // 0..100 (percent)
 };
 
-class Overlap: public Filter{
+class Overlap : public Filter {
 public:
-    explicit Overlap(OverlapParams params): filter_params(params) {}
+    explicit Overlap(OverlapParams params)
+        : filter_params(params), has_prev(false) {}
+
     void apply_filter(const cv::Mat& original, cv::Mat& filtered) const override;
+
 private:
     OverlapParams filter_params;
+
+    // Cached previous mono8 frame
+    mutable cv::Mat prev;
+    mutable bool has_prev;
 };
+
 
 /////////////////////////////
 // Median + Binary
