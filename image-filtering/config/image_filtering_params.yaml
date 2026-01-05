@@ -6,7 +6,7 @@
     input_encoding: "mono8" 
   
     filter_params:
-      filter_type: "unsharpening"
+      filter_type: "flip"
       flip:
         flip_code: 1
       unsharpening:

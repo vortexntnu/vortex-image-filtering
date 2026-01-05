@@ -3,6 +3,8 @@
 #include <iostream>
 
 
+
+
 void Flip::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     int flip_code = this->filter_params.flip_code;  // 0: x-axis, 1: y-axis, -1: both
     cv::flip(original, filtered, flip_code);
@@ -70,14 +72,12 @@ void Ebus::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
 
 
 void OtsuSegmentation::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
-
-    
     bool gamma_auto_correction = this->filter_params.gamma_auto_correction;
     double gamma_auto_correction_weight = this->filter_params.gamma_auto_correction_weight;
 
     bool otsu_segmentation = this->filter_params.otsu_segmentation;
 
-    // if (original.type)
+
     to_weighted_gray(original, filtered, this->filter_params.gsc_weight_b,
                               this->filter_params.gsc_weight_g,
                               this->filter_params.gsc_weight_r);
