@@ -54,7 +54,10 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<int>("filter_params.median_binary.threshold");
     this->declare_parameter<bool>("filter_params.median_binary.invert");
     
+
     // TODO: Declare parameters set for your filter here
+    this->declare_parameter<int>("filter_params.example.example_int");
+    this->declare_parameter<std::string>("filter_params.example.example_string");
 
 }
 
@@ -202,18 +205,18 @@ void ImageFilteringNode::set_filter_params() {
         break;
     }
 
-    // TODO: Add your filter case here as such:
-    // case FilterType::Example:
-    // {
-    //     ExampleParams params;
-    //     params.example_variable =
-    //         this->get_parameter("filter_params.example.example_variable").as_int();
-    //     params.example_string =
-    //         this->get_parameter("filter_params.example.example_string").as_string();
+    // TODO: Add your filter case here:
+    case FilterType::Example:
+    {
+        ExampleParams params;
+        params.example_int =
+            this->get_parameter("filter_params.example.example_int").as_int();
+        params.example_string =
+            this->get_parameter("filter_params.example.example_string").as_string();
 
-    //     filter_ptr = std::make_unique<Example>(params);
-    //     break;
-    // }
+        filter_ptr = std::make_unique<Example>(params);
+        break;
+    }
 
 
     default:

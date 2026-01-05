@@ -169,9 +169,18 @@ void BinaryThreshold::apply_filter(const cv::Mat& original, cv::Mat& filtered) c
         gray.convertTo(src8, CV_8U);
     } else {
         src8 = gray;
-    }
-
+    }  
     // Apply fixed threshold
     const int type = invert ? cv::THRESH_BINARY_INV : cv::THRESH_BINARY;
     cv::threshold(src8, filtered, thresh, maxval, type);
+}
+
+
+
+
+// TODO: Implement your filter here
+void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
+    std::string example_str = this->filter_params.example_string;
+    int example_int = this->filter_params.example_int;
+    DoExample(original,filtered, example_str, example_int);
 }

@@ -23,8 +23,6 @@ enum class FilterType { // TODO: Add filters here
   Overlap, 
   MedianBinary, 
   Binary, 
-
-  Example,
   Unknown
 };
 
@@ -46,7 +44,6 @@ inline FilterType parse_filter_type(std::string s) { // TODO: Also add filter-ty
     if (s == "overlap")        return FilterType::Overlap;
     if (s == "median_binary")  return FilterType::MedianBinary;
     if (s == "binary")         return FilterType::Binary;
-    if (s == "example")        return FilterType::Example;
     return FilterType::Unknown;
 }
 
@@ -283,7 +280,7 @@ private:
 
 // Example:
 struct ExampleParams{ // Add filter variables here
-    int example_int;
+    int example_variable;
     std::string example_string;
 };
 

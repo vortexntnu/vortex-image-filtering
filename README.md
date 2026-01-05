@@ -32,96 +32,141 @@ Parameters can be set through a YAML file or dynamically adjusted at runtime.
 
 ## Implementing New Filters
 
-To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase:
+To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO comments where you add your filter:
 
-### Step 1: Define Filter Parameters
+### Step 1: Add filter to Enum
 
-Each filter should have its own set of parameters encapsulated in a structure. Define this structure within the `vortex::image_filters` namespace.
+You should define your filtertype in the filtertype enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
 ```cpp
-struct YourFilterParams {
-    // Add necessary parameters here
-    int example_param;
+enum class FilterType { 
+  NoFilter, 
+  Flip, 
+  Unsharpening, 
+  Erosion, 
+  Dilation, 
+  ...
+  // Add your filter here
 };
 ```
 
-### Step 2: Add to FilterParams Structure
-
-Integrate your new filter parameters structure into the existing `FilterParams` structure. This allows the `apply_filter` function to access the parameters specific to your filter.
-
-```cpp
-struct FilterParams {
-    std::string filter_type;
-    UnsharpeningFilterParams unsharpening;
-    ErodingFilterParams eroding;
-    DilatingFilterParams dilating;
-    WhiteBalancingFilterParams white_balancing;
-    EbusFilterParams ebus;
-    YourFilterParams your_filter; // Add your filter params here
-};
-```
-
-### Step 3: Create the Filter Function
-
-Implement your filter function. This function should take the `cv::Mat` objects for the input and output images and a `const FilterParams&` which includes your specific filter parameters. Make sure to use your parameter structure within this function.
+### Step 2: Filter string
+To access the filter trough the yamal file we need to access it trough a string. You need to add it as a string to parse_filter_type in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
 ```cpp
-void your_filter_function(const cv::Mat &original, cv::Mat &filtered, const FilterParams& filter_params) {
-    // Access your filter-specific parameters like this:
-    int example_param = filter_params.your_filter.example_param;
-
-    // Implement your filtering logic here
-}
-```
-
-### Step 4: Register the Filter Function
-
-Add an entry to the `filter_functions` map for your new filter. This step is crucial as it links the filter name (as a string) to the corresponding filter function pointer.
-
-```cpp
-std::map<std::string, FilterFunction> filter_functions = {
-    {"no_filter", no_filter},
-    {"sharpening", sharpening_filter},
-    {"unsharpening", unsharpening_filter},
-    {"eroding", eroding_filter},
-    {"dilating", dilating_filter},
-    {"white_balancing", white_balance_filter},
-    {"ebus", ebus_filter},
-    {"your_filter", your_filter_function} // Add your filter here
-};
-```
-
-### Step 5: Declare and Assign Parameters
-
-Declare the new filter parameters in the ROS 2 node constructor and assign these parameters to the `FilterParams` structure within the `set_filter_params` function.
-
-#### In the Node Constructor
-
-In the constructor of your ROS 2 node, declare each of the new filter parameters using the `declare_parameter` function. This sets the default values and prepares the node to accept these parameters at runtime through command line or a YAML configuration file.
-
-```cpp
-ImageFilteringNode::ImageFilteringNode() : Node("image_filtering_node")
-{
-    this->declare_parameter<std::string>("filter_params.your_filter.example_param", "default_value");
+inline FilterType parse_filter_type(std::string s) {
+  s = to_lower(std::move(s));
+    if (s == "no_filter")      return FilterType::NoFilter;
+    if (s == "flip")           return FilterType::Flip;
+    if (s == "unsharpening")   return FilterType::Unsharpening;
     ...
-    // Other parameters declarations
+    // Add your filter type here:
+    
+    return FilterType::Unknown;
+
 }
 ```
 
 
-#### In the set_filter_params Function
+### Step 3: Define Filter Parameters
 
-In the set_filter_params function, retrieve and assign the parameters to the corresponding fields in the FilterParams structure. Ensure to handle cases where the parameter might not be set or provided.
+Each filter should have its own set of parameters encapsulated in a structure. Define this structure within [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp).
 
 ```cpp
+struct ExampleParams{ 
+    // Add necessary filter parameters here
+    int example_int;
+    std::string example_string;
+};
+```
 
-void ImageFilteringNode::set_filter_params(){
-    FilterParams params = filter_params_; // assuming filter_params_ is already defined in your class
+### Step 4: Add filter class
 
-    params.your_filter.example_param = this->get_parameter("filter_params.your_filter.example_param").as_string();
-    ...
-    // Retrieve other parameters and handle cases where parameters might not be provided
-    filter_params_ = params; // Update the filter parameters structure
-    RCLCPP_INFO(this->get_logger(), "Filter parameters updated for your_filter.");
+Add a Class for your filter inhereting from the Filter class, with the same exact structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+```cpp
+class Example: public Filter{
+    public:
+        explicit Example(ExampleParams params): filter_params(params) {}
+        void apply_filter(const cv::Mat& original, cv::Mat& filtered) const override; // This is the filter itself
+    private:
+        ExampleParams filter_params;
+};
+```
+Here you can add other filter spesific stuff like storing variables that needs to change between runs and so on.
+
+
+
+### Step 5: Create the Filter Function
+
+Implement your filter function in [image_processing.cpp](image-filtering/src/image_processing.cpp). This function should take inn the `cv::Mat` objects for the input and the filtered image, and change the filtered one according to your need.
+
+```cpp
+void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
+    std::string example_str = this->filter_params.example_string;
+    int example_int = this->filter_params.example_int;
+    DoExample(original,filtered, example_str, example_int);
 }
 ```
+*If you need a helperfunction go to the [helperfunction](#adding-helperfunctions) section of this page.
+
+
+### Step 6: Add to config file
+
+In the [image_filtering_params.yaml](image-filtering/config/image_filtering_params.yaml) file you add your filter and filterparameters for easily interfacing with the filters:
+
+```yaml
+    filter_params:
+        filter_type: "example"
+        
+        flip:
+            flip_code: 1
+        ...
+        # Add your filter type here
+
+        example:
+            example_int: 5
+            example_string: "This is an example"
+```
+
+
+### Step 7: Declare and Assign Parameters
+
+In the constructor of your ROS 2 node, declare each of the new filter parameters using the `declare_parameter` function in [image_filtering_ros.cpp](image-filtering/src/image_filtering_ros.cpp). This sets the default values and prepares the node to accept these parameters at runtime through command line or the YAML configuration file.
+
+```cpp
+void ImageFilteringNode::declare_parameters() {
+    // Declare your parameters here
+    this->declare_parameter<int>("filter_params.example.example_int");
+    this->declare_parameter<std::string>("filter_params.example.example_string");
+}
+```
+
+Then in the same file you make a new case in `set_filter_params` for your filter, to set the variables you just declared.
+```cpp
+void ImageFilteringNode::set_filter_params() {
+    ...
+    switch (filter_type){
+
+        ...
+        // Add case here
+        case FilterType::Example:
+    {
+        ExampleParams params;
+        params.example_int =
+            this->get_parameter("filter_params.example.example_int").as_int();
+        params.example_string =
+            this->get_parameter("filter_params.example.example_string").as_string();
+
+        filter_ptr = std::make_unique<Example>(params);
+        break;
+    }
+
+    }
+}
+```
+
+
+
+#### Adding Helperfunctions
+
+If you need helperfunctions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function defenition to  [utilities.cpp](image-filtering/src/utilities.cpp). There wil be TODO comments where you can add them. These cunctions are allredy included in the image_prosessing files.

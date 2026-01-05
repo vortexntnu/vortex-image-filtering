@@ -6,7 +6,7 @@
     input_encoding: "mono8" 
   
     filter_params:
-      filter_type: "flip"
+      filter_type: "example"
       flip:
         flip_code: 1
       unsharpening:
@@ -40,6 +40,11 @@
         threshold: 0.1 # in percent
         maxval: 255.
         invert: true
+      
+      # TODO: add your filterparameters here
+      example:
+        example_int: 5
+        example_string: "This is an example"
 
 
 # Filter params should reflect the FilterParams struct

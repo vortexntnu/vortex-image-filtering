@@ -27,4 +27,12 @@ void apply_fixed_threshold(const cv::Mat& img, cv::Mat& filtered, int thresh, bo
 // TODO Fix, does not work properly (Chat has failed me)
 void distance_field(const cv::Mat& binObstacles, cv::Mat& dist, bool obstaclesAreWhite = true, int type = cv::DIST_L2, int maskSize = 3); // DIST_L2 is normal euclidian
 
+
+
+
+
+
+// TODO: If you need a helper function have the signature here
+void DoExample(const cv::Mat& original, cv::Mat& filtered, std::string example_string, int example_int);
+
 #endif
