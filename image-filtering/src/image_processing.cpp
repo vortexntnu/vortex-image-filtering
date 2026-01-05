@@ -3,23 +3,6 @@
 #include <iostream>
 
 
-
-void Unsharpening::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
-    int blur_size = this->filter_params.blur_size;
-    // Create a blurred version of the image
-    cv::Mat blurred;
-    GaussianBlur(original, blurred,
-                 cv::Size(2 * blur_size + 1, 2 * blur_size + 1), 0);
-
-    // Compute the unsharp mask
-    cv::Mat mask = original - blurred;
-    cv::Mat unsharp;
-
-    addWeighted(original, 1, mask, 3, 0, filtered);
-}
-
-
-
 void Flip::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     int flip_code = this->filter_params.flip_code;  // 0: x-axis, 1: y-axis, -1: both
     cv::flip(original, filtered, flip_code);
@@ -87,12 +70,14 @@ void Ebus::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
 
 
 void OtsuSegmentation::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
+
+    
     bool gamma_auto_correction = this->filter_params.gamma_auto_correction;
     double gamma_auto_correction_weight = this->filter_params.gamma_auto_correction_weight;
 
     bool otsu_segmentation = this->filter_params.otsu_segmentation;
 
-
+    // if (original.type)
     to_weighted_gray(original, filtered, this->filter_params.gsc_weight_b,
                               this->filter_params.gsc_weight_g,
                               this->filter_params.gsc_weight_r);
