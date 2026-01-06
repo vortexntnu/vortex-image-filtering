@@ -77,12 +77,14 @@ void OtsuSegmentation::apply_filter(const cv::Mat& original, cv::Mat& filtered) 
 
     bool otsu_segmentation = this->filter_params.otsu_segmentation;
 
-
-    to_weighted_gray(original, filtered, this->filter_params.gsc_weight_b,
-                              this->filter_params.gsc_weight_g,
-                              this->filter_params.gsc_weight_r);
-    original.copyTo(filtered);
-
+    if (original.type() == CV_8UC3) { // if the image type is bgr8
+        to_weighted_gray(original, filtered, 
+                                  this->filter_params.gsc_weight_b,
+                                  this->filter_params.gsc_weight_g,
+                                  this->filter_params.gsc_weight_r);
+    }
+    else if (original.type() == CV_8UC1){ original.copyTo(filtered); } // if its mono8
+    else {std::cout << "your image type is not matching this filter" << std::endl;}
 
     if (gamma_auto_correction) { 
         apply_auto_gamma(filtered, gamma_auto_correction_weight);
