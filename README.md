@@ -169,4 +169,4 @@ void ImageFilteringNode::set_filter_params() {
 
 #### Adding Helperfunctions
 
-If you need helperfunctions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function defenition to  [utilities.cpp](image-filtering/src/utilities.cpp). There wil be TODO comments where you can add them. These cunctions are allredy included in the image_prosessing files.
+If you need helperfunctions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function defenition to  [utilities.cpp](image-filtering/src/utilities.cpp). There wil be TODO comments where you can add them. These functions are alredy included in the image_prosessing files.

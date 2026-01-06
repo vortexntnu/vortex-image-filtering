@@ -267,8 +267,6 @@ void DoExample(const cv::Mat& original,
                std::string example_string,
                int example_int)
 {
-    CV_Assert(!original.empty());
-    CV_Assert(original.type() == CV_8UC1); // mono8
 
     filtered = original.clone();
 
