@@ -39,12 +39,12 @@ To extend the functionality of the `image_filtering_node` by adding new filters,
 You should define your filtertype in the filtertype enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
 ```cpp
-enum class FilterType { 
-  NoFilter, 
-  Flip, 
-  Unsharpening, 
-  Erosion, 
-  Dilation, 
+enum class FilterType {
+  NoFilter,
+  Flip,
+  Unsharpening,
+  Erosion,
+  Dilation,
   ...
   // Add your filter here
 };
@@ -59,7 +59,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"flip",            FilterType::Flip},
     {"unsharpening",    FilterType::Unsharpening},
     ...
-    
+
     // Add your filter here
     {"example",         FilterType::Example},
     {"unknown",         FilterType::Unknown}
@@ -72,7 +72,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
 Each filter should have its own set of parameters encapsulated in a structure. Define this structure within [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp).
 
 ```cpp
-struct ExampleParams{ 
+struct ExampleParams{
     // Add necessary filter parameters here
     int example_int;
     std::string example_string;
@@ -116,7 +116,7 @@ In the [image_filtering_params.yaml](image-filtering/config/image_filtering_para
 ```yaml
     filter_params:
         filter_type: "example"
-        
+
         flip:
             flip_code: 1
         ...

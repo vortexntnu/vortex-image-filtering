@@ -43,9 +43,10 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
     this->declare_parameter<int>("filter_params.otsu.erosion_size");
     this->declare_parameter<int>("filter_params.otsu.dilation_size");
-    
-    this->declare_parameter<double>("filter_params.overlap.percentage_threshold");
-    
+
+    this->declare_parameter<double>(
+        "filter_params.overlap.percentage_threshold");
+
     this->declare_parameter<double>("filter_params.binary.threshold");
     this->declare_parameter<double>("filter_params.binary.maxval");
     this->declare_parameter<bool>("filter_params.binary.invert");
@@ -53,183 +54,193 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<int>("filter_params.median_binary.kernel_size");
     this->declare_parameter<int>("filter_params.median_binary.threshold");
     this->declare_parameter<bool>("filter_params.median_binary.invert");
-    
 
     // TODO: Declare parameters set for your filter here
     this->declare_parameter<int>("filter_params.example.example_int");
-    this->declare_parameter<std::string>("filter_params.example.example_string");
-
+    this->declare_parameter<std::string>(
+        "filter_params.example.example_string");
 }
 
 void ImageFilteringNode::set_filter_params() {
-    std::string filter_type_string = this->get_parameter("filter_params.filter_type").as_string();
+    std::string filter_type_string =
+        this->get_parameter("filter_params.filter_type").as_string();
     FilterType filter_type = parse_filter_type(filter_type_string);
 
-    
-    switch (filter_type)
-    {
-    case FilterType::Unknown:
-    {
-        spdlog::warn("\033[33mInvalid filter type received: {}. Using default: no_filter.\033[0m", filter_type_string);
-        filter_type = FilterType::NoFilter;
-        [[fallthrough]];
-    }
-    
-    case FilterType::NoFilter:
-    {
-        filter_ptr = std::make_unique<NoFilter>();
-        break;
-    }
-    case FilterType::Unsharpening:
-    {
-        UnsharpeningParams params;
-        params.blur_size = this->get_parameter("filter_params.unsharpening.blur_size").as_int();
-        
-        filter_ptr = std::make_unique<Unsharpening>(params);
-        break;
-    }
+    switch (filter_type) {
+        case FilterType::Unknown: {
+            spdlog::warn(
+                "\033[33mInvalid filter type received: {}. Using default: "
+                "no_filter.\033[0m",
+                filter_type_string);
+            filter_type = FilterType::NoFilter;
+            [[fallthrough]];
+        }
 
-    case FilterType::Flip:
-    {
-        FlipParams params;
-        params.flip_code =
-            this->get_parameter("filter_params.flip.flip_code").as_int();
+        case FilterType::NoFilter: {
+            filter_ptr = std::make_unique<NoFilter>();
+            break;
+        }
+        case FilterType::Unsharpening: {
+            UnsharpeningParams params;
+            params.blur_size =
+                this->get_parameter("filter_params.unsharpening.blur_size")
+                    .as_int();
 
-        filter_ptr = std::make_unique<Flip>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Unsharpening>(params);
+            break;
+        }
 
-    case FilterType::Erosion:
-    {
-        ErosionParams params;
-        params.kernel_size =
-            this->get_parameter("filter_params.erosion.size").as_int();
+        case FilterType::Flip: {
+            FlipParams params;
+            params.flip_code =
+                this->get_parameter("filter_params.flip.flip_code").as_int();
 
-        filter_ptr = std::make_unique<Erosion>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Flip>(params);
+            break;
+        }
 
-    case FilterType::Dilation:
-    {
-        DilationParams params;
-        params.kernel_size =
-            this->get_parameter("filter_params.dilation.size").as_int();
+        case FilterType::Erosion: {
+            ErosionParams params;
+            params.kernel_size =
+                this->get_parameter("filter_params.erosion.size").as_int();
 
-        filter_ptr = std::make_unique<Dilation>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Erosion>(params);
+            break;
+        }
 
-    case FilterType::WhiteBalancing:
-    {
-        WhiteBalanceParams params;
-        params.contrast_percentage =
-            this->get_parameter("filter_params.white_balancing.contrast_percentage").as_double();
+        case FilterType::Dilation: {
+            DilationParams params;
+            params.kernel_size =
+                this->get_parameter("filter_params.dilation.size").as_int();
 
-        filter_ptr = std::make_unique<WhiteBalance>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Dilation>(params);
+            break;
+        }
 
-    case FilterType::Ebus:
-    {
-        EbusParams params;
-        params.erosion_size =
-            this->get_parameter("filter_params.ebus.erosion_size").as_int();
-        params.blur_size =
-            this->get_parameter("filter_params.ebus.blur_size").as_int();
-        params.mask_weight =
-            this->get_parameter("filter_params.ebus.mask_weight").as_int();
+        case FilterType::WhiteBalancing: {
+            WhiteBalanceParams params;
+            params.contrast_percentage =
+                this->get_parameter(
+                        "filter_params.white_balancing.contrast_percentage")
+                    .as_double();
 
-        filter_ptr = std::make_unique<Ebus>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<WhiteBalance>(params);
+            break;
+        }
 
-    case FilterType::Otsu:
-    {
-        OtsuSegmentationParams params;
-        params.gamma_auto_correction =
-            this->get_parameter("filter_params.otsu.gamma_auto_correction").as_bool();
-        params.gamma_auto_correction_weight =
-            this->get_parameter("filter_params.otsu.gamma_auto_correction_weight").as_double();
-        params.otsu_segmentation =
-            this->get_parameter("filter_params.otsu.otsu_segmentation").as_bool();
-        params.gsc_weight_r =
-            this->get_parameter("filter_params.otsu.gsc_weight_r").as_double();
-        params.gsc_weight_g =
-            this->get_parameter("filter_params.otsu.gsc_weight_g").as_double();
-        params.gsc_weight_b =
-            this->get_parameter("filter_params.otsu.gsc_weight_b").as_double();
-        params.erosion_size =
-            this->get_parameter("filter_params.otsu.erosion_size").as_int();
-        params.dilation_size =
-            this->get_parameter("filter_params.otsu.dilation_size").as_int();
+        case FilterType::Ebus: {
+            EbusParams params;
+            params.erosion_size =
+                this->get_parameter("filter_params.ebus.erosion_size").as_int();
+            params.blur_size =
+                this->get_parameter("filter_params.ebus.blur_size").as_int();
+            params.mask_weight =
+                this->get_parameter("filter_params.ebus.mask_weight").as_int();
 
-        filter_ptr = std::make_unique<OtsuSegmentation>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Ebus>(params);
+            break;
+        }
 
-    case FilterType::Overlap:
-    {
-        OverlapParams params;
-        params.percentage_threshold = 
-            this->get_parameter("filter_params.overlap.percentage_threshold").as_double();
+        case FilterType::Otsu: {
+            OtsuSegmentationParams params;
+            params.gamma_auto_correction =
+                this->get_parameter("filter_params.otsu.gamma_auto_correction")
+                    .as_bool();
+            params.gamma_auto_correction_weight =
+                this->get_parameter(
+                        "filter_params.otsu.gamma_auto_correction_weight")
+                    .as_double();
+            params.otsu_segmentation =
+                this->get_parameter("filter_params.otsu.otsu_segmentation")
+                    .as_bool();
+            params.gsc_weight_r =
+                this->get_parameter("filter_params.otsu.gsc_weight_r")
+                    .as_double();
+            params.gsc_weight_g =
+                this->get_parameter("filter_params.otsu.gsc_weight_g")
+                    .as_double();
+            params.gsc_weight_b =
+                this->get_parameter("filter_params.otsu.gsc_weight_b")
+                    .as_double();
+            params.erosion_size =
+                this->get_parameter("filter_params.otsu.erosion_size").as_int();
+            params.dilation_size =
+                this->get_parameter("filter_params.otsu.dilation_size")
+                    .as_int();
 
-        filter_ptr = std::make_unique<Overlap>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<OtsuSegmentation>(params);
+            break;
+        }
 
-    case FilterType::MedianBinary:
-    {
-        MedianBinaryParams params;
-        params.kernel_size =
-            this->get_parameter("filter_params.median_binary.kernel_size").as_int();
-        params.threshold =
-            this->get_parameter("filter_params.median_binary.threshold").as_int();
-        params.invert =
-            this->get_parameter("filter_params.median_binary.invert").as_bool();
+        case FilterType::Overlap: {
+            OverlapParams params;
+            params.percentage_threshold =
+                this->get_parameter(
+                        "filter_params.overlap.percentage_threshold")
+                    .as_double();
 
-        filter_ptr = std::make_unique<MedianBinary>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<Overlap>(params);
+            break;
+        }
 
-    case FilterType::Binary:
-    {
-        BinaryThresholdParams params;
-        params.threshold =
-            this->get_parameter("filter_params.binary.threshold").as_double();
-        params.maxval =
-            this->get_parameter("filter_params.binary.maxval").as_double();
-        params.invert =
-            this->get_parameter("filter_params.binary.invert").as_bool();
+        case FilterType::MedianBinary: {
+            MedianBinaryParams params;
+            params.kernel_size =
+                this->get_parameter("filter_params.median_binary.kernel_size")
+                    .as_int();
+            params.threshold =
+                this->get_parameter("filter_params.median_binary.threshold")
+                    .as_int();
+            params.invert =
+                this->get_parameter("filter_params.median_binary.invert")
+                    .as_bool();
 
-        filter_ptr = std::make_unique<BinaryThreshold>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<MedianBinary>(params);
+            break;
+        }
 
-    // TODO: Add your filter case here:
-    case FilterType::Example:
-    {
-        ExampleParams params;
-        params.example_int =
-            this->get_parameter("filter_params.example.example_int").as_int();
-        params.example_string =
-            this->get_parameter("filter_params.example.example_string").as_string();
+        case FilterType::Binary: {
+            BinaryThresholdParams params;
+            params.threshold =
+                this->get_parameter("filter_params.binary.threshold")
+                    .as_double();
+            params.maxval =
+                this->get_parameter("filter_params.binary.maxval").as_double();
+            params.invert =
+                this->get_parameter("filter_params.binary.invert").as_bool();
 
-        filter_ptr = std::make_unique<Example>(params);
-        break;
-    }
+            filter_ptr = std::make_unique<BinaryThreshold>(params);
+            break;
+        }
 
+        // TODO: Add your filter case here:
+        case FilterType::Example: {
+            ExampleParams params;
+            params.example_int =
+                this->get_parameter("filter_params.example.example_int")
+                    .as_int();
+            params.example_string =
+                this->get_parameter("filter_params.example.example_string")
+                    .as_string();
 
-    default:
-        ;
-        filter_ptr = std::make_unique<NoFilter>();
-        spdlog::warn("\033[33m Filterparams has not been set for your chosen filter {}. "
-                    "To fix this add your filter to ImageFilteringNode::set_filter_params(). "
-                    "Defaulting to no_filter. \033[0m",
-                    filter_type_string);
-        filter_type = FilterType::NoFilter;
+            filter_ptr = std::make_unique<Example>(params);
+            break;
+        }
+
+        default:;
+            filter_ptr = std::make_unique<NoFilter>();
+            spdlog::warn(
+                "\033[33m Filterparams has not been set for your chosen filter "
+                "{}. "
+                "To fix this add your filter to "
+                "ImageFilteringNode::set_filter_params(). "
+                "Defaulting to no_filter. \033[0m",
+                filter_type_string);
+            filter_type = FilterType::NoFilter;
     };
 
-    spdlog::info("\033[32m Using filter: {} \033[0m", filtertype_to_string(filter_type));
+    spdlog::info("\033[32m Using filter: {} \033[0m",
+                 filtertype_to_string(filter_type));
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
@@ -279,11 +290,11 @@ void ImageFilteringNode::image_callback(
     const sensor_msgs::msg::Image::SharedPtr msg) {
     cv_bridge::CvImagePtr cv_ptr;
 
-    std::string input_encoding = 
+    std::string input_encoding =
         this->get_parameter("input_encoding").as_string();
-    
-    if (input_encoding.empty()){
-        input_encoding = msg->encoding; // Default to the input image encoding
+
+    if (input_encoding.empty()) {
+        input_encoding = msg->encoding;  // Default to the input image encoding
     }
 
     try {

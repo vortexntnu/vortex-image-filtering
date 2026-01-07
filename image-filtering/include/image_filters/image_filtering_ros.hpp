@@ -1,7 +1,7 @@
 #ifndef IMAGE_FILTERING_ROS_HPP
 #define IMAGE_FILTERING_ROS_HPP
 
-#include <cv_bridge/cv_bridge.h> // for jazzy this has to be hpp and for humble it has to be h
+#include <cv_bridge/cv_bridge.h>  // for jazzy this has to be hpp and for humble it has to be h
 #include <spdlog/spdlog.h>
 #include <rclcpp/parameter_event_handler.hpp>
 #include <rclcpp/qos.hpp>
@@ -101,7 +101,6 @@ class ImageFilteringNode : public rclcpp::Node {
      *
      */
     std::unique_ptr<Filter> filter_ptr;
-
 };
 
 #endif  // IMAGE_FILTERING_ROS_HPP

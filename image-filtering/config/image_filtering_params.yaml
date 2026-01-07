@@ -2,9 +2,9 @@
   ros__parameters:
     sub_topic: "/fls_publisher/display_mono"
     pub_topic: "/filtered_image"
-    input_encoding: "mono8" 
+    input_encoding: "mono8"
     output_encoding: "mono8"
-  
+
     filter_params:
       filter_type: "example"
       flip:
@@ -32,15 +32,15 @@
         dilation_size: 2
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
-      median_binary: # finds the median of each n x n square around each pixel 
+      median_binary: # finds the median of each n x n square around each pixel
         kernel_size: 3 # must be odd >= 1
         threshold: 100 # [0, 255]
         invert: false
-      binary: 
+      binary:
         threshold: 20. # in percent
         maxval: 255.
         invert: true
-      
+
       # TODO: add your filterparameters here
       example:
         example_int: 1
