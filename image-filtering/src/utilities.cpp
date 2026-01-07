@@ -318,25 +318,3 @@ void apply_example(const cv::Mat& original,
     cv::putText(filtered, line2, cv::Point(x2c, y2c),
                 fontFace, fontScale, cv::Scalar(255), thickness, lineType);
 }
-
-
-
-
-//                               _.-.
-//                              /  66\ 
-//                             (      `\          Hi, how you doin :)
-//                             |\\ ,  ,|
-//                     __      | \\____/
-//               ,.--"`-.".   /   `---'
-//           _.-'          '-/      |
-//       _.-"   |   '-.             |_/_
-// ,__.-'  _,.--\      \      ((    /-\ 
-// ',_..--'      `\     \      \\_ /
-//                 `-,   )      |\' 
-//                   |   |-.,,-" (  
-//                   |   |   `\   `',_
-//                   )    \    \,(\(\-'
-//                   \     `-,_
-//                    \_(\-(\`-`
-//                       "  "
-
