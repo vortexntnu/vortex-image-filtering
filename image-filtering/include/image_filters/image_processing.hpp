@@ -61,13 +61,13 @@ inline FilterType parse_filter_type(std::string s) {
     for (auto [name, type] : kFilterMap) {
         if (s == name) return type;
     }
-    std::cout  << "\033[33m No string connected to that filtertype: '" << s << "'. This might be misspelling or you need to add the filtertype to kFilterMap in image_processing.hpp\033[0m";
+    std::cout  << "\033[33m No string connected to that filter type: '" << s << "'. This might be misspelling or you need to add the filter type to kFilterMap in image_processing.hpp\033[0m";
     return FilterType::Unknown;
 }
 
 inline std::string_view filtertype_to_string(FilterType t) {
     for (auto [name, type] : kFilterMap) {if (t == type) return name;}
-    std::cout  << "\033[33m No string connected to your filtertype. To fix this add the string and filtertype to kFilterMap\033[0m";
+    std::cout  << "\033[33m No string connected to your filter type. To fix this add the string and filter type to kFilterMap\033[0m";
     return "unknown";
 }
 

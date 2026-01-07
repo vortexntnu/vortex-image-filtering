@@ -21,7 +21,7 @@ int apply_otsu(const cv::Mat& gray8u, cv::Mat& out, bool invert = false, double 
 // Performs morphological erosion (shrinks bright regions / removes small white noise)
 void apply_erosion(const cv::Mat& src, cv::Mat& dst, int size, int shape = cv::MORPH_RECT);
 
-// Performs morphological dilation (grows bright regions / fills small holes) opposite of erotion
+// Performs morphological dilation (grows bright regions / fills small holes) opposite of erosion
 void apply_dilation(const cv::Mat& src, cv::Mat& dst, int size, int shape=cv::MORPH_RECT);
 
 // Applies a median blur with `kernel_size` to reduce salt-and-pepper noise while preserving edges.
@@ -38,7 +38,7 @@ void apply_fixed_threshold(const cv::Mat& img, cv::Mat& filtered, int thresh, bo
 
 
 // This does not work properly (Chat has failed me) 
-void distance_field(const cv::Mat& binObstacles, cv::Mat& dist, bool obstaclesAreWhite = true, int type = cv::DIST_L2, int maskSize = 3); // DIST_L2 is normal euclidian
+void distance_field(const cv::Mat& binObstacles, cv::Mat& dist, bool obstaclesAreWhite = true, int type = cv::DIST_L2, int maskSize = 3); // DIST_L2 is normal euclidean
 
 
 

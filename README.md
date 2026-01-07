@@ -51,7 +51,7 @@ enum class FilterType {
 ```
 
 ### Step 2: Filter string
-To access the filter trough the yamal file we need to access it trough a string. You need to add it as a string to map to the Enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+To access the filter through the yaml file we need to access it through a string. You need to add it as a string to map to the Enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
 ```cpp
 static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
@@ -81,7 +81,7 @@ struct ExampleParams{
 
 ### Step 4: Add filter class
 
-Below the filter parameters add a Class for your filter inhereting from the Filter class, with the same structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+Below the filter parameters add a Class for your filter inheriting from the Filter class, with the same structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 ```cpp
 class Example: public Filter{
     public:
@@ -91,13 +91,13 @@ class Example: public Filter{
         ExampleParams filter_params;
 };
 ```
-Here you can add other filter spesific stuff like storing variables that needs to change between runs and so on.
+Here you can add other filter specific stuff like storing variables that need to change between runs and so on.
 
 
 
 ### Step 5: Create the Filter Function
 
-Implement your filter function in [image_processing.cpp](image-filtering/src/image_processing.cpp). This function should take inn the `cv::Mat` objects for the input and the filtered image, and change the filtered one according to your need.
+Implement your filter function in [image_processing.cpp](image-filtering/src/image_processing.cpp). This function should take in the `cv::Mat` objects for the input and the filtered image, and change the filtered one according to your needs.
 
 ```cpp
 void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
@@ -106,7 +106,7 @@ void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
     DoExample(original,filtered, example_str, example_int);
 }
 ```
-*If you need a helperfunction go to the [helperfunction](#adding-helperfunctions) section of this page.
+*If you need a helper function go to the [helperfunction](#adding-helper-functions) section of this page.
 
 
 ### Step 6: Add to config file
@@ -166,6 +166,6 @@ void ImageFilteringNode::set_filter_params() {
 
 
 
-#### Adding Helperfunctions
+#### Adding Helper functions
 
-If you need helperfunctions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function defenition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO comments where you can add them. These functions are alredy included in the image_prosessing files.
+If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO comments where you can add them. These functions are already included in the image_processing files.

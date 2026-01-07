@@ -52,7 +52,7 @@ double computeAutoGammaFromMean(const cv::Mat& image) {
 
 // Auto-choose a gamma so dark images get lifted and bright images get toned down (expects mono8)
 // - It sets the mean intensity to 255/2 ≃ 128
-// - The weight makes makes all the values weeker(<1) or stronger(>1)
+// - The correction weight makes all the values weaker(<1) or stronger(>1)
 void apply_auto_gamma(cv::Mat& image, double correction_weight) {
     double gamma = computeAutoGammaFromMean(image) * correction_weight;
     applyGammaLUT(image, gamma);
