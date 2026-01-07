@@ -34,7 +34,7 @@ Parameters can be set through a YAML file or dynamically adjusted at runtime.
 
 To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO comments where you add your filter:
 
-### Step 1: Add filter to Enum
+### Step 1: Filter Enum
 
 You should define your filtertype in the filtertype enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
@@ -51,20 +51,19 @@ enum class FilterType {
 ```
 
 ### Step 2: Filter string
-To access the filter trough the yamal file we need to access it trough a string. You need to add it as a string to parse_filter_type in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+To access the filter trough the yamal file we need to access it trough a string. You need to add it as a string to map to the Enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 
 ```cpp
-inline FilterType parse_filter_type(std::string s) {
-  s = to_lower(std::move(s));
-    if (s == "no_filter")      return FilterType::NoFilter;
-    if (s == "flip")           return FilterType::Flip;
-    if (s == "unsharpening")   return FilterType::Unsharpening;
+static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
+    {"no_filter",       FilterType::NoFilter},
+    {"flip",            FilterType::Flip},
+    {"unsharpening",    FilterType::Unsharpening},
     ...
-    // Add your filter type here:
     
-    return FilterType::Unknown;
-
-}
+    // Add your filter here
+    {"example",         FilterType::Example},
+    {"unknown",         FilterType::Unknown}
+};
 ```
 
 
@@ -82,7 +81,7 @@ struct ExampleParams{
 
 ### Step 4: Add filter class
 
-Add a Class for your filter inhereting from the Filter class, with the same exact structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+Below the filter parameters add a Class for your filter inhereting from the Filter class, with the same structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
 ```cpp
 class Example: public Filter{
     public:
