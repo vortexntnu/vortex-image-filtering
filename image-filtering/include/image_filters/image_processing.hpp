@@ -11,6 +11,7 @@
 #include <opencv2/xphoto.hpp>
 
 
+
 enum class FilterType { // TODO: Add filters here
   NoFilter, 
   Flip, 
@@ -28,28 +29,47 @@ enum class FilterType { // TODO: Add filters here
   Unknown
 };
 
+static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
+    {"no_filter",       FilterType::NoFilter},
+    {"flip",            FilterType::Flip},
+    {"unsharpening",    FilterType::Unsharpening},
+    {"erosion",         FilterType::Erosion},
+    {"dilation",        FilterType::Dilation},
+    {"white_balancing", FilterType::WhiteBalancing},
+    {"ebus",            FilterType::Ebus},
+    {"otsu",            FilterType::Otsu},
+    {"overlap",         FilterType::Overlap},
+    {"median_binary",   FilterType::MedianBinary},
+    {"binary",          FilterType::Binary},
+    
+    // TODO: Also add your filter here
+    {"example",         FilterType::Example},
+    {"unknown",         FilterType::Unknown}
+};
+
+
 inline std::string to_lower(std::string s) {
-  for (auto& c : s) c = static_cast<char>(std::tolower(c));
+  for (char& ch : s) {
+    ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+  }
   return s;
 }
 
-inline FilterType parse_filter_type(std::string s) { // TODO: Also add filter-type here
-  s = to_lower(std::move(s));
-    if (s == "no_filter")      return FilterType::NoFilter;
-    if (s == "flip")           return FilterType::Flip;
-    if (s == "unsharpening")   return FilterType::Unsharpening;
-    if (s == "erosion")        return FilterType::Erosion;
-    if (s == "dilation")       return FilterType::Dilation;
-    if (s == "white_balancing")return FilterType::WhiteBalancing;
-    if (s == "ebus")           return FilterType::Ebus;
-    if (s == "otsu")           return FilterType::Otsu;
-    if (s == "overlap")        return FilterType::Overlap;
-    if (s == "median_binary")  return FilterType::MedianBinary;
-    if (s == "binary")         return FilterType::Binary;
-    if (s == "example")        return FilterType::Example;
+inline FilterType parse_filter_type(std::string s) {
+    s = to_lower(std::move(s));
+
+    for (auto [name, type] : kFilterMap) {
+        if (s == name) return type;
+    }
+    std::cout  << "\033[33m No string connected to that filtertype: '" << s << "'. This might be misspelling or you need to add the filtertype to kFilterMap in image_processing.hpp\033[0m";
     return FilterType::Unknown;
 }
 
+inline std::string_view filtertype_to_string(FilterType t) {
+    for (auto [name, type] : kFilterMap) {if (t == type) return name;}
+    std::cout  << "\033[33m No string connected to your filtertype. To fix this add the string and filtertype to kFilterMap\033[0m";
+    return "unknown";
+}
 
 
 
@@ -282,12 +302,11 @@ private:
 
 
 
+// TODO: add this structure for your filter
 
 /////////////////////////////
 // Example
 /////////////////////////////
-
-// TODO: add this structure for your filter
 
 // Example:
 struct ExampleParams{ // Add filter variables here

@@ -187,5 +187,5 @@ void BinaryThreshold::apply_filter(const cv::Mat& original, cv::Mat& filtered) c
 void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
     std::string example_str = this->filter_params.example_string;
     int example_int = this->filter_params.example_int;
-    DoExample(original,filtered, example_str, example_int);
+    apply_example(original,filtered, example_str, example_int);
 }

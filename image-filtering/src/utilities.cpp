@@ -209,6 +209,7 @@ void apply_fixed_threshold(const cv::Mat& img, cv::Mat& filtered, int thresh, bo
 // Params:
 // - type: CV_DIST_L1, CV_DIST_L2, CV_DIST_C, ...
 // - maskSize: 3, 5, or CV_DIST_MASK_PRECISE (0)
+// Best regards, ChatGPT
 void distance_field(const cv::Mat& binObstacles,
                            cv::Mat& dist,
                            bool obstaclesAreWhite,
@@ -262,7 +263,7 @@ void distance_field(const cv::Mat& binObstacles,
 
 // TODO: If you need a helper function define it here like this
 
-void DoExample(const cv::Mat& original,
+void apply_example(const cv::Mat& original,
                cv::Mat& filtered,
                std::string example_string,
                int example_int)
@@ -321,23 +322,15 @@ void DoExample(const cv::Mat& original,
 
 
 
-
-
-
-
-
-
-
-
 //                               _.-.
-//                              /  66\
+//                              /  66\ 
 //                             (      `\          Hi, how you doin :)
 //                             |\\ ,  ,|
 //                     __      | \\____/
 //               ,.--"`-.".   /   `---'
 //           _.-'          '-/      |
 //       _.-"   |   '-.             |_/_
-// ,__.-'  _,.--\      \      ((    /-\
+// ,__.-'  _,.--\      \      ((    /-\ 
 // ',_..--'      `\     \      \\_ /
 //                 `-,   )      |\' 
 //                   |   |-.,,-" (  

@@ -71,8 +71,8 @@ void ImageFilteringNode::set_filter_params() {
     case FilterType::Unknown:
     {
         spdlog::warn("\033[33mInvalid filter type received: {}. Using default: no_filter.\033[0m", filter_type_string);
-        // filter_ = "no_filter";
         filter_type = FilterType::NoFilter;
+        [[fallthrough]];
     }
     
     case FilterType::NoFilter:
@@ -226,11 +226,10 @@ void ImageFilteringNode::set_filter_params() {
                     "To fix this add your filter to ImageFilteringNode::set_filter_params(). "
                     "Defaulting to no_filter. \033[0m",
                     filter_type_string);
+        filter_type = FilterType::NoFilter;
     };
 
-    if (filter_type != FilterType::Unknown){
-        spdlog::info("\033[32m Using filter: {} \033[0m", filter_type_string);
-    }
+    spdlog::info("\033[32m Using filter: {} \033[0m", filtertype_to_string(filter_type));
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
