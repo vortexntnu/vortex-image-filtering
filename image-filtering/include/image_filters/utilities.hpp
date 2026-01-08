@@ -1,5 +1,5 @@
-#ifndef UTILITIES_HPP
-#define UTILITIES_HPP
+#ifndef IMAGE_FILTERS__UTILITIES_HPP_
+#define IMAGE_FILTERS__UTILITIES_HPP_
 
 #include <numeric>
 #include <opencv2/core.hpp>
@@ -7,6 +7,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
+#include <string>
 
 // Auto-choose a gamma so dark images get lifted and bright images get toned
 // down (expects mono8)
@@ -60,10 +61,10 @@ void distance_field(const cv::Mat& binObstacles,
                     int type = cv::DIST_L2,
                     int maskSize = 3);  // DIST_L2 is normal euclidean
 
-// TODO: If you need a helper function have the signature here
+// TODO(Vortex): If you need a helper function have the signature here
 void apply_example(const cv::Mat& original,
                    cv::Mat& filtered,
                    std::string example_string,
                    int example_int);
 
-#endif
+#endif  // IMAGE_FILTERS__UTILITIES_HPP_

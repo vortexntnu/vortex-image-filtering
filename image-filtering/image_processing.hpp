@@ -10,7 +10,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
 
-enum class FilterType {  // TODO: Add filters here
+enum class FilterType {  // TODO(Vortex): Add filters here
     NoFilter,
     Flip,
     Unsharpening,
@@ -32,7 +32,7 @@ inline std::string to_lower(std::string s) {
 }
 
 inline FilterType parse_filter_type(
-    std::string s) {  // TODO: Also add filter-type here
+    std::string s) {  // TODO(Vortex): Also add filter-type here
     s = to_lower(std::move(s));
     if (s == "no_filter")
         return FilterType::NoFilter;
@@ -297,7 +297,7 @@ class BinaryThreshold : public Filter {
 // Example
 /////////////////////////////
 
-// TODO: add this structure for your filter
+// TODO(Vortex): add this structure for your filter
 
 // Example:
 struct ExampleParams {  // Add filter variables here

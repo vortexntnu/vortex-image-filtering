@@ -1,12 +1,14 @@
-#ifndef IMAGE_FILTERING_ROS_HPP
-#define IMAGE_FILTERING_ROS_HPP
+#ifndef IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
+#define IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
 
 #include <cv_bridge/cv_bridge.h>  // for jazzy this has to be hpp and for humble it has to be h
 #include <spdlog/spdlog.h>
+#include <memory>
 #include <rclcpp/parameter_event_handler.hpp>
 #include <rclcpp/qos.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
+#include <string>
 #include "image_processing.hpp"
 
 class ImageFilteringNode : public rclcpp::Node {
@@ -103,4 +105,4 @@ class ImageFilteringNode : public rclcpp::Node {
     std::unique_ptr<Filter> filter_ptr;
 };
 
-#endif  // IMAGE_FILTERING_ROS_HPP
+#endif  // IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_

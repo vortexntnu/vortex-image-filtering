@@ -32,7 +32,7 @@ Parameters can be set through a YAML file or dynamically adjusted at runtime.
 
 ## Implementing New Filters
 
-To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO comments where you add your filter:
+To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO(Vortex) comments where you add your filter:
 
 ### Step 1: Filter Enum
 
@@ -168,4 +168,4 @@ void ImageFilteringNode::set_filter_params() {
 
 #### Adding Helper functions
 
-If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO comments where you can add them. These functions are already included in the image_processing files.
+If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO(Vortex) comments where you can add them. These functions are already included in the image_processing files.

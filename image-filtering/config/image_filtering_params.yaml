@@ -41,7 +41,7 @@
         maxval: 255.
         invert: true
 
-      # TODO: add your filterparameters here
+      # TODO(Vortex): add your filterparameters here
       example:
         example_int: 1
         example_string: "Get filtered"

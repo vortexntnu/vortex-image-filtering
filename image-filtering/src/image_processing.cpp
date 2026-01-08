@@ -179,7 +179,7 @@ void BinaryThreshold::apply_filter(const cv::Mat& original,
     cv::threshold(src8, filtered, thresh, maxval, type);
 }
 
-// TODO: Implement your filter here
+// TODO(Vortex): Implement your filter here
 void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     std::string example_str = this->filter_params.example_string;
     int example_int = this->filter_params.example_int;
