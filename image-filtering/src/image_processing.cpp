@@ -86,9 +86,8 @@ void OtsuSegmentation::apply_filter(const cv::Mat& original,
     } else if (original.type() == CV_8UC1) {
         original.copyTo(filtered);
     }  // if its mono8
-    else {
+    else
         std::cout << "your image type is not matching this filter" << std::endl;
-    }
 
     if (gamma_auto_correction) {
         apply_auto_gamma(filtered, gamma_auto_correction_weight);

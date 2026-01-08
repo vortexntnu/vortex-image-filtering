@@ -237,7 +237,7 @@ void ImageFilteringNode::set_filter_params() {
                 "Defaulting to no_filter. \033[0m",
                 filter_type_string);
             filter_type = FilterType::NoFilter;
-    };
+    }
 
     spdlog::info("\033[32m Using filter: {} \033[0m",
                  filtertype_to_string(filter_type));
@@ -304,7 +304,6 @@ void ImageFilteringNode::image_callback(
             spdlog::error("Received empty image, skipping processing.");
             return;
         }
-
     } catch (cv_bridge::Exception& e) {
         spdlog::error("cv_bridge exception: {}", e.what());
         ;

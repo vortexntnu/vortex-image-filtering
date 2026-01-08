@@ -14,7 +14,7 @@
 class ImageFilteringNode : public rclcpp::Node {
    public:
     explicit ImageFilteringNode(const rclcpp::NodeOptions& options);
-    ~ImageFilteringNode() {};
+    ~ImageFilteringNode() {}
 
    private:
     /**

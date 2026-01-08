@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILTERING__IMAGE_PROCESSING_HPP_
-#define IMAGE_FILTERING__IMAGE_PROCESSING_HPP_
+#ifndef IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
+#define IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
 
 #include <iostream>
 #include <map>
@@ -94,7 +94,6 @@ struct NoFilterParams {};
 
 class NoFilter : public Filter {
    public:
-    explicit NoFilter() = default;  // No parameters to set
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override {
         original.copyTo(filtered);
@@ -337,4 +336,4 @@ class Example : public Filter {
     ExampleParams filter_params;
 };
 
-#endif  // IMAGE_FILTERING__IMAGE_PROCESSING_HPP_
+#endif  // IMAGE_FILTERS__IMAGE_PROCESSING_HPP_
