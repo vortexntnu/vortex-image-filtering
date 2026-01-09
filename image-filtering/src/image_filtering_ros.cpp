@@ -67,14 +67,6 @@ void ImageFilteringNode::set_filter_params() {
     FilterType filter_type = parse_filter_type(filter_type_string);
 
     switch (filter_type) {
-        case FilterType::Unknown: {
-            spdlog::warn(
-                "\033[33mInvalid filter type received: {}. Using default: "
-                "no_filter.\033[0m",
-                filter_type_string);
-            filter_type = FilterType::NoFilter;
-            [[fallthrough]];
-        }
 
         case FilterType::NoFilter: {
             filter_ptr = std::make_unique<NoFilter>();
@@ -228,19 +220,31 @@ void ImageFilteringNode::set_filter_params() {
         }
 
         default:;
+            if (filter_type == FilterType::Unknown){
+                spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                        "Invalid filter type received: {}. Using default: no_filter.",
+                        filter_type_string));
+            }
+            else{
+                spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                    "Filterparams has not been set for your chosen filter "
+                    "{}. "
+                    "To fix this add your filter to "
+                    "ImageFilteringNode::set_filter_params(). "
+                    "Using default: no_filter.",
+                    filter_type_string));
+            }
+
             filter_ptr = std::make_unique<NoFilter>();
-            spdlog::warn(
-                "\033[33m Filterparams has not been set for your chosen filter "
-                "{}. "
-                "To fix this add your filter to "
-                "ImageFilteringNode::set_filter_params(). "
-                "Defaulting to no_filter. \033[0m",
-                filter_type_string);
             filter_type = FilterType::NoFilter;
+        
+            return;
     }
 
-    spdlog::info("\033[32m Using filter: {} \033[0m",
-                 filtertype_to_string(filter_type));
+
+
+    spdlog::info(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),"Using filter: {}",
+                filter_type_string));
 }
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
@@ -312,7 +316,17 @@ void ImageFilteringNode::image_callback(
     cv::Mat input_image = cv_ptr->image;
     cv::Mat filtered_image;
 
-    filter_ptr->apply_filter(input_image, filtered_image);
+    try{
+        filter_ptr->apply_filter(input_image, filtered_image);
+    } 
+    catch (const cv::Exception& e) {
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)), "OpenCV error while applying filter: {}", e.what()));
+        filtered_image = input_image.clone();  // fallback to no filter
+    }
+    catch (const std::exception& e) {
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),"Error while applying filter: {}", e.what()));
+        filtered_image = input_image.clone();
+    }
 
     std::string output_encoding =
         this->get_parameter("output_encoding").as_string();

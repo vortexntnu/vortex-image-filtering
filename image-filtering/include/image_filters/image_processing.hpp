@@ -9,6 +9,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
+#include <spdlog/spdlog.h>
+#include <fmt/color.h>
 #include <string>
 #include <utility>
 
@@ -60,9 +62,7 @@ inline FilterType parse_filter_type(std::string s) {
         if (s == name)
             return type;
     }
-    std::cout << "\033[33m No string connected to that filter type: '" << s
-              << "'. This might be misspelling or you need to add the filter "
-                 "type to kFilterMap in image_processing.hpp\033[0m";
+    spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)), "No string connected to that filter type: '{}'. This might be misspelling or you need to add the filter type to kFilterMap in image_processing.hpp", s));
     return FilterType::Unknown;
 }
 
@@ -71,8 +71,8 @@ inline std::string_view filtertype_to_string(FilterType t) {
         if (t == type)
             return name;
     }
-    std::cout << "\033[33m No string connected to your filter type. To fix "
-                 "this add the string and filter type to kFilterMap\033[0m";
+    spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)), " No string connected to your filter type. To fix "
+                 "this add the string and filter type to kFilterMap"));
     return "unknown";
 }
 

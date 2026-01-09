@@ -3,6 +3,8 @@
 
 #include <cv_bridge/cv_bridge.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
+#include <fmt/color.h>
 #include <memory>
 #include <rclcpp/parameter_event_handler.hpp>
 #include <rclcpp/qos.hpp>
@@ -10,6 +12,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
 #include "image_processing.hpp"
+
 
 class ImageFilteringNode : public rclcpp::Node {
    public:
