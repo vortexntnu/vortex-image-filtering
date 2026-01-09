@@ -61,7 +61,7 @@ void distance_field(const cv::Mat& binObstacles,
                     int type = cv::DIST_L2,
                     int maskSize = 3);  // DIST_L2 is normal euclidean
 
-// TODO(Vortex): If you need a helper function have the signature here
+// TODO(New filter): If you need a helper function have the signature here
 void apply_example(const cv::Mat& original,
                    cv::Mat& filtered,
                    std::string example_string,

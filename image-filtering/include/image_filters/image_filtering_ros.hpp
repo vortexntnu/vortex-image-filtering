@@ -1,7 +1,7 @@
 #ifndef IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
 #define IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
 
-#include <cv_bridge/cv_bridge.h>  // for jazzy this has to be hpp and for humble it has to be h
+#include <cv_bridge/cv_bridge.h>
 #include <spdlog/spdlog.h>
 #include <memory>
 #include <rclcpp/parameter_event_handler.hpp>

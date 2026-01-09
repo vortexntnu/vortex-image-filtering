@@ -12,7 +12,7 @@
 #include <string>
 #include <utility>
 
-enum class FilterType {  // TODO(Vortex): Add filters here
+enum class FilterType {  // TODO(New filter): Add filters here
     NoFilter,
     Flip,
     Unsharpening,
@@ -42,7 +42,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"median_binary", FilterType::MedianBinary},
     {"binary", FilterType::Binary},
 
-    // TODO(Vortex): Also add your filter here
+    // TODO(New filter): Also add your filter here
     {"example", FilterType::Example},
     {"unknown", FilterType::Unknown}};
 
@@ -315,7 +315,7 @@ class BinaryThreshold : public Filter {
     BinaryThresholdParams filter_params;
 };
 
-// TODO(Vortex): add this structure for your filter
+// TODO(New filter): add this structure for your filter
 
 /////////////////////////////
 // Example

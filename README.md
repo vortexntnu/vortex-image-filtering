@@ -32,7 +32,7 @@ Parameters can be set through a YAML file or dynamically adjusted at runtime.
 
 ## Implementing New Filters
 
-To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO(Vortex) comments where you add your filter:
+To extend the functionality of the `image_filtering_node` by adding new filters, follow these steps to ensure compatibility and integration with the existing codebase. There should be //TODO(New filter) comments where you add your filter:
 
 ### Step 1: Filter Enum
 
@@ -130,7 +130,7 @@ In the [image_filtering_params.yaml](image-filtering/config/image_filtering_para
 
 ### Step 7: Declare and Assign Parameters
 
-In the constructor of your ROS 2 node, declare each of the new filter parameters using the `declare_parameter` function in [image_filtering_ros.cpp](image-filtering/src/image_filtering_ros.cpp). This sets the default values and prepares the node to accept these parameters at runtime through command line or the YAML configuration file.
+In the constructor of your ROS 2 node, declare each of the new filter parameters using the `declare_parameter` function in [image_filtering_ros.cpp](image-filtering/src/image_filtering_ros.cpp). This declares the ros2 parameters and prepares the node to accept them at runtime through command line or the YAML configuration file.
 
 ```cpp
 void ImageFilteringNode::declare_parameters() {
@@ -168,4 +168,4 @@ void ImageFilteringNode::set_filter_params() {
 
 #### Adding Helper functions
 
-If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO(Vortex) comments where you can add them. These functions are already included in the image_processing files.
+If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO(New filter) comments where you can add them. These functions are already included in the image_processing files.

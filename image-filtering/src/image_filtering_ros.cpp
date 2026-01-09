@@ -55,7 +55,7 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<int>("filter_params.median_binary.threshold");
     this->declare_parameter<bool>("filter_params.median_binary.invert");
 
-    // TODO(Vortex): Declare parameters set for your filter here
+    // TODO(New filter): Declare parameters set for your filter here
     this->declare_parameter<int>("filter_params.example.example_int");
     this->declare_parameter<std::string>(
         "filter_params.example.example_string");
@@ -213,7 +213,7 @@ void ImageFilteringNode::set_filter_params() {
             break;
         }
 
-        // TODO(Vortex): Add your filter case here:
+        // TODO(New filter): Add your filter case here:
         case FilterType::Example: {
             ExampleParams params;
             params.example_int =

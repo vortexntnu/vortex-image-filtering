@@ -242,7 +242,7 @@ void distance_field(const cv::Mat& binObstacles,
     // publish vis8u as "mono8"
 }
 
-// TODO(Vortex): If you need a helper function define it here like this
+// TODO(New filter): If you need a helper function define it here like this
 
 void apply_example(const cv::Mat& original,
                    cv::Mat& filtered,
