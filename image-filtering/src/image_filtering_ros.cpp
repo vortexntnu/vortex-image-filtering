@@ -1,7 +1,7 @@
 #include <image_filters/image_filtering_ros.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <image_filters/image_filtering_ros_utils.hpp>
 
-using std::placeholders::_1;
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
@@ -9,57 +9,52 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     check_and_subscribe_to_image_topic();
     set_filter_params();
     initialize_parameter_handler();
+    check_and_publish_to_output_topic();
 
-    rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
-    auto qos_sensor_data = rclcpp::QoS(
-        rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
-
-    std::string pub_topic = this->get_parameter("pub_topic").as_string();
-    image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
-        pub_topic, qos_sensor_data);
 }
 
-void ImageFilteringNode::declare_parameters() {
-    this->declare_parameter<std::string>("sub_topic");
-    this->declare_parameter<std::string>("pub_topic");
-    this->declare_parameter<std::string>("output_encoding");
-    this->declare_parameter<std::string>("input_encoding");
-    this->declare_parameter<std::string>("filter_params.filter_type");
-    this->declare_parameter<int>("filter_params.flip.flip_code");
-    this->declare_parameter<int>("filter_params.unsharpening.blur_size");
-    this->declare_parameter<int>("filter_params.erosion.size");
-    this->declare_parameter<int>("filter_params.dilation.size");
-    this->declare_parameter<double>(
-        "filter_params.white_balancing.contrast_percentage");
-    this->declare_parameter<int>("filter_params.ebus.erosion_size");
-    this->declare_parameter<int>("filter_params.ebus.blur_size");
-    this->declare_parameter<int>("filter_params.ebus.mask_weight");
-    this->declare_parameter<bool>("filter_params.otsu.gamma_auto_correction");
-    this->declare_parameter<double>(
-        "filter_params.otsu.gamma_auto_correction_weight");
-    this->declare_parameter<bool>("filter_params.otsu.otsu_segmentation");
-    this->declare_parameter<double>("filter_params.otsu.gsc_weight_r");
-    this->declare_parameter<double>("filter_params.otsu.gsc_weight_g");
-    this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
-    this->declare_parameter<int>("filter_params.otsu.erosion_size");
-    this->declare_parameter<int>("filter_params.otsu.dilation_size");
+// void ImageFilteringNode::declare_parameters() {
+//     this->declare_parameter<std::string>("sub_topic");
+//     this->declare_parameter<std::string>("pub_topic");
+//     this->declare_parameter<std::string>("output_encoding");
+//     this->declare_parameter<std::string>("input_encoding");
+//     this->declare_parameter<std::string>("filter_params.filter_type");
 
-    this->declare_parameter<double>(
-        "filter_params.overlap.percentage_threshold");
+//     this->declare_parameter<int>("filter_params.flip.flip_code");
+//     this->declare_parameter<int>("filter_params.unsharpening.blur_size");
+//     this->declare_parameter<int>("filter_params.erosion.size");
+//     this->declare_parameter<int>("filter_params.dilation.size");
+//     this->declare_parameter<double>(
+//         "filter_params.white_balancing.contrast_percentage");
+//     this->declare_parameter<int>("filter_params.ebus.erosion_size");
+//     this->declare_parameter<int>("filter_params.ebus.blur_size");
+//     this->declare_parameter<int>("filter_params.ebus.mask_weight");
+//     this->declare_parameter<bool>("filter_params.otsu.gamma_auto_correction");
+//     this->declare_parameter<double>(
+//         "filter_params.otsu.gamma_auto_correction_weight");
+//     this->declare_parameter<bool>("filter_params.otsu.otsu_segmentation");
+//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_r");
+//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_g");
+//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
+//     this->declare_parameter<int>("filter_params.otsu.erosion_size");
+//     this->declare_parameter<int>("filter_params.otsu.dilation_size");
 
-    this->declare_parameter<double>("filter_params.binary.threshold");
-    this->declare_parameter<double>("filter_params.binary.maxval");
-    this->declare_parameter<bool>("filter_params.binary.invert");
+//     this->declare_parameter<double>(
+//         "filter_params.overlap.percentage_threshold");
 
-    this->declare_parameter<int>("filter_params.median_binary.kernel_size");
-    this->declare_parameter<int>("filter_params.median_binary.threshold");
-    this->declare_parameter<bool>("filter_params.median_binary.invert");
+//     this->declare_parameter<double>("filter_params.binary.threshold");
+//     this->declare_parameter<double>("filter_params.binary.maxval");
+//     this->declare_parameter<bool>("filter_params.binary.invert");
 
-    // TODO(New filter): Declare parameters set for your filter here
-    this->declare_parameter<int>("filter_params.example.example_int");
-    this->declare_parameter<std::string>(
-        "filter_params.example.example_string");
-}
+//     this->declare_parameter<int>("filter_params.median_binary.kernel_size");
+//     this->declare_parameter<int>("filter_params.median_binary.threshold");
+//     this->declare_parameter<bool>("filter_params.median_binary.invert");
+
+//     // TODO(New filter): Declare parameters set for your filter here
+//     this->declare_parameter<int>("filter_params.example.example_int");
+//     this->declare_parameter<std::string>(
+//         "filter_params.example.example_string");
+// }
 
 void ImageFilteringNode::set_filter_params() {
     std::string filter_type_string =
@@ -72,11 +67,11 @@ void ImageFilteringNode::set_filter_params() {
             filter_ptr = std::make_unique<NoFilter>();
             break;
         }
+
         case FilterType::Unsharpening: {
             UnsharpeningParams params;
             params.blur_size =
-                this->get_parameter("filter_params.unsharpening.blur_size")
-                    .as_int();
+                declare_and_get<int>("filter_params.unsharpening.blur_size");
 
             filter_ptr = std::make_unique<Unsharpening>(params);
             break;
@@ -85,7 +80,7 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Flip: {
             FlipParams params;
             params.flip_code =
-                this->get_parameter("filter_params.flip.flip_code").as_int();
+                declare_and_get<int>("filter_params.flip.flip_code");
 
             filter_ptr = std::make_unique<Flip>(params);
             break;
@@ -94,7 +89,7 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Erosion: {
             ErosionParams params;
             params.kernel_size =
-                this->get_parameter("filter_params.erosion.size").as_int();
+                declare_and_get<int>("filter_params.erosion.size");
 
             filter_ptr = std::make_unique<Erosion>(params);
             break;
@@ -103,7 +98,7 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Dilation: {
             DilationParams params;
             params.kernel_size =
-                this->get_parameter("filter_params.dilation.size").as_int();
+                declare_and_get<int>("filter_params.dilation.size");
 
             filter_ptr = std::make_unique<Dilation>(params);
             break;
@@ -112,9 +107,8 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::WhiteBalancing: {
             WhiteBalanceParams params;
             params.contrast_percentage =
-                this->get_parameter(
-                        "filter_params.white_balancing.contrast_percentage")
-                    .as_double();
+                declare_and_get<double>(
+                    "filter_params.white_balancing.contrast_percentage");
 
             filter_ptr = std::make_unique<WhiteBalance>(params);
             break;
@@ -123,11 +117,11 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Ebus: {
             EbusParams params;
             params.erosion_size =
-                this->get_parameter("filter_params.ebus.erosion_size").as_int();
+                declare_and_get<int>("filter_params.ebus.erosion_size");
             params.blur_size =
-                this->get_parameter("filter_params.ebus.blur_size").as_int();
+                declare_and_get<int>("filter_params.ebus.blur_size");
             params.mask_weight =
-                this->get_parameter("filter_params.ebus.mask_weight").as_int();
+                declare_and_get<int>("filter_params.ebus.mask_weight");
 
             filter_ptr = std::make_unique<Ebus>(params);
             break;
@@ -136,29 +130,22 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Otsu: {
             OtsuSegmentationParams params;
             params.gamma_auto_correction =
-                this->get_parameter("filter_params.otsu.gamma_auto_correction")
-                    .as_bool();
+                declare_and_get<bool>("filter_params.otsu.gamma_auto_correction");
             params.gamma_auto_correction_weight =
-                this->get_parameter(
-                        "filter_params.otsu.gamma_auto_correction_weight")
-                    .as_double();
+                declare_and_get<double>(
+                    "filter_params.otsu.gamma_auto_correction_weight");
             params.otsu_segmentation =
-                this->get_parameter("filter_params.otsu.otsu_segmentation")
-                    .as_bool();
+                declare_and_get<bool>("filter_params.otsu.otsu_segmentation");
             params.gsc_weight_r =
-                this->get_parameter("filter_params.otsu.gsc_weight_r")
-                    .as_double();
+                declare_and_get<double>("filter_params.otsu.gsc_weight_r");
             params.gsc_weight_g =
-                this->get_parameter("filter_params.otsu.gsc_weight_g")
-                    .as_double();
+                declare_and_get<double>("filter_params.otsu.gsc_weight_g");
             params.gsc_weight_b =
-                this->get_parameter("filter_params.otsu.gsc_weight_b")
-                    .as_double();
+                declare_and_get<double>("filter_params.otsu.gsc_weight_b");
             params.erosion_size =
-                this->get_parameter("filter_params.otsu.erosion_size").as_int();
+                declare_and_get<int>("filter_params.otsu.erosion_size");
             params.dilation_size =
-                this->get_parameter("filter_params.otsu.dilation_size")
-                    .as_int();
+                declare_and_get<int>("filter_params.otsu.dilation_size");
 
             filter_ptr = std::make_unique<OtsuSegmentation>(params);
             break;
@@ -167,9 +154,8 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Overlap: {
             OverlapParams params;
             params.percentage_threshold =
-                this->get_parameter(
-                        "filter_params.overlap.percentage_threshold")
-                    .as_double();
+                declare_and_get<double>(
+                    "filter_params.overlap.percentage_threshold");
 
             filter_ptr = std::make_unique<Overlap>(params);
             break;
@@ -178,14 +164,11 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::MedianBinary: {
             MedianBinaryParams params;
             params.kernel_size =
-                this->get_parameter("filter_params.median_binary.kernel_size")
-                    .as_int();
+                declare_and_get<int>("filter_params.median_binary.kernel_size");
             params.threshold =
-                this->get_parameter("filter_params.median_binary.threshold")
-                    .as_int();
+                declare_and_get<int>("filter_params.median_binary.threshold");
             params.invert =
-                this->get_parameter("filter_params.median_binary.invert")
-                    .as_bool();
+                declare_and_get<bool>("filter_params.median_binary.invert");
 
             filter_ptr = std::make_unique<MedianBinary>(params);
             break;
@@ -194,12 +177,11 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Binary: {
             BinaryThresholdParams params;
             params.threshold =
-                this->get_parameter("filter_params.binary.threshold")
-                    .as_double();
+                declare_and_get<double>("filter_params.binary.threshold");
             params.maxval =
-                this->get_parameter("filter_params.binary.maxval").as_double();
+                declare_and_get<double>("filter_params.binary.maxval");
             params.invert =
-                this->get_parameter("filter_params.binary.invert").as_bool();
+                declare_and_get<bool>("filter_params.binary.invert");
 
             filter_ptr = std::make_unique<BinaryThreshold>(params);
             break;
@@ -209,11 +191,10 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::Example: {
             ExampleParams params;
             params.example_int =
-                this->get_parameter("filter_params.example.example_int")
-                    .as_int();
+                declare_and_get<int>("filter_params.example.example_int");
             params.example_string =
-                this->get_parameter("filter_params.example.example_string")
-                    .as_string();
+                declare_and_get<std::string>(
+                    "filter_params.example.example_string");
 
             filter_ptr = std::make_unique<Example>(params);
             break;
@@ -237,9 +218,10 @@ void ImageFilteringNode::set_filter_params() {
 
             filter_ptr = std::make_unique<NoFilter>();
             filter_type = FilterType::NoFilter;
-        
+
             return;
     }
+
 
 
 
@@ -247,34 +229,34 @@ void ImageFilteringNode::set_filter_params() {
                 filter_type_string));
 }
 
-void ImageFilteringNode::check_and_subscribe_to_image_topic() {
-    std::string image_topic = this->get_parameter("sub_topic").as_string();
-    if (image_topic_ != image_topic) {
-        rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
-        auto qos_sensor_data = rclcpp::QoS(
-            rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
+// void ImageFilteringNode::check_and_subscribe_to_image_topic() {
+//     std::string image_topic = this->get_parameter("sub_topic").as_string();
+//     if (image_topic_ != image_topic) {
+//         rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
+//         auto qos_sensor_data = rclcpp::QoS(
+//             rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
 
-        image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-            image_topic, qos_sensor_data,
-            std::bind(&ImageFilteringNode::image_callback, this, _1));
-        image_topic_ = image_topic;
-        spdlog::info("Subscribed to image topic: {}", image_topic);
-    }
-}
+//         image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+//             image_topic, qos_sensor_data,
+//             std::bind(&ImageFilteringNode::image_callback, this, _1));
+//         image_topic_ = image_topic;
+//         spdlog::info("Subscribed to image topic: {}", image_topic);
+//     }
+// }
 
-void ImageFilteringNode::check_and_publish_to_output_topic(){
-    std::string pub_topic = this->get_parameter("pub_topic").as_string();
-    if (pub_topic_ != pub_topic){
-        rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data; // This is some quality of service stuf (prefers low latency over quality)
-        auto qos_sensor_data = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile); // ROS keeps only the newest image
+// void ImageFilteringNode::check_and_publish_to_output_topic(){
+//     std::string pub_topic = this->get_parameter("pub_topic").as_string();
+//     if (pub_topic_ != pub_topic){
+//         rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data; // This is some quality of service stuf (prefers low latency over quality)
+//         auto qos_sensor_data = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile); // ROS keeps only the newest image
 
 
-        image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(pub_topic, qos_sensor_data);
+//         image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(pub_topic, qos_sensor_data);
 
-        pub_topic_ = pub_topic;
-        spdlog::info("Publishing to image topic: {}", pub_topic);
-    } 
-}
+//         pub_topic_ = pub_topic;
+//         spdlog::info("Publishing to image topic: {}", pub_topic);
+//     } 
+// }
 
 void ImageFilteringNode::initialize_parameter_handler() {
     param_handler_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
@@ -301,6 +283,8 @@ void ImageFilteringNode::on_parameter_event(
             check_and_subscribe_to_image_topic();
         if (changed_parameter.name.find("filter_params") == 0)
             set_filter_params();
+        if (changed_parameter.name.find("pub_topic") == 0)
+            check_and_publish_to_output_topic();
     }
 }
 

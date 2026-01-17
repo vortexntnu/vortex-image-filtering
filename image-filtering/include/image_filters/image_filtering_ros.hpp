@@ -42,8 +42,8 @@ class ImageFilteringNode : public rclcpp::Node {
     void check_and_subscribe_to_image_topic();
 
     /**
-     * @brief Check and start publishing to output topic. 
-     * If output topic is changed, then shut down the old one and start publishing to the new.
+     * @brief Check and start publishing to output topic if output topic is changed, or not alredy started.
+     *  Then shut down the old one and start publishing to the new.
      */
     void check_and_publish_to_output_topic();
 
@@ -52,6 +52,18 @@ class ImageFilteringNode : public rclcpp::Node {
      *
      */
     void declare_parameters();
+
+    /**
+     * @brief Declare a ros parameter if it isn't declared yet and return it
+     */
+    template<typename T>
+    T declare_and_get(const std::string& name)
+    {
+        if (!this->has_parameter(name)) {
+            this->declare_parameter<T>(name);
+        }
+        return this->get_parameter(name).get_value<T>();
+    }
 
     /**
      * @brief Set the filter parameters for the FilterParams struct.
@@ -120,6 +132,7 @@ class ImageFilteringNode : public rclcpp::Node {
      *
      */
     std::unique_ptr<Filter> filter_ptr;
+
 };
 
 #endif  // IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
