@@ -26,6 +26,7 @@ add_library(${LIB_NAME} SHARED
   src/image_processing.cpp
   src/image_filtering_ros.cpp
   src/utilities.cpp
+  src/filters/example.cpp
 )
 
 target_link_libraries(${LIB_NAME} PUBLIC

@@ -11,7 +11,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
-#include "image_processing.hpp"
+#include "image_processing.hpp" // TODO (Thomas) Remove this later
+#include "filters/all_filters.hpp"
+
+#include "typedef.hpp"
 
 
 class ImageFilteringNode : public rclcpp::Node {
@@ -37,6 +40,12 @@ class ImageFilteringNode : public rclcpp::Node {
      *
      */
     void check_and_subscribe_to_image_topic();
+
+    /**
+     * @brief Check and start publishing to output topic. 
+     * If output topic is changed, then shut down the old one and start publishing to the new.
+     */
+    void check_and_publish_to_output_topic();
 
     /**
      * @brief Declare the ros2 parameters used by the node.
@@ -101,6 +110,11 @@ class ImageFilteringNode : public rclcpp::Node {
      */
     std::string image_topic_;
 
+    /**
+     * @brief The output topic to publish to
+     *
+     */
+    std::string pub_topic_;
     /**
      * @brief Pointer to the filter object
      *

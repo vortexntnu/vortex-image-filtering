@@ -262,6 +262,20 @@ void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     }
 }
 
+void ImageFilteringNode::check_and_publish_to_output_topic(){
+    std::string pub_topic = this->get_parameter("pub_topic").as_string();
+    if (pub_topic_ != pub_topic){
+        rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data; // This is some quality of service stuf (prefers low latency over quality)
+        auto qos_sensor_data = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile); // ROS keeps only the newest image
+
+
+        image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(pub_topic, qos_sensor_data);
+
+        pub_topic_ = pub_topic;
+        spdlog::info("Publishing to image topic: {}", pub_topic);
+    } 
+}
+
 void ImageFilteringNode::initialize_parameter_handler() {
     param_handler_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
 

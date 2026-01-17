@@ -177,10 +177,3 @@ void BinaryThreshold::apply_filter(const cv::Mat& original,
     const int type = invert ? cv::THRESH_BINARY_INV : cv::THRESH_BINARY;
     cv::threshold(src8, filtered, thresh, maxval, type);
 }
-
-// TODO(New filter): Implement your filter here
-void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
-    std::string example_str = this->filter_params.example_string;
-    int example_int = this->filter_params.example_int;
-    apply_example(original, filtered, example_str, example_int);
-}

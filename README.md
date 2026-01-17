@@ -36,7 +36,7 @@ To extend the functionality of the `image_filtering_node` by adding new filters,
 
 ### Step 1: Filter Enum
 
-You should define your filtertype in the filtertype enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+You should define your filtertype in the filtertype enum in [typedef.hpp](image-filtering/include/image_filters/typedef.hpp)
 
 ```cpp
 enum class FilterType {
@@ -51,7 +51,7 @@ enum class FilterType {
 ```
 
 ### Step 2: Filter string
-To access the filter through the yaml file we need to access it through a string. You need to add it as a string to map to the Enum in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+To access the filter through the yaml file we need to access it through a string. You need to add it as a string to map to the Enum in [typedef.hpp](image-filtering/include/image_filters/typedef.hpp)
 
 ```cpp
 static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
