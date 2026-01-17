@@ -40,6 +40,22 @@ class Unsharpening : public Filter {
 // Sharpening
 /////////////////////////////
 
+struct SharpeningParams {};
+
+class Sharpening : public Filter {
+   public:
+    explicit Sharpening(SharpeningParams params) : filter_params(params) {}
+    void apply_filter(const cv::Mat& original,
+                      cv::Mat& filtered) const override;
+
+   private:
+    SharpeningParams filter_params;
+};
+
+/////////////////////////////
+// Flip
+/////////////////////////////
+
 struct FlipParams {
     int flip_code;
 };
@@ -54,21 +70,7 @@ class Flip : public Filter {
     FlipParams filter_params;
 };
 
-/////////////////////////////
-// Sharpening
-/////////////////////////////
 
-struct SharpeningParams {};
-
-class Sharpening : public Filter {
-   public:
-    explicit Sharpening(SharpeningParams params) : filter_params(params) {}
-    void apply_filter(const cv::Mat& original,
-                      cv::Mat& filtered) const override;
-
-   private:
-    SharpeningParams filter_params;
-};
 /////////////////////////////
 // Erosion
 /////////////////////////////

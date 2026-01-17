@@ -6,7 +6,7 @@
     output_encoding: "mono8"
 
     filter_params:
-      filter_type: "otsu"
+      filter_type: "example"
       flip:
         flip_code: 1
       unsharpening:
