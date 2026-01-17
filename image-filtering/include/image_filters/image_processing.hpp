@@ -4,19 +4,6 @@
 
 #include "filters/abstract_filter_class.hpp"
 
-/////////////////////////////
-// No filter
-/////////////////////////////
-
-struct NoFilterParams {};
-
-class NoFilter : public Filter {
-   public:
-    void apply_filter(const cv::Mat& original,
-                      cv::Mat& filtered) const override {
-        original.copyTo(filtered);
-    };
-};
 
 ////////////////////////////
 // Unsharpening
