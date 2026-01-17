@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
-#define IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
+#ifndef ROS__IMAGE_FILTERING_ROS_HPP_
+#define ROS__IMAGE_FILTERING_ROS_HPP_
 
 #include <cv_bridge/cv_bridge.h>
 #include <spdlog/spdlog.h>
@@ -11,10 +11,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
-#include "image_processing.hpp" // TODO (Thomas) Remove this later
-#include "filters/all_filters.hpp"
+#include "lib/filters/all_filters.hpp"
 
-#include "typedef.hpp"
+#include "lib/typedef.hpp"
 
 
 class ImageFilteringNode : public rclcpp::Node {
@@ -133,6 +132,9 @@ class ImageFilteringNode : public rclcpp::Node {
      */
     std::unique_ptr<Filter> filter_ptr;
 
+
+
+
 };
 
-#endif  // IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
+#endif  // ROS__IMAGE_FILTERING_ROS_HPP_

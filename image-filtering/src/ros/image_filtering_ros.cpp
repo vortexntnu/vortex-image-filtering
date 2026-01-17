@@ -1,6 +1,6 @@
-#include <image_filters/image_filtering_ros.hpp>
+#include <ros/image_filtering_ros.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
-#include <image_filters/image_filtering_ros_utils.hpp>
+#include <ros/image_filtering_ros_utils.hpp>
 
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
@@ -10,51 +10,8 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     set_filter_params();
     initialize_parameter_handler();
     check_and_publish_to_output_topic();
-
 }
 
-// void ImageFilteringNode::declare_parameters() {
-//     this->declare_parameter<std::string>("sub_topic");
-//     this->declare_parameter<std::string>("pub_topic");
-//     this->declare_parameter<std::string>("output_encoding");
-//     this->declare_parameter<std::string>("input_encoding");
-//     this->declare_parameter<std::string>("filter_params.filter_type");
-
-//     this->declare_parameter<int>("filter_params.flip.flip_code");
-//     this->declare_parameter<int>("filter_params.unsharpening.blur_size");
-//     this->declare_parameter<int>("filter_params.erosion.size");
-//     this->declare_parameter<int>("filter_params.dilation.size");
-//     this->declare_parameter<double>(
-//         "filter_params.white_balancing.contrast_percentage");
-//     this->declare_parameter<int>("filter_params.ebus.erosion_size");
-//     this->declare_parameter<int>("filter_params.ebus.blur_size");
-//     this->declare_parameter<int>("filter_params.ebus.mask_weight");
-//     this->declare_parameter<bool>("filter_params.otsu.gamma_auto_correction");
-//     this->declare_parameter<double>(
-//         "filter_params.otsu.gamma_auto_correction_weight");
-//     this->declare_parameter<bool>("filter_params.otsu.otsu_segmentation");
-//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_r");
-//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_g");
-//     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
-//     this->declare_parameter<int>("filter_params.otsu.erosion_size");
-//     this->declare_parameter<int>("filter_params.otsu.dilation_size");
-
-//     this->declare_parameter<double>(
-//         "filter_params.overlap.percentage_threshold");
-
-//     this->declare_parameter<double>("filter_params.binary.threshold");
-//     this->declare_parameter<double>("filter_params.binary.maxval");
-//     this->declare_parameter<bool>("filter_params.binary.invert");
-
-//     this->declare_parameter<int>("filter_params.median_binary.kernel_size");
-//     this->declare_parameter<int>("filter_params.median_binary.threshold");
-//     this->declare_parameter<bool>("filter_params.median_binary.invert");
-
-//     // TODO(New filter): Declare parameters set for your filter here
-//     this->declare_parameter<int>("filter_params.example.example_int");
-//     this->declare_parameter<std::string>(
-//         "filter_params.example.example_string");
-// }
 
 void ImageFilteringNode::set_filter_params() {
     std::string filter_type_string =
@@ -223,40 +180,10 @@ void ImageFilteringNode::set_filter_params() {
     }
 
 
-
-
     spdlog::info(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),"Using filter: {}",
                 filter_type_string));
 }
 
-// void ImageFilteringNode::check_and_subscribe_to_image_topic() {
-//     std::string image_topic = this->get_parameter("sub_topic").as_string();
-//     if (image_topic_ != image_topic) {
-//         rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data;
-//         auto qos_sensor_data = rclcpp::QoS(
-//             rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile);
-
-//         image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-//             image_topic, qos_sensor_data,
-//             std::bind(&ImageFilteringNode::image_callback, this, _1));
-//         image_topic_ = image_topic;
-//         spdlog::info("Subscribed to image topic: {}", image_topic);
-//     }
-// }
-
-// void ImageFilteringNode::check_and_publish_to_output_topic(){
-//     std::string pub_topic = this->get_parameter("pub_topic").as_string();
-//     if (pub_topic_ != pub_topic){
-//         rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data; // This is some quality of service stuf (prefers low latency over quality)
-//         auto qos_sensor_data = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile); // ROS keeps only the newest image
-
-
-//         image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(pub_topic, qos_sensor_data);
-
-//         pub_topic_ = pub_topic;
-//         spdlog::info("Publishing to image topic: {}", pub_topic);
-//     } 
-// }
 
 void ImageFilteringNode::initialize_parameter_handler() {
     param_handler_ = std::make_shared<rclcpp::ParameterEventHandler>(this);

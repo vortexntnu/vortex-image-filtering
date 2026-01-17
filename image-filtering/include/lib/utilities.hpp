@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILTERS__UTILITIES_HPP_
-#define IMAGE_FILTERS__UTILITIES_HPP_
+#ifndef LIB__UTILITIES_HPP_
+#define LIB__UTILITIES_HPP_
 
 #include <numeric>
 #include <opencv2/core.hpp>
@@ -61,4 +61,4 @@ void distance_field(const cv::Mat& binObstacles,
                     int type = cv::DIST_L2,
                     int maskSize = 3);  // DIST_L2 is normal euclidean
                     
-#endif  // IMAGE_FILTERS__UTILITIES_HPP_
+#endif  // LIB__UTILITIES_HPP_

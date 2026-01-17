@@ -1,4 +1,4 @@
-#include <image_filters/utilities.hpp>
+#include <lib/utilities.hpp>
 #include <iostream>
 
 // Apply a given gamma to an 8-bit image using a LUT
@@ -82,7 +82,7 @@ int apply_otsu(const cv::Mat& gray8u,
     return static_cast<int>(std::round(thresh));
 }
 
-// Basic erosion
+
 void apply_erosion(const cv::Mat& src, cv::Mat& filtered, int size, int shape) {
     cv::Mat kernel = cv::getStructuringElement(
         shape, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));

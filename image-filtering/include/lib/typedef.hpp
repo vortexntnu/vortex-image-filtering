@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILTERS__TYPEDEF_HPP_
-#define IMAGE_FILTERS__TYPEDEF_HPP_
+#ifndef LIB__TYPEDEF_HPP_
+#define LIB__TYPEDEF_HPP_
 
 #include <map>
 #include <numeric>
@@ -88,4 +88,4 @@ inline std::string_view filtertype_to_string(FilterType t) {
 
 
 
-#endif // IMAGE_FILTERS__TYPEDEF_HPP_
+#endif // LIB__TYPEDEF_HPP_

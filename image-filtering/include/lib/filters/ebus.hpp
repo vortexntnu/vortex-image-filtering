@@ -1,0 +1,64 @@
+
+#ifndef LIB__filters__EBUS_HPP_
+#define LIB__filters__EBUS_HPP_
+
+
+#include "abstract_filter_class.hpp"
+
+
+
+
+
+
+
+
+
+/////////////////////////////
+// Ebus (dilation + unsharpening combo)
+/////////////////////////////
+
+struct EbusParams {
+    int erosion_size;
+    int blur_size;
+    int mask_weight;
+};
+
+class Ebus : public Filter {
+   public:
+    explicit Ebus(EbusParams params) : filter_params(params) {}
+    void apply_filter(const cv::Mat& original,
+                      cv::Mat& filtered) const override;
+
+   private:
+    EbusParams filter_params;
+};
+
+
+
+
+
+
+inline void Ebus::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
+    int blur_size = this->filter_params.blur_size;
+    int mask_weight = this->filter_params.mask_weight;
+    int erosion_size = this->filter_params.erosion_size;
+    // Erode image to make blacks more black
+    cv::Mat eroded;
+
+    apply_erosion(original, eroded, erosion_size);
+
+    // Make an unsharp mask from original image
+    cv::Mat blurred;
+    GaussianBlur(original, blurred,
+                 cv::Size(2 * blur_size + 1, 2 * blur_size + 1), 0);
+
+    // Compute the unsharp mask
+    cv::Mat mask = original - blurred;
+    cv::Mat unsharp;
+
+    // Add mask to the eroded image instead of the original
+    // Higher weight of mask will create a sharper but more noisy image
+    addWeighted(eroded, 1, mask, mask_weight, 0, filtered);
+}
+
+#endif // LIB__filters__EBUS_HPP_

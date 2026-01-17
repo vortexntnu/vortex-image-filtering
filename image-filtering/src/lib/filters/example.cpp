@@ -1,4 +1,4 @@
-#include "image_filters/filters/example.hpp"
+#include "lib/filters/example.hpp"
 
 void apply_example(const cv::Mat& original,
                    cv::Mat& filtered,

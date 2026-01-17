@@ -1,5 +1,5 @@
-#ifndef IMAGE_FILTERS__filters__example_HPP_
-#define IMAGE_FILTERS__filters__example_HPP_
+#ifndef LIB__filters__EXAMPLE_HPP_
+#define LIB__filters__EXAMPLE_HPP_
 
 
 #include "abstract_filter_class.hpp"
@@ -27,4 +27,4 @@ class Example : public Filter {
 };
 
 
-#endif // IMAGE_FILTERS__filters__example_HPP_
+#endif // LIB__filters__EXAMPLE_HPP_

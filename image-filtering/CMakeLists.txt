@@ -23,11 +23,10 @@ include_directories(include)
 set(LIB_NAME "${PROJECT_NAME}_component")
 
 add_library(${LIB_NAME} SHARED
-  src/image_processing.cpp
-  src/image_filtering_ros.cpp
-  src/utilities.cpp
-  src/filters/example.cpp
-  src/image_filtering_ros_utils.cpp
+  src/ros/image_filtering_ros.cpp
+  src/lib/utilities.cpp
+  src/lib/filters/example.cpp
+  src/ros/image_filtering_ros_utils.cpp
 )
 
 target_link_libraries(${LIB_NAME} PUBLIC
