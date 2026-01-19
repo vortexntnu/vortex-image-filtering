@@ -1,10 +1,10 @@
 /**:
   ros__parameters:
-    sub_topic: "/downwards_camera/image_raw"
+    sub_topic: "/cam_down/image_color"
     pub_topic: "/filtered_image"
     output_encoding: "mono8"
     filter_params:
-      filter_type: "otsu"
+      filter_type: "remove_grid"
       flip:
         flip_code: 1
       unsharpening:
@@ -28,6 +28,10 @@
         otsu_segmentation: true
         erosion_size: 10
         dilation_size: 10
+      remove_grid:
+        threshold_green: 0.5
+        threshold_binary: 30.0
+        inpaint_radius: 1.0
 
 # Filter params should reflect the FilterParams struct
 # defined in /include/image_filters/image_processing.hpp

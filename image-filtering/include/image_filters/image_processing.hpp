@@ -9,6 +9,8 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
+#include <opencv2/imgproc.hpp>  // dilate
+#include <opencv2/photo.hpp>    // inpaint
 #include <string>
 
 struct FlipParams {
@@ -47,6 +49,12 @@ struct OtsuParams {
     int dilation_size;
 };
 
+struct GridRemovalParams {
+    double threshold_green;
+    double threshold_binary;
+    double inpaint_radius;
+};
+
 struct FilterParams {
     FlipParams flip;
     UnsharpeningParams unsharpening;
@@ -55,6 +63,7 @@ struct FilterParams {
     WhiteBalancingParams white_balancing;
     EbusParams ebus;
     OtsuParams otsu;
+    GridRemovalParams remove_grid;
 };
 
 typedef void (*FilterFunction)(const FilterParams&, const cv::Mat&, cv::Mat&);
@@ -132,6 +141,12 @@ void otsu_segmentation_filter(const FilterParams& params,
                               const cv::Mat& original,
                               cv::Mat& output);
 
+/**  
+* A filter to remove yellow/green-ish grid lines from images
+**/
+
+void remove_grid_filter(const FilterParams& params, const cv::Mat& original, cv::Mat& filtered);
+
 static const std::map<std::string, FilterFunction> filter_functions = {
     {"no_filter", no_filter},
     {"flip", flip_filter},
@@ -141,6 +156,7 @@ static const std::map<std::string, FilterFunction> filter_functions = {
     {"dilation", dilation_filter},
     {"white_balancing", white_balance_filter},
     {"ebus", ebus_filter},
-    {"otsu", otsu_segmentation_filter}};
+    {"otsu", otsu_segmentation_filter},
+    {"remove_grid", remove_grid_filter}};
 
 #endif  // IMAGE_FILTERS__IMAGE_PROCESSING_HPP_

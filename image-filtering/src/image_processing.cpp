@@ -236,6 +236,51 @@ void otsu_segmentation_filter(const FilterParams& params,
     }
 }
 
+void remove_grid_filter(const FilterParams& params, const cv::Mat& original, cv::Mat& filtered) {
+    CV_Assert(!original.empty());
+    CV_Assert(original.type() == CV_8UC3);
+
+    cv::Mat img_u8 = original.clone();
+    cv::Mat img_f;
+
+    // extract grid lines
+    img_u8.convertTo(img_f, CV_32F, 1.0 / 255.0);
+    std::vector<cv::Mat> color_channels(3);
+    cv::split(img_f, color_channels);   // BGR
+
+    cv::Mat B = color_channels[0];
+    cv::Mat G = color_channels[1];
+    cv::Mat R = color_channels[2];
+
+    cv::Mat sum_rgb = B + G + R + 1e-6f;  // avoid division by zero
+    
+    for (int i = 0; i < 3; ++i) {
+        color_channels[i] /= sum_rgb;
+    }
+
+    /* mask the green channel (grid) */
+    cv::Mat grid_mask = (color_channels[1] > params.remove_grid.threshold_green);
+    cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
+    cv::Mat dilated_mask;
+    cv::dilate(grid_mask, dilated_mask, kernel, cv::Point(-1,-1), 1);
+
+    /* prevent "leak" at image borders */
+    dilated_mask.row(0).setTo(0);
+    dilated_mask.row(dilated_mask.rows - 1).setTo(0);
+    dilated_mask.col(0).setTo(0);
+    dilated_mask.col(dilated_mask.cols - 1).setTo(0);
+
+    // inpaint the masked areas
+    cv::Mat inpainted_img;
+    cv::inpaint(img_u8, dilated_mask, inpainted_img, params.remove_grid.inpaint_radius, cv::INPAINT_TELEA);
+
+    // binary thresholding
+    cv::Mat gray;
+    cv::cvtColor(inpainted_img, gray, cv::COLOR_BGR2GRAY);
+    cv::threshold(gray, filtered, params.remove_grid.threshold_binary, 255, cv::THRESH_BINARY);
+
+}
+
 void apply_filter(const std::string& filter,
                   const FilterParams& params,
                   const cv::Mat& original,
