@@ -36,7 +36,7 @@ To extend the functionality of the `image_filtering_node` by adding new filters,
 
 ### Step 1: Filter Enum
 
-You should define your filtertype in the filtertype enum in [typedef.hpp](image-filtering/include/image_filters/typedef.hpp)
+You should define your filtertype in the filtertype enum in [typedef.hpp](image-filtering/include/lib/typedef.hpp)
 
 ```cpp
 enum class FilterType {
@@ -49,9 +49,7 @@ enum class FilterType {
   // Add your filter here
 };
 ```
-
-### Step 2: Filter string
-To access the filter through the yaml file we need to access it through a string. You need to add it as a string to map to the Enum in [typedef.hpp](image-filtering/include/image_filters/typedef.hpp)
+To access the filter through the yaml file we need to access it through a string. In the same file you need to add it as an item in the kFilterMap.
 
 ```cpp
 static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
@@ -66,10 +64,39 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
 };
 ```
 
+### Step 2: Make the filter header
+Each filter should have its own headerfile asosiated with it. You can add this in the [filters](image-filtering/include/lib/filters), and name it the same as your filter (your_filter.hpp). In this file you start with adding these lines (swaping out example with your filter):
+
+```cpp
+#ifndef LIB__filters__EXAMPLE_HPP_
+#define LIB__filters__EXAMPLE_HPP_
+#include "abstract_filter_class.hpp"
+
+
+// Insert code here ...
+
+
+#endif // LIB__filters__EXAMPLE_HPP_
+```
+This new file needs to be added to [all_filters.hpp](image-filtering/include/lib/filters/all_filters.hpp).
+```cpp
+#ifndef LIB__FILTERS__EXAMPLE__HPP_
+#define LIB__FILTERS__EXAMPLE__HPP_
+
+#include "lib/filters/example.hpp"
+#include "lib/filters/no_filter.hpp"
+              ...
+// Add this 
+#include "lib/filters/your_filter.hpp"
+
+
+#endif // LIB__FILTERS__EXAMPLE__HPP_
+```
+
 
 ### Step 3: Define Filter Parameters
 
-Each filter should have its own set of parameters encapsulated in a structure. Define this structure within [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp).
+Each filter should have its own set of parameters encapsulated in a structure. Define this structure within your_filter.hpp.
 
 ```cpp
 struct ExampleParams{
@@ -92,21 +119,20 @@ class Example: public Filter{
 };
 ```
 Here you can add other filter specific stuff like storing variables that need to change between runs and so on.
+When this is done it should look like [this](image-filtering/include/lib/filters/example.hpp).
 
 
+### Step 5: Define the filter function
 
-### Step 5: Create the Filter Function
-
-Implement your filter function in [image_processing.cpp](image-filtering/src/image_processing.cpp). This function should take in the `cv::Mat` objects for the input and the filtered image, and change the filtered one according to your needs.
+You can do this in two differente ways. If your filter is big you can add a cpp file for your filter, explaned in the [helperfunctions](#helper-functions) section of this page. Otherwise you can add the function defenition just below the class defenition like this.
 
 ```cpp
-void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
+inline void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const{
     std::string example_str = this->filter_params.example_string;
     int example_int = this->filter_params.example_int;
     DoExample(original,filtered, example_str, example_int);
 }
 ```
-*If you need a helper function go to the [helperfunction](#adding-helper-functions) section of this page.
 
 
 ### Step 6: Add to config file
@@ -130,42 +156,42 @@ In the [image_filtering_params.yaml](image-filtering/config/image_filtering_para
 
 ### Step 7: Declare and Assign Parameters
 
-In the constructor of your ROS 2 node, declare each of the new filter parameters using the `declare_parameter` function in [image_filtering_ros.cpp](image-filtering/src/image_filtering_ros.cpp). This declares the ros2 parameters and prepares the node to accept them at runtime through command line or the YAML configuration file.
+Now we need to use the right filter and set the variables for your filter. We do that by making a new case in `set_filter_params`, in [image_filtering_ros.cpp](image-filtering/src/ros/image_filtering_ros.cpp), for your filter. 
 
-```cpp
-void ImageFilteringNode::declare_parameters() {
-    // Declare your parameters here
-    this->declare_parameter<int>("filter_params.example.example_int");
-    this->declare_parameter<std::string>("filter_params.example.example_string");
-}
-```
-
-Then in the same file you make a new case in `set_filter_params` for your filter, to set the variables you just declared.
 ```cpp
 void ImageFilteringNode::set_filter_params() {
     ...
     switch (filter_type){
 
         ...
-        // Add case here
-        case FilterType::Example:
-    {
-        ExampleParams params;
-        params.example_int =
-            this->get_parameter("filter_params.example.example_int").as_int();
-        params.example_string =
-            this->get_parameter("filter_params.example.example_string").as_string();
 
-        filter_ptr = std::make_unique<Example>(params);
-        break;
-    }
+        case FilterType::Example: {
+            ExampleParams params;
+            params.example_int =
+                declare_and_get<int>("filter_params.example.example_int");
+            params.example_string =
+                declare_and_get<std::string>(
+                    "filter_params.example.example_string");
 
+            filter_ptr = std::make_unique<Example>(params);
+            break;
+        }
     }
 }
 ```
 
 
 
-#### Adding Helper functions
+### Helper functions
 
-If you need helper functions for your filter, you can add the declaration to [utilities.hpp](image-filtering/include/image_filters/utilities.hpp), and then add the function definition to  [utilities.cpp](image-filtering/src/utilities.cpp). There will be TODO(New filter) comments where you can add them. These functions are already included in the image_processing files.
+Is your filter to big, is it a chunky boy, are you in need of space, then you have come to the right place!!! 
+
+#### Define the apply filter function
+
+If the Example::apply_filter function gets to big you can add a cpp file named the same as your hpp file (your_filter.cpp) in the [filters](image-filtering/src/lib/filters) folder. There you add #include "lib/filters/your_filter.hpp" at the top. Then you can define your filter there. Here is an [example](image-filtering/src/lib/filters/example.cpp)
+
+#### Make and use helperfunctions
+
+
+If you are making a function that is useful for many differente filters, then you can add the declaration to [utilities.hpp](image-filtering/include/lib/utilities.hpp), and the defenition to [utilities.cpp](image-filtering/src/lib/utilities.cpp). Make a description off the function above the declaration. To use this in the filter add `#include "image-filtering/include/lib/utilities.hpp"` to your_filter.hpp
+
