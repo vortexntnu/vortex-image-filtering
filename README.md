@@ -119,7 +119,6 @@ class Example: public Filter{
 };
 ```
 Here you can add other filter specific stuff like storing variables that need to change between runs and so on.
-When this is done it should look like [this](image-filtering/include/lib/filters/example.hpp).
 
 
 ### Step 5: Define the filter function
