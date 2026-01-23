@@ -2,17 +2,7 @@
 #ifndef LIB__filters__MEDIAN_BINARY_HPP_
 #define LIB__filters__MEDIAN_BINARY_HPP_
 
-
 #include "abstract_filter_class.hpp"
-
-
-
-
-
-
-
-
-
 
 /////////////////////////////
 // Median + Binary
@@ -34,18 +24,11 @@ class MedianBinary : public Filter {
     MedianBinaryParams filter_params;
 };
 
-
-
-
-
-
 inline void MedianBinary::apply_filter(const cv::Mat& original,
-                                cv::Mat& filtered) const {
+                                       cv::Mat& filtered) const {
     apply_median(original, filtered, this->filter_params.kernel_size);
     apply_fixed_threshold(filtered, filtered, this->filter_params.threshold,
                           this->filter_params.invert);
 }
 
-
-
-#endif // LIB__filters__MEDIAN_BINARY_HPP_
+#endif  // LIB__filters__MEDIAN_BINARY_HPP_

@@ -1,7 +1,6 @@
-#include <ros/image_filtering_ros.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <ros/image_filtering_ros.hpp>
 #include <ros/image_filtering_ros_utils.hpp>
-
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
@@ -12,14 +11,12 @@ ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     check_and_publish_to_output_topic();
 }
 
-
 void ImageFilteringNode::set_filter_params() {
     std::string filter_type_string =
         this->get_parameter("filter_params.filter_type").as_string();
     FilterType filter_type = parse_filter_type(filter_type_string);
 
     switch (filter_type) {
-
         case FilterType::NoFilter: {
             filter_ptr = std::make_unique<NoFilter>();
             break;
@@ -63,9 +60,8 @@ void ImageFilteringNode::set_filter_params() {
 
         case FilterType::WhiteBalancing: {
             WhiteBalanceParams params;
-            params.contrast_percentage =
-                declare_and_get<double>(
-                    "filter_params.white_balancing.contrast_percentage");
+            params.contrast_percentage = declare_and_get<double>(
+                "filter_params.white_balancing.contrast_percentage");
 
             filter_ptr = std::make_unique<WhiteBalance>(params);
             break;
@@ -86,11 +82,10 @@ void ImageFilteringNode::set_filter_params() {
 
         case FilterType::Otsu: {
             OtsuSegmentationParams params;
-            params.gamma_auto_correction =
-                declare_and_get<bool>("filter_params.otsu.gamma_auto_correction");
-            params.gamma_auto_correction_weight =
-                declare_and_get<double>(
-                    "filter_params.otsu.gamma_auto_correction_weight");
+            params.gamma_auto_correction = declare_and_get<bool>(
+                "filter_params.otsu.gamma_auto_correction");
+            params.gamma_auto_correction_weight = declare_and_get<double>(
+                "filter_params.otsu.gamma_auto_correction_weight");
             params.otsu_segmentation =
                 declare_and_get<bool>("filter_params.otsu.otsu_segmentation");
             params.gsc_weight_r =
@@ -110,9 +105,8 @@ void ImageFilteringNode::set_filter_params() {
 
         case FilterType::Overlap: {
             OverlapParams params;
-            params.percentage_threshold =
-                declare_and_get<double>(
-                    "filter_params.overlap.percentage_threshold");
+            params.percentage_threshold = declare_and_get<double>(
+                "filter_params.overlap.percentage_threshold");
 
             filter_ptr = std::make_unique<Overlap>(params);
             break;
@@ -149,22 +143,22 @@ void ImageFilteringNode::set_filter_params() {
             ExampleParams params;
             params.example_int =
                 declare_and_get<int>("filter_params.example.example_int");
-            params.example_string =
-                declare_and_get<std::string>(
-                    "filter_params.example.example_string");
+            params.example_string = declare_and_get<std::string>(
+                "filter_params.example.example_string");
 
             filter_ptr = std::make_unique<Example>(params);
             break;
         }
 
         default:;
-            if (filter_type == FilterType::Unknown){
+            if (filter_type == FilterType::Unknown) {
                 spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
-                        "Invalid filter type received: {}. Using default: no_filter.",
-                        filter_type_string));
-            }
-            else{
-                spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                                         "Invalid filter type received: {}. "
+                                         "Using default: no_filter.",
+                                         filter_type_string));
+            } else {
+                spdlog::warn(fmt::format(
+                    fmt::fg(fmt::rgb(200, 180, 50)),
                     "Filterparams has not been set for your chosen filter "
                     "{}. "
                     "To fix this add your filter to "
@@ -179,11 +173,9 @@ void ImageFilteringNode::set_filter_params() {
             return;
     }
 
-
-    spdlog::info(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),"Using filter: {}",
-                filter_type_string));
+    spdlog::info(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
+                             "Using filter: {}", filter_type_string));
 }
-
 
 void ImageFilteringNode::initialize_parameter_handler() {
     param_handler_ = std::make_shared<rclcpp::ParameterEventHandler>(this);
@@ -241,15 +233,16 @@ void ImageFilteringNode::image_callback(
     cv::Mat input_image = cv_ptr->image;
     cv::Mat filtered_image;
 
-    try{
+    try {
         filter_ptr->apply_filter(input_image, filtered_image);
-    } 
-    catch (const cv::Exception& e) {
-        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)), "OpenCV error while applying filter: {}", e.what()));
+    } catch (const cv::Exception& e) {
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
+                                  "OpenCV error while applying filter: {}",
+                                  e.what()));
         filtered_image = input_image.clone();  // fallback to no filter
-    }
-    catch (const std::exception& e) {
-        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),"Error while applying filter: {}", e.what()));
+    } catch (const std::exception& e) {
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
+                                  "Error while applying filter: {}", e.what()));
         filtered_image = input_image.clone();
     }
 

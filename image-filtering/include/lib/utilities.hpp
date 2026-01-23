@@ -60,5 +60,5 @@ void distance_field(const cv::Mat& binObstacles,
                     bool obstaclesAreWhite = true,
                     int type = cv::DIST_L2,
                     int maskSize = 3);  // DIST_L2 is normal euclidean
-                    
+
 #endif  // LIB__UTILITIES_HPP_

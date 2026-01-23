@@ -1,11 +1,8 @@
 
-#include <ros/image_filtering_ros.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
+#include <ros/image_filtering_ros.hpp>
 #include <ros/image_filtering_ros_utils.hpp>
 using std::placeholders::_1;
-
-
-
 
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     std::string image_topic = this->get_parameter("sub_topic").as_string();
@@ -22,21 +19,24 @@ void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     }
 }
 
-void ImageFilteringNode::check_and_publish_to_output_topic(){
+void ImageFilteringNode::check_and_publish_to_output_topic() {
     std::string pub_topic = this->get_parameter("pub_topic").as_string();
-    if (pub_topic_ != pub_topic){
-        rmw_qos_profile_t qos_profile = rmw_qos_profile_sensor_data; // This is some quality of service stuf (prefers low latency over quality)
-        auto qos_sensor_data = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1), qos_profile); // ROS keeps only the newest image
+    if (pub_topic_ != pub_topic) {
+        rmw_qos_profile_t qos_profile =
+            rmw_qos_profile_sensor_data;  // This is some quality of service
+                                          // stuf (prefers low latency over
+                                          // quality)
+        auto qos_sensor_data =
+            rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1),
+                        qos_profile);  // ROS keeps only the newest image
 
-
-        image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(pub_topic, qos_sensor_data);
+        image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
+            pub_topic, qos_sensor_data);
 
         pub_topic_ = pub_topic;
         spdlog::info("Publishing to image output topic: {}", pub_topic);
-    } 
+    }
 }
-
-
 
 void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<std::string>("sub_topic");
@@ -45,4 +45,3 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<std::string>("input_encoding");
     this->declare_parameter<std::string>("filter_params.filter_type");
 }
-

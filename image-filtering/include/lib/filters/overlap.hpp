@@ -2,16 +2,7 @@
 #ifndef LIB__filters__OVERLAP_HPP_
 #define LIB__filters__OVERLAP_HPP_
 
-
 #include "abstract_filter_class.hpp"
-
-
-
-
-
-
-
-
 
 /////////////////////////////
 // Overlap (blend/composite)
@@ -37,11 +28,8 @@ class Overlap : public Filter {
     mutable bool has_prev;
 };
 
-
-
-
-
-inline void Overlap::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
+inline void Overlap::apply_filter(const cv::Mat& original,
+                                  cv::Mat& filtered) const {
     // mono8 only
     CV_Assert(!original.empty());
     CV_Assert(original.type() == CV_8UC1);
@@ -78,7 +66,4 @@ inline void Overlap::apply_filter(const cv::Mat& original, cv::Mat& filtered) co
     prev = original.clone();
 }
 
-
-
-
-#endif // LIB__filters__OVERLAP_HPP_
+#endif  // LIB__filters__OVERLAP_HPP_

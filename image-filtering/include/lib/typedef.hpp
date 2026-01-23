@@ -8,13 +8,10 @@
 // #include <opencv2/imgcodecs.hpp>
 // #include <opencv2/imgproc.hpp>
 // #include <opencv2/xphoto.hpp>
-#include <spdlog/spdlog.h>
 #include <fmt/color.h>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <utility>
-
-
-
 
 enum class FilterType {  // TODO(New filter): Add filters here
     NoFilter,
@@ -50,12 +47,6 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"example", FilterType::Example},
     {"unknown", FilterType::Unknown}};
 
-
-
-
-
-
-    
 inline std::string to_lower(std::string s) {
     for (char& ch : s) {
         ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
@@ -70,7 +61,12 @@ inline FilterType parse_filter_type(std::string s) {
         if (s == name)
             return type;
     }
-    spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)), "No string connected to that filter type: '{}'. This might be misspelling or you need to add the filter type to kFilterMap in image_processing.hpp", s));
+    spdlog::warn(
+        fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                    "No string connected to that filter type: '{}'. This might "
+                    "be misspelling or you need to add the filter type to "
+                    "kFilterMap in image_processing.hpp",
+                    s));
     return FilterType::Unknown;
 }
 
@@ -79,13 +75,11 @@ inline std::string_view filtertype_to_string(FilterType t) {
         if (t == type)
             return name;
     }
-    spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)), " No string connected to your filter type. To fix "
-                 "this add the string and filter type to kFilterMap"));
+    spdlog::warn(
+        fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                    " No string connected to your filter type. To fix "
+                    "this add the string and filter type to kFilterMap"));
     return "unknown";
 }
 
-
-
-
-
-#endif // LIB__TYPEDEF_HPP_
+#endif  // LIB__TYPEDEF_HPP_

@@ -3,12 +3,7 @@
 #ifndef LIB__filters__OTSU_HPP_
 #define LIB__filters__OTSU_HPP_
 
-
 #include "abstract_filter_class.hpp"
-
-
-
-
 
 /////////////////////////////
 // Otsu Segmentation
@@ -35,12 +30,8 @@ class OtsuSegmentation : public Filter {
     OtsuSegmentationParams filter_params;
 };
 
-
-
-
-
 inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
-                                    cv::Mat& filtered) const {
+                                           cv::Mat& filtered) const {
     bool gamma_auto_correction = this->filter_params.gamma_auto_correction;
     double gamma_auto_correction_weight =
         this->filter_params.gamma_auto_correction_weight;
@@ -73,8 +64,4 @@ inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
     }
 }
 
-
-
-
-
-#endif // LIB__filters__OTSU_HPP_
+#endif  // LIB__filters__OTSU_HPP_

@@ -2,12 +2,8 @@
 #ifndef LIB__filters__EROSION_HPP_
 #define LIB__filters__EROSION_HPP_
 
-
 #include "abstract_filter_class.hpp"
 #include "lib/utilities.hpp"
-
-
-
 
 /////////////////////////////
 // Erosion
@@ -27,12 +23,10 @@ class Erosion : public Filter {
     ErosionParams filter_params;
 };
 
-
-
-
-inline void Erosion::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
+inline void Erosion::apply_filter(const cv::Mat& original,
+                                  cv::Mat& filtered) const {
     apply_erosion(original, filtered, this->filter_params.kernel_size,
                   cv::MORPH_RECT);
 }
 
-#endif // LIB__filters__EROSION_HPP_
+#endif  // LIB__filters__EROSION_HPP_

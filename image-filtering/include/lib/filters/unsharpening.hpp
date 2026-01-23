@@ -3,10 +3,7 @@
 #ifndef LIB__filters__UNSHARPENING_HPP_
 #define LIB__filters__UNSHARPENING_HPP_
 
-
-
 #include "abstract_filter_class.hpp"
-
 
 ////////////////////////////
 // Unsharpening
@@ -26,11 +23,8 @@ class Unsharpening : public Filter {
     UnsharpeningParams filter_params;
 };
 
-
-
-
 inline void Unsharpening::apply_filter(const cv::Mat& original,
-                                cv::Mat& filtered) const {
+                                       cv::Mat& filtered) const {
     int blur_size = this->filter_params.blur_size;
     // Create a blurred version of the image
     cv::Mat blurred;
@@ -44,5 +38,4 @@ inline void Unsharpening::apply_filter(const cv::Mat& original,
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
 
-
-#endif // LIB__filters__UNSHARPENING_HPP_
+#endif  // LIB__filters__UNSHARPENING_HPP_

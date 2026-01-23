@@ -2,16 +2,7 @@
 #ifndef LIB__filters__EBUS_HPP_
 #define LIB__filters__EBUS_HPP_
 
-
 #include "abstract_filter_class.hpp"
-
-
-
-
-
-
-
-
 
 /////////////////////////////
 // Ebus (dilation + unsharpening combo)
@@ -33,12 +24,8 @@ class Ebus : public Filter {
     EbusParams filter_params;
 };
 
-
-
-
-
-
-inline void Ebus::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
+inline void Ebus::apply_filter(const cv::Mat& original,
+                               cv::Mat& filtered) const {
     int blur_size = this->filter_params.blur_size;
     int mask_weight = this->filter_params.mask_weight;
     int erosion_size = this->filter_params.erosion_size;
@@ -61,4 +48,4 @@ inline void Ebus::apply_filter(const cv::Mat& original, cv::Mat& filtered) const
     addWeighted(eroded, 1, mask, mask_weight, 0, filtered);
 }
 
-#endif // LIB__filters__EBUS_HPP_
+#endif  // LIB__filters__EBUS_HPP_

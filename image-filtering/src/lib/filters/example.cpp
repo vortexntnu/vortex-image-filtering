@@ -12,12 +12,6 @@ void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     apply_example(original, filtered, example_str, example_int);
 }
 
-
-
-
-
-
-
 // TODO(New filter): If you need a helper function define it here like this
 
 void apply_example(const cv::Mat& original,

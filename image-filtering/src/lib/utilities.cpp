@@ -1,5 +1,5 @@
-#include <lib/utilities.hpp>
 #include <iostream>
+#include <lib/utilities.hpp>
 
 // Apply a given gamma to an 8-bit image using a LUT
 void applyGammaLUT(cv::Mat& image, double gamma) {
@@ -81,7 +81,6 @@ int apply_otsu(const cv::Mat& gray8u,
         cv::threshold(gray8u, out, /*thresh ignored*/ 0.0, maxval, ttype);
     return static_cast<int>(std::round(thresh));
 }
-
 
 void apply_erosion(const cv::Mat& src, cv::Mat& filtered, int size, int shape) {
     cv::Mat kernel = cv::getStructuringElement(

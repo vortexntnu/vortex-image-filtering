@@ -2,7 +2,6 @@
 #ifndef IMAGE_FILTERS__filters__NO_FILTER_HPP_
 #define IMAGE_FILTERS__filters__NO_FILTER_HPP_
 
-
 #include "abstract_filter_class.hpp"
 
 /////////////////////////////
@@ -19,5 +18,4 @@ class NoFilter : public Filter {
     };
 };
 
-
-#endif // IMAGE_FILTERS__filters__NO_FILTER_HPP_
+#endif  // IMAGE_FILTERS__filters__NO_FILTER_HPP_
