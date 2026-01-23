@@ -138,18 +138,6 @@ void ImageFilteringNode::set_filter_params() {
             break;
         }
 
-        // (New filter): Add your filter case here:
-        case FilterType::Example: {
-            ExampleParams params;
-            params.example_int =
-                declare_and_get<int>("filter_params.example.example_int");
-            params.example_string = declare_and_get<std::string>(
-                "filter_params.example.example_string");
-
-            filter_ptr = std::make_unique<Example>(params);
-            break;
-        }
-
         default:;
             if (filter_type == FilterType::Unknown) {
                 spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),

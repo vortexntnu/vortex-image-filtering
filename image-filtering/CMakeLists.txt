@@ -25,7 +25,6 @@ set(LIB_NAME "${PROJECT_NAME}_component")
 add_library(${LIB_NAME} SHARED
   src/ros/image_filtering_ros.cpp
   src/lib/utilities.cpp
-  src/lib/filters/example.cpp
   src/ros/image_filtering_ros_utils.cpp
 )
 

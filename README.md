@@ -188,7 +188,7 @@ Is your filter to big, is it a chunky boy, are you in need of space, then you ha
 
 #### Define the apply filter function
 
-If the Example::apply_filter function gets to big you can add a cpp file named the same as your hpp file (your_filter.cpp) in the [filters](image-filtering/src/lib/filters) folder. There you add #include "lib/filters/your_filter.hpp" at the top. Then you can define your filter there. Here is an [example](image-filtering/src/lib/filters/example.cpp)
+If the YourFilter::apply_filter function gets to big you can add a cpp file named the same as your hpp file (your_filter.cpp) in the [filters](image-filtering/src/lib/filters) folder. There you add #include "lib/filters/your_filter.hpp" at the top. Then you can define your filter there. Whenever you make a new c++ file, add the path to [CMakeList.txt](image-filtering/CMakeLists.txt), to the `add_library(${LIB_NAME}` part.
 
 #### Make and use helperfunctions
 

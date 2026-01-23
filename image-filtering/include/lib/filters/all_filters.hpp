@@ -5,7 +5,6 @@
 #include "lib/filters/dilation.hpp"
 #include "lib/filters/ebus.hpp"
 #include "lib/filters/erosion.hpp"
-#include "lib/filters/example.hpp"
 #include "lib/filters/flip.hpp"
 #include "lib/filters/median_binary.hpp"
 #include "lib/filters/no_filter.hpp"
