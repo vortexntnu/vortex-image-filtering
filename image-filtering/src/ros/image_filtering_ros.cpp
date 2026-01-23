@@ -138,7 +138,7 @@ void ImageFilteringNode::set_filter_params() {
             break;
         }
 
-        // TODO(New filter): Add your filter case here:
+        // (New filter): Add your filter case here:
         case FilterType::Example: {
             ExampleParams params;
             params.example_int =

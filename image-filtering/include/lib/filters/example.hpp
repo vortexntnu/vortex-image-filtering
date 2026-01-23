@@ -4,7 +4,7 @@
 #include <string>
 #include "abstract_filter_class.hpp"
 
-// TODO(New filter): add this structure for your filter
+// (New filter): add this structure for your filter
 
 /////////////////////////////
 // Example

@@ -54,11 +54,4 @@ void apply_fixed_threshold(const cv::Mat& img,
                            int thresh,
                            bool invert = false);
 
-// This does not work properly (Chat has failed me)
-void distance_field(const cv::Mat& binObstacles,
-                    cv::Mat& dist,
-                    bool obstaclesAreWhite = true,
-                    int type = cv::DIST_L2,
-                    int maskSize = 3);  // DIST_L2 is normal euclidean
-
 #endif  // LIB__UTILITIES_HPP_

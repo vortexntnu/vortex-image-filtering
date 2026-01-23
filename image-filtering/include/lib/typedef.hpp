@@ -13,7 +13,7 @@
 #include <string>
 #include <utility>
 
-enum class FilterType {  // TODO(New filter): Add filters here
+enum class FilterType {  // (New filter): Add filters here
     NoFilter,
     Flip,
     Unsharpening,
@@ -43,7 +43,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"median_binary", FilterType::MedianBinary},
     {"binary", FilterType::Binary},
 
-    // TODO(New filter): Also add your filter here
+    // (New filter): Also add your filter here
     {"example", FilterType::Example},
     {"unknown", FilterType::Unknown}};
 

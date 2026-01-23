@@ -5,14 +5,14 @@ void apply_example(const cv::Mat& original,
                    std::string example_string,
                    int example_int);
 
-// TODO(New filter): Implement your filter here
+// (New filter): Implement your filter here
 void Example::apply_filter(const cv::Mat& original, cv::Mat& filtered) const {
     std::string example_str = this->filter_params.example_string;
     int example_int = this->filter_params.example_int;
     apply_example(original, filtered, example_str, example_int);
 }
 
-// TODO(New filter): If you need a helper function define it here like this
+// (New filter): If you need a helper function define it here like this
 
 void apply_example(const cv::Mat& original,
                    cv::Mat& filtered,

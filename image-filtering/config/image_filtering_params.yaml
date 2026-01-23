@@ -41,7 +41,7 @@
         maxval: 255.
         invert: true
 
-      # TODO(New filter): add your filterparameters here
+      # (New filter): add your filterparameters here
       example:
         example_int: 1
         example_string: "Get filtered"
