@@ -68,15 +68,15 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
 Each filter should have its own headerfile asosiated with it. You can add this in the [filters](image-filtering/include/lib/filters), and name it the same as your filter (your_filter.hpp). In this file you start with adding these lines (swapping out example with your filter):
 
 ```cpp
-#ifndef LIB__filters__EXAMPLE_HPP_
-#define LIB__filters__EXAMPLE_HPP_
+#ifndef LIB__FILTERS__EXAMPLE_HPP_
+#define LIB__FILTERS__EXAMPLE_HPP_
 #include "abstract_filter_class.hpp"
 
 
 // Insert code here ...
 
 
-#endif // LIB__filters__EXAMPLE_HPP_
+#endif // LIB__FILTERS__EXAMPLE_HPP_
 ```
 This new file needs to be added to [all_filters.hpp](image-filtering/include/lib/filters/all_filters.hpp).
 ```cpp
@@ -108,7 +108,7 @@ struct ExampleParams{
 
 ### Step 4: Add filter class
 
-Below the filter parameters add a Class for your filter inheriting from the Filter class, with the same structure as shown below. This should also be in [image_processing.hpp](image-filtering/include/image_filters/image_processing.hpp)
+Below the filter parameters add a Class for your filter inheriting from the Filter class, with the same structure as shown below.
 ```cpp
 class Example: public Filter{
     public:
