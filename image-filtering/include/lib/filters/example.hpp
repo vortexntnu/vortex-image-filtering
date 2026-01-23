@@ -1,6 +1,7 @@
-#ifndef LIB__filters__EXAMPLE_HPP_
-#define LIB__filters__EXAMPLE_HPP_
+#ifndef LIB__FILTERS__EXAMPLE_HPP_
+#define LIB__FILTERS__EXAMPLE_HPP_
 
+#include <string>
 #include "abstract_filter_class.hpp"
 
 // TODO(New filter): add this structure for your filter
@@ -23,4 +24,4 @@ class Example : public Filter {
     ExampleParams filter_params;
 };
 
-#endif  // LIB__filters__EXAMPLE_HPP_
+#endif  // LIB__FILTERS__EXAMPLE_HPP_

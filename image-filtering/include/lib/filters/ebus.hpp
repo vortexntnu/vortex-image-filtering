@@ -1,6 +1,6 @@
 
-#ifndef LIB__filters__EBUS_HPP_
-#define LIB__filters__EBUS_HPP_
+#ifndef LIB__FILTERS__EBUS_HPP_
+#define LIB__FILTERS__EBUS_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -48,4 +48,4 @@ inline void Ebus::apply_filter(const cv::Mat& original,
     addWeighted(eroded, 1, mask, mask_weight, 0, filtered);
 }
 
-#endif  // LIB__filters__EBUS_HPP_
+#endif  // LIB__FILTERS__EBUS_HPP_

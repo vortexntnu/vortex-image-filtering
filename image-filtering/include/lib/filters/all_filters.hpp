@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__EXAMPLE_HPP_
-#define LIB__FILTERS__EXAMPLE_HPP_
+#ifndef LIB__FILTERS__ALL_FILTERS_HPP_
+#define LIB__FILTERS__ALL_FILTERS_HPP_
 
 #include "lib/filters/binary_threshold.hpp"
 #include "lib/filters/dilation.hpp"
@@ -15,4 +15,4 @@
 #include "lib/filters/unsharpening.hpp"
 #include "lib/filters/white_balancing.hpp"
 
-#endif  // LIB__FILTERS__EXAMPLE_HPP_
+#endif  // LIB__FILTERS__ALL_FILTERS_HPP_

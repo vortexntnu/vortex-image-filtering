@@ -1,7 +1,7 @@
 
 
-#ifndef LIB__filters__BINARY_THRESHOLD_HPP_
-#define LIB__filters__BINARY_THRESHOLD_HPP_
+#ifndef LIB__FILTERS__BINARY_THRESHOLD_HPP_
+#define LIB__FILTERS__BINARY_THRESHOLD_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -55,4 +55,4 @@ inline void BinaryThreshold::apply_filter(const cv::Mat& original,
     cv::threshold(src8, filtered, thresh, maxval, type);
 }
 
-#endif  // LIB__filters__BINARY_THRESHOLD_HPP_
+#endif  // LIB__FILTERS__BINARY_THRESHOLD_HPP_

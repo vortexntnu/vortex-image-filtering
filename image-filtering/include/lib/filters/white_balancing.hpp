@@ -1,5 +1,5 @@
-#ifndef LIB__filters__WHITE_BALANCING_HPP_
-#define LIB__filters__WHITE_BALANCING_HPP_
+#ifndef LIB__FILTERS__WHITE_BALANCING_HPP_
+#define LIB__FILTERS__WHITE_BALANCING_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -29,4 +29,4 @@ inline void WhiteBalance::apply_filter(const cv::Mat& original,
     balance->balanceWhite(original, filtered);
 }
 
-#endif  // LIB__filters__WHITE_BALANCING_HPP_
+#endif  // LIB__FILTERS__WHITE_BALANCING_HPP_

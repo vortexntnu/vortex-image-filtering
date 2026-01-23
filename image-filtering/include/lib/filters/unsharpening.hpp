@@ -1,7 +1,7 @@
 
 
-#ifndef LIB__filters__UNSHARPENING_HPP_
-#define LIB__filters__UNSHARPENING_HPP_
+#ifndef LIB__FILTERS__UNSHARPENING_HPP_
+#define LIB__FILTERS__UNSHARPENING_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -38,4 +38,4 @@ inline void Unsharpening::apply_filter(const cv::Mat& original,
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
 
-#endif  // LIB__filters__UNSHARPENING_HPP_
+#endif  // LIB__FILTERS__UNSHARPENING_HPP_

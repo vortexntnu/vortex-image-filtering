@@ -1,5 +1,5 @@
-#ifndef LIB__filters__FLIP_HPP_
-#define LIB__filters__FLIP_HPP_
+#ifndef LIB__FILTERS__FLIP_HPP_
+#define LIB__FILTERS__FLIP_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -28,4 +28,4 @@ inline void Flip::apply_filter(const cv::Mat& original,
     cv::flip(original, filtered, flip_code);
 }
 
-#endif  // LIB__filters__FLIP_HPP_
+#endif  // LIB__FILTERS__FLIP_HPP_

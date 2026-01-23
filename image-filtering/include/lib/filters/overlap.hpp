@@ -1,6 +1,6 @@
 
-#ifndef LIB__filters__OVERLAP_HPP_
-#define LIB__filters__OVERLAP_HPP_
+#ifndef LIB__FILTERS__OVERLAP_HPP_
+#define LIB__FILTERS__OVERLAP_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -66,4 +66,4 @@ inline void Overlap::apply_filter(const cv::Mat& original,
     prev = original.clone();
 }
 
-#endif  // LIB__filters__OVERLAP_HPP_
+#endif  // LIB__FILTERS__OVERLAP_HPP_

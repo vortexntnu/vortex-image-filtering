@@ -1,6 +1,6 @@
 
-#ifndef LIB__filters__DILATION_HPP_
-#define LIB__filters__DILATION_HPP_
+#ifndef LIB__FILTERS__DILATION_HPP_
+#define LIB__FILTERS__DILATION_HPP_
 
 #include "abstract_filter_class.hpp"
 #include "lib/utilities.hpp"
@@ -29,4 +29,4 @@ inline void Dilation::apply_filter(const cv::Mat& original,
                    cv::MORPH_RECT);
 }
 
-#endif  // LIB__filters__DILATION_HPP_
+#endif  // LIB__FILTERS__DILATION_HPP_
