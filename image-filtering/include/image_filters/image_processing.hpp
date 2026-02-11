@@ -53,6 +53,9 @@ struct GridRemovalParams {
     double threshold_green;
     double threshold_binary;
     double inpaint_radius;
+    int rotation;    // degrees
+    int height;
+    int width;
 };
 
 struct FilterParams {

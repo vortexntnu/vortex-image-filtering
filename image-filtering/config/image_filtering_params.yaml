@@ -1,8 +1,8 @@
 /**:
   ros__parameters:
-    sub_topic: "/cam_down/image_color"
+    sub_topic: "/cam/image_color"
     pub_topic: "/filtered_image"
-    output_encoding: "mono8"
+    output_encoding: "bgr8"
     filter_params:
       filter_type: "remove_grid"
       flip:
@@ -32,6 +32,9 @@
         threshold_green: 0.5
         threshold_binary: 30.0
         inpaint_radius: 1.0
+        rotation: 0
+        height: 50
+        width: 50
 
 # Filter params should reflect the FilterParams struct
 # defined in /include/image_filters/image_processing.hpp

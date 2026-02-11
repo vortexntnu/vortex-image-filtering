@@ -46,6 +46,9 @@ void ImageFilteringNode::declare_parameters() {
         "filter_params.remove_grid.threshold_green");
     this->declare_parameter<double>("filter_params.remove_grid.threshold_binary");
     this->declare_parameter<double>("filter_params.remove_grid.inpaint_radius");
+    this->declare_parameter<int>("filter_params.remove_grid.rotation");
+    this->declare_parameter<int>("filter_params.remove_grid.height");
+    this->declare_parameter<int>("filter_params.remove_grid.width");
 }
 
 void ImageFilteringNode::set_filter_params() {
@@ -101,6 +104,12 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.remove_grid.threshold_binary").as_double();
     params.remove_grid.inpaint_radius = 
         this->get_parameter("filter_params.remove_grid.inpaint_radius").as_double();
+    params.remove_grid.rotation = 
+        this->get_parameter("filter_params.remove_grid.rotation").as_int();
+    params.remove_grid.height = 
+        this->get_parameter("filter_params.remove_grid.height").as_int();
+    params.remove_grid.width = 
+        this->get_parameter("filter_params.remove_grid.width").as_int();
     filter_params_ = params;
     spdlog::info("Filter parameters set: {}", filter);
 }

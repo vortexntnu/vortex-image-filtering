@@ -240,13 +240,33 @@ void remove_grid_filter(const FilterParams& params, const cv::Mat& original, cv:
     CV_Assert(!original.empty());
     CV_Assert(original.type() == CV_8UC3);
 
-    cv::Mat img_u8 = original.clone();
-    cv::Mat img_f;
+    // rotation and cropping of the image
+    cv::Point2f center(original.cols * 0.5f, img_u8.rows * 0.5f);
+    cv::Mat rotation_matrix =
+        cv::getRotationMatrix2D(center, params.remove_grid.rotation, 1.0);
+
+    cv::Mat rotated_img_u8;
+    cv::warpAffine(original, rotated_img_u8, rotation_matrix, original.size(),
+                cv::INTER_NEAREST,
+                cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+
+
+    /* centered crop */
+    int crop_w = std::min(params.remove_grid.width,  rotated_img_u8.cols);
+    int crop_h = std::min(params.remove_grid.height, rotated_img_u8.rows);
+
+    int x_corner = (rotated_img_u8.cols - crop_w) / 2;     // x of top left corner
+    int y_corner = (rotated_img_u8.rows - crop_h) / 2;     // y of top left corner 
+
+    cv::Rect roi(x_corner, y_corner, crop_w, crop_h);
+    cv::Mat cropped_img_u8 = rotated_img_u8(roi);
+
+    cv::Mat cropped_img_f;
 
     // extract grid lines
-    img_u8.convertTo(img_f, CV_32F, 1.0 / 255.0);
+    cropped_img_u8.convertTo(cropped_img_f, CV_32F, 1.0 / 255.0);
     std::vector<cv::Mat> color_channels(3);
-    cv::split(img_f, color_channels);   // BGR
+    cv::split(cropped_img_f, color_channels);   // BGR
 
     cv::Mat B = color_channels[0];
     cv::Mat G = color_channels[1];
@@ -272,12 +292,28 @@ void remove_grid_filter(const FilterParams& params, const cv::Mat& original, cv:
 
     // inpaint the masked areas
     cv::Mat inpainted_img;
-    cv::inpaint(img_u8, dilated_mask, inpainted_img, params.remove_grid.inpaint_radius, cv::INPAINT_TELEA);
+    cv::inpaint(cropped_img_u8, dilated_mask, inpainted_img, params.remove_grid.inpaint_radius, cv::INPAINT_TELEA);
 
     // binary thresholding
     cv::Mat gray;
+    cv::Mat thresholded_img;
     cv::cvtColor(inpainted_img, gray, cv::COLOR_BGR2GRAY);
-    cv::threshold(gray, filtered, params.remove_grid.threshold_binary, 255, cv::THRESH_BINARY);
+    //cv::threshold(gray, filtered, params.remove_grid.threshold_binary, 255, cv::THRESH_BINARY);
+
+    cv::threshold(gray, thresholded_img, params.remove_grid.threshold_binary, 255, cv::THRESH_BINARY);
+
+    // paste the aruco-marker back to the published image 
+    cv::Mat thresholded_bgr;
+    cv::cvtColor(thresholded_img, thresholded_bgr, cv::COLOR_GRAY2BGR);
+
+    cv::Mat rotated_thresholded_img = rotated_img_u8;
+    thresholded_bgr.copyTo(rotated_thresholded_img(roi));
+
+    cv::Mat inverse_rotation_matrix;
+    cv::invertAffineTransform(rotation_matrix, inverse_rotation_matrix);
+
+    cv::warpAffine(rotated_thresholded_img, filtered, inverse_rotation_matrix, original.size(),
+               cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
 
 }
 
