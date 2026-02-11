@@ -42,6 +42,13 @@ void ImageFilteringNode::declare_parameters() {
     this->declare_parameter<double>("filter_params.otsu.gsc_weight_b");
     this->declare_parameter<int>("filter_params.otsu.erosion_size");
     this->declare_parameter<int>("filter_params.otsu.dilation_size");
+    this->declare_parameter<double>(
+        "filter_params.remove_grid.threshold_green");
+    this->declare_parameter<double>("filter_params.remove_grid.threshold_binary");
+    this->declare_parameter<double>("filter_params.remove_grid.inpaint_radius");
+    this->declare_parameter<int>("filter_params.remove_grid.rotation");
+    this->declare_parameter<int>("filter_params.remove_grid.height");
+    this->declare_parameter<int>("filter_params.remove_grid.width");
 }
 
 void ImageFilteringNode::set_filter_params() {
@@ -91,6 +98,18 @@ void ImageFilteringNode::set_filter_params() {
         this->get_parameter("filter_params.otsu.erosion_size").as_int();
     params.otsu.dilation_size =
         this->get_parameter("filter_params.otsu.dilation_size").as_int();
+    params.remove_grid.threshold_green = 
+        this->get_parameter("filter_params.remove_grid.threshold_green").as_double();
+    params.remove_grid.threshold_binary = 
+        this->get_parameter("filter_params.remove_grid.threshold_binary").as_double();
+    params.remove_grid.inpaint_radius = 
+        this->get_parameter("filter_params.remove_grid.inpaint_radius").as_double();
+    params.remove_grid.rotation = 
+        this->get_parameter("filter_params.remove_grid.rotation").as_int();
+    params.remove_grid.height = 
+        this->get_parameter("filter_params.remove_grid.height").as_int();
+    params.remove_grid.width = 
+        this->get_parameter("filter_params.remove_grid.width").as_int();
     filter_params_ = params;
     spdlog::info("Filter parameters set: {}", filter);
 }
@@ -141,7 +160,10 @@ void ImageFilteringNode::on_parameter_event(
 void ImageFilteringNode::image_callback(
     const sensor_msgs::msg::Image::SharedPtr msg) {
     cv_bridge::CvImagePtr cv_ptr;
-
+    std::cout << "Received image with height: " << msg->height << " width: " << msg->width << std::endl;
+    //get time before processing
+    auto start_time = std::chrono::high_resolution_clock::now();
+    std::cout << "time start: " << start_time.time_since_epoch().count() << std::endl;
     try {
         cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
 
@@ -164,6 +186,13 @@ void ImageFilteringNode::image_callback(
     cv_bridge::CvImage(msg->header, output_encoding, filtered_image)
         .toImageMsg(*message);
 
+    // get time after processing
+    auto end_time = std::chrono::high_resolution_clock::now();
+    std::cout << "time end: " << end_time.time_since_epoch().count() << std::endl;
+    auto processing_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+        end_time - start_time);
+    std::cout << "Processing time (ms): " << processing_duration.count() << std::endl;
+    std::cout << "Publishing filtered image with height: " << message->height << " width: " << message->width << std::endl;
     image_pub_->publish(std::move(message));
 }
 
