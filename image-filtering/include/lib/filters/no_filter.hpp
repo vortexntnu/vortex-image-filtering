@@ -1,4 +1,3 @@
-
 #ifndef LIB__FILTERS__NO_FILTER_HPP_
 #define LIB__FILTERS__NO_FILTER_HPP_
 

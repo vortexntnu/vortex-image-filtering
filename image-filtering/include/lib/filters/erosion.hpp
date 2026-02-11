@@ -1,4 +1,3 @@
-
 #ifndef LIB__FILTERS__EROSION_HPP_
 #define LIB__FILTERS__EROSION_HPP_
 

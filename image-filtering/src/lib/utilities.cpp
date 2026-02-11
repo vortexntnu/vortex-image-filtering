@@ -47,6 +47,8 @@ double computeAutoGammaFromMean(const cv::Mat& image) {
     return gamma;
 }
 }
+
+
 // Auto-choose a gamma so dark images get lifted and bright images get toned
 // down (expects mono8)
 // - It sets the mean intensity to 255/2 ≃ 128
@@ -179,6 +181,39 @@ void vortex::image_filtering::apply_fixed_threshold(const cv::Mat& img,
 }
 
 /*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                _.-.
                               /  66\
                              (      `\          Hi, how you doing :)

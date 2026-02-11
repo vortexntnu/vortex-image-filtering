@@ -1,7 +1,8 @@
-
 #ifndef LIB__FILTERS__MEDIAN_BINARY_HPP_
 #define LIB__FILTERS__MEDIAN_BINARY_HPP_
 
+#include "abstract_filter_class.hpp"
+#include "lib/utilities.hpp"
 /////////////////////////////
 // Median + Binary
 /////////////////////////////
