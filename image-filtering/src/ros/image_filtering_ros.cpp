@@ -4,10 +4,10 @@
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
-    declare_parameters();
-    check_and_subscribe_to_image_topic();
+    declare_common_ros_params();
     set_filter_params();
     initialize_parameter_handler();
+    check_and_subscribe_to_image_topic();
     check_and_publish_to_output_topic();
 }
 
@@ -215,7 +215,6 @@ void ImageFilteringNode::image_callback(
         }
     } catch (cv_bridge::Exception& e) {
         spdlog::error("cv_bridge exception: {}", e.what());
-        ;
     }
 
     cv::Mat input_image = cv_ptr->image;

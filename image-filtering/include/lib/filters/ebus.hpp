@@ -2,7 +2,8 @@
 #ifndef LIB__FILTERS__EBUS_HPP_
 #define LIB__FILTERS__EBUS_HPP_
 
-#include "abstract_filter_class.hpp"
+// #include "abstract_filter_class.hpp"
+
 
 /////////////////////////////
 // Ebus (dilation + unsharpening combo)

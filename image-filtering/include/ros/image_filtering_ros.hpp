@@ -50,7 +50,7 @@ class ImageFilteringNode : public rclcpp::Node {
      * @brief Declare the ros2 parameters used by the node.
      *
      */
-    void declare_parameters();
+    void declare_common_ros_params();
 
     /**
      * @brief Declare a ros parameter if it isn't declared yet and return it

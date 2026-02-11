@@ -4,6 +4,7 @@
 #define LIB__FILTERS__OTSU_HPP_
 
 #include "abstract_filter_class.hpp"
+#include "lib/utilities.hpp"
 
 /////////////////////////////
 // Otsu Segmentation

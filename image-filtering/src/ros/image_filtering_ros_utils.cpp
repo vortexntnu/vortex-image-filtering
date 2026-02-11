@@ -23,12 +23,10 @@ void ImageFilteringNode::check_and_publish_to_output_topic() {
     std::string pub_topic = this->get_parameter("pub_topic").as_string();
     if (pub_topic_ != pub_topic) {
         rmw_qos_profile_t qos_profile =
-            rmw_qos_profile_sensor_data;  // This is some quality of service
-                                          // stuf (prefers low latency over
-                                          // quality)
+            rmw_qos_profile_sensor_data;
         auto qos_sensor_data =
             rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, 1),
-                        qos_profile);  // ROS keeps only the newest image
+                        qos_profile);
 
         image_pub_ = this->create_publisher<sensor_msgs::msg::Image>(
             pub_topic, qos_sensor_data);
@@ -38,7 +36,7 @@ void ImageFilteringNode::check_and_publish_to_output_topic() {
     }
 }
 
-void ImageFilteringNode::declare_parameters() {
+void ImageFilteringNode::declare_common_ros_params() {
     this->declare_parameter<std::string>("sub_topic");
     this->declare_parameter<std::string>("pub_topic");
     this->declare_parameter<std::string>("output_encoding");
