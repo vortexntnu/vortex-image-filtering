@@ -16,5 +16,5 @@ class NoFilter : public Filter {
         original.copyTo(filtered);
     };
 };
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__NO_FILTER_HPP_

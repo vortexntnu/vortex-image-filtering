@@ -1,10 +1,10 @@
 #ifndef LIB__TYPEDEF_HPP_
 #define LIB__TYPEDEF_HPP_
 
-#include <map>
-#include <numeric>
 #include <fmt/color.h>
 #include <spdlog/spdlog.h>
+#include <map>
+#include <numeric>
 #include <string>
 #include <utility>
 
@@ -76,5 +76,5 @@ inline std::string_view filtertype_to_string(FilterType t) {
                     "this add the string and filter type to kFilterMap"));
     return "unknown";
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__TYPEDEF_HPP_

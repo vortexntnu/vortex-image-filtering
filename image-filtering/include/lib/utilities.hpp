@@ -48,5 +48,5 @@ void apply_fixed_threshold(const cv::Mat& img,
                            cv::Mat& filtered,
                            int thresh,
                            bool invert = false);
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__UTILITIES_HPP_

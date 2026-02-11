@@ -29,5 +29,5 @@ inline void MedianBinary::apply_filter(const cv::Mat& original,
     apply_fixed_threshold(filtered, filtered, this->filter_params.threshold,
                           this->filter_params.invert);
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__MEDIAN_BINARY_HPP_

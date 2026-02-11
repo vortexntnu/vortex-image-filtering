@@ -27,6 +27,6 @@ inline void Erosion::apply_filter(const cv::Mat& original,
     apply_erosion(original, filtered, this->filter_params.kernel_size,
                   cv::MORPH_RECT);
 }
-}
+}  // namespace vortex::image_filtering
 
 #endif  // LIB__FILTERS__EROSION_HPP_

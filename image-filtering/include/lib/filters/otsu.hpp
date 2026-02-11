@@ -1,10 +1,10 @@
 #ifndef LIB__FILTERS__OTSU_HPP_
 #define LIB__FILTERS__OTSU_HPP_
 
-#include "abstract_filter_class.hpp"
-#include "lib/utilities.hpp"
 #include <spdlog/spdlog.h>
 #include <opencv2/imgproc.hpp>
+#include "abstract_filter_class.hpp"
+#include "lib/utilities.hpp"
 /////////////////////////////
 // Otsu Segmentation
 /////////////////////////////
@@ -63,5 +63,5 @@ inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
                        cv::MORPH_CROSS);
     }
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__OTSU_HPP_

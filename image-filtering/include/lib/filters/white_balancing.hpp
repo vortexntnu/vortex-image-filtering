@@ -1,8 +1,8 @@
 #ifndef LIB__FILTERS__WHITE_BALANCING_HPP_
 #define LIB__FILTERS__WHITE_BALANCING_HPP_
 
-#include "abstract_filter_class.hpp"
 #include <opencv2/xphoto.hpp>
+#include "abstract_filter_class.hpp"
 /////////////////////////////
 // White Balance
 /////////////////////////////
@@ -28,5 +28,5 @@ inline void WhiteBalance::apply_filter(const cv::Mat& original,
     balance->setP(contrast_percentage);
     balance->balanceWhite(original, filtered);
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__WHITE_BALANCING_HPP_

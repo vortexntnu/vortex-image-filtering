@@ -35,5 +35,5 @@ inline void Unsharpening::apply_filter(const cv::Mat& original,
 
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__UNSHARPENING_HPP_

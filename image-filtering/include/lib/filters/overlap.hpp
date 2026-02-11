@@ -65,5 +65,5 @@ inline void Overlap::apply_filter(const cv::Mat& original,
     // Update history (write to cached previous)
     prev = original.clone();
 }
-}
+}  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__OVERLAP_HPP_
