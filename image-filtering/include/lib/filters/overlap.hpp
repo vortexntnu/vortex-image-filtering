@@ -1,4 +1,3 @@
-
 #ifndef LIB__FILTERS__OVERLAP_HPP_
 #define LIB__FILTERS__OVERLAP_HPP_
 

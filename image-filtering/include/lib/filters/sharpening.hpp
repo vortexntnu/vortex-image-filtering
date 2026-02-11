@@ -1,5 +1,3 @@
-
-
 #ifndef LIB__FILTERS__SHARPENING_HPP_
 #define LIB__FILTERS__SHARPENING_HPP_
 

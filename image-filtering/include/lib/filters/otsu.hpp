@@ -1,5 +1,3 @@
-
-
 #ifndef LIB__FILTERS__OTSU_HPP_
 #define LIB__FILTERS__OTSU_HPP_
 
