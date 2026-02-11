@@ -48,33 +48,33 @@ double computeAutoGammaFromMean(const cv::Mat& image) {
 }
 }  // namespace
 
+namespace vortex::image_filtering {
 // Auto-choose a gamma so dark images get lifted and bright images get toned
 // down (expects mono8)
 // - It sets the mean intensity to 255/2 ≃ 128
 // - The correction weight makes all the values weaker(<1) or stronger(>1)
-void vortex::image_filtering::apply_auto_gamma(cv::Mat& image,
-                                               double correction_weight) {
+void apply_auto_gamma(cv::Mat& image, double correction_weight) {
     double gamma = computeAutoGammaFromMean(image) * correction_weight;
     applyGammaLUT(image, gamma);
 }
 
 // Convert BGR image to single-channel grayscale using custom B,G,R weights
 // weights = (b, g, r), e.g. (0.114f, 0.587f, 0.299f)
-void vortex::image_filtering::to_weighted_gray(const cv::Mat& bgr,
-                                               cv::Mat& gray,
-                                               double wB,
-                                               double wG,
-                                               double wR) {
+void to_weighted_gray(const cv::Mat& bgr,
+                      cv::Mat& gray,
+                      double wB,
+                      double wG,
+                      double wR) {
     cv::Matx13f customWeights(wB, wG, wR);
     cv::transform(bgr, gray, customWeights);
 }
 
 // Returns the Otsu threshold value chosen by OpenCV (0..255) and outputs the
 // thresholded binary image
-int vortex::image_filtering::apply_otsu(const cv::Mat& gray8u,
-                                        cv::Mat& out,
-                                        bool invert,
-                                        double maxval) {
+int apply_otsu(const cv::Mat& gray8u,
+               cv::Mat& out,
+               bool invert,
+               double maxval) {
     CV_Assert(gray8u.type() == CV_8UC1 &&
               "applyOtsu expects 8-bit single-channel input");
 
@@ -86,20 +86,14 @@ int vortex::image_filtering::apply_otsu(const cv::Mat& gray8u,
     return static_cast<int>(std::round(thresh));
 }
 
-void vortex::image_filtering::apply_erosion(const cv::Mat& src,
-                                            cv::Mat& filtered,
-                                            int size,
-                                            int shape) {
+void apply_erosion(const cv::Mat& src, cv::Mat& filtered, int size, int shape) {
     cv::Mat kernel = cv::getStructuringElement(
         shape, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
     cv::erode(src, filtered, kernel);
 }
 
 // Basic dilation
-void vortex::image_filtering::apply_dilation(const cv::Mat& src,
-                                             cv::Mat& dst,
-                                             int size,
-                                             int shape) {
+void apply_dilation(const cv::Mat& src, cv::Mat& dst, int size, int shape) {
     cv::Mat kernel = cv::getStructuringElement(
         shape, cv::Size(2 * size + 1, 2 * size + 1), cv::Point(size, size));
     cv::dilate(src, dst, kernel);
@@ -108,9 +102,7 @@ void vortex::image_filtering::apply_dilation(const cv::Mat& src,
 // Median filter that preserves original depth if it's unsupported by
 // cv::medianBlur. Supported depths: CV_8U, CV_16U, CV_32F For others (e.g.,
 // CV_16S, CV_32S, CV_64F) we convert to CV_32F, filter, then convert back.
-void vortex::image_filtering::apply_median(const cv::Mat& original,
-                                           cv::Mat& filtered,
-                                           int kernel_size) {
+void apply_median(const cv::Mat& original, cv::Mat& filtered, int kernel_size) {
     CV_Assert(!original.empty());
 
     // If caller passed 1, just copy
@@ -155,10 +147,10 @@ void vortex::image_filtering::apply_median(const cv::Mat& original,
 // - Ensures 8-bit depth for thresholding.
 // - Returns a 0/255 mask (CV_8U).
 // - Set `invert=true` to get white background & black foreground.
-void vortex::image_filtering::apply_fixed_threshold(const cv::Mat& img,
-                                                    cv::Mat& filtered,
-                                                    int thresh,
-                                                    bool invert) {
+void apply_fixed_threshold(const cv::Mat& img,
+                           cv::Mat& filtered,
+                           int thresh,
+                           bool invert) {
     if (img.empty()) {
         throw std::invalid_argument(
             "applyFixedThreshold: input image is empty");
@@ -187,6 +179,7 @@ void vortex::image_filtering::apply_fixed_threshold(const cv::Mat& img,
     int type = invert ? (cv::THRESH_BINARY_INV) : (cv::THRESH_BINARY);
     cv::threshold(gray, filtered, thresh, 255, type);
 }
+}  // namespace vortex::image_filtering
 
 /*
 

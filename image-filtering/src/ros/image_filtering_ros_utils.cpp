@@ -3,9 +3,7 @@
 #include <ros/image_filtering_ros.hpp>
 #include <ros/image_filtering_ros_utils.hpp>
 using std::placeholders::_1;
-
-using namespace vortex::image_filtering;
-
+namespace vortex::image_filtering {
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     std::string image_topic = this->get_parameter("sub_topic").as_string();
     if (image_topic_ != image_topic) {
@@ -43,3 +41,4 @@ void ImageFilteringNode::declare_common_ros_params() {
     this->declare_parameter<std::string>("input_encoding");
     this->declare_parameter<std::string>("filter_params.filter_type");
 }
+}  // namespace vortex::image_filtering

@@ -2,7 +2,7 @@
 #include <ros/image_filtering_ros.hpp>
 #include <ros/image_filtering_ros_utils.hpp>
 
-using namespace vortex::image_filtering;
+namespace vortex::image_filtering {
 
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
@@ -251,3 +251,4 @@ void ImageFilteringNode::image_callback(
 }
 
 RCLCPP_COMPONENTS_REGISTER_NODE(ImageFilteringNode)
+}  // namespace vortex::image_filtering
