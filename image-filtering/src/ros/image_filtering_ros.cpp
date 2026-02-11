@@ -9,8 +9,8 @@ using namespace vortex::image_filtering;
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
     declare_common_ros_params();
-    set_filter_params();
     initialize_parameter_handler();
+    set_filter_params();
     check_and_subscribe_to_image_topic();
     check_and_publish_to_output_topic();
 }

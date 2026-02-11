@@ -183,11 +183,9 @@ void ImageFilteringNode::set_filter_params() {
 
 ### Helper functions
 
-Is your filter to big, is it a chunky boy, are you in need of space, then you have come to the right place!!!
-
 #### Define the apply filter function
 
-If the YourFilter::apply_filter function gets to big you can add a cpp file named the same as your hpp file (your_filter.cpp) in the [filters](image-filtering/src/lib/filters) folder. There you add #include "lib/filters/your_filter.hpp" at the top. Then you can define your filter there. Whenever you make a new c++ file, add the path to [CMakeList.txt](image-filtering/CMakeLists.txt), to the `add_library(${LIB_NAME}` part.
+If the YourFilter::apply_filter function gets to big you can add a cpp file named the same as your hpp file (your_filter.cpp) in the [filters](image-filtering/src/lib/filters) folder. There you add #include "lib/filters/your_filter.hpp" at the top. Then you can define your filter there. Whenever you make a new c++ file, add the path to [CMakeList.txt](image-filtering/CMakeLists.txt), to the `add_library(${CORE_LIB} SHARED` part.
 
 #### Make and use helperfunctions
 
