@@ -9,6 +9,7 @@
 #include <opencv2/xphoto.hpp>
 #include <string>
 
+namespace vortex::image_filtering {
 // Auto-choose a gamma so dark images get lifted and bright images get toned
 // down (expects mono8)
 void apply_auto_gamma(cv::Mat& image, double correction_weight);
@@ -53,5 +54,5 @@ void apply_fixed_threshold(const cv::Mat& img,
                            cv::Mat& filtered,
                            int thresh,
                            bool invert = false);
-
+}
 #endif  // LIB__UTILITIES_HPP_

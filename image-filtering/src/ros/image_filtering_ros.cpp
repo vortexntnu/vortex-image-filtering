@@ -2,6 +2,10 @@
 #include <ros/image_filtering_ros.hpp>
 #include <ros/image_filtering_ros_utils.hpp>
 
+using namespace vortex::image_filtering;
+
+
+
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
     declare_common_ros_params();

@@ -9,7 +9,7 @@
 /////////////////////////////
 // Otsu Segmentation
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct OtsuSegmentationParams {
     bool gamma_auto_correction;
     double gamma_auto_correction_weight;
@@ -64,5 +64,5 @@ inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
                        cv::MORPH_CROSS);
     }
 }
-
+}
 #endif  // LIB__FILTERS__OTSU_HPP_

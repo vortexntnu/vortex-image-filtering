@@ -8,7 +8,7 @@
 ////////////////////////////
 // Unsharpening
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct UnsharpeningParams {
     int blur_size;
 };
@@ -37,5 +37,5 @@ inline void Unsharpening::apply_filter(const cv::Mat& original,
 
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
-
+}
 #endif  // LIB__FILTERS__UNSHARPENING_HPP_

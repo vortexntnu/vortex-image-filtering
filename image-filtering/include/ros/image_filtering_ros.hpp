@@ -14,7 +14,7 @@
 #include "lib/filters/all_filters.hpp"
 
 #include "lib/typedef.hpp"
-
+namespace vortex::image_filtering {
 class ImageFilteringNode : public rclcpp::Node {
    public:
     explicit ImageFilteringNode(const rclcpp::NodeOptions& options);
@@ -131,5 +131,5 @@ class ImageFilteringNode : public rclcpp::Node {
      */
     std::unique_ptr<Filter> filter_ptr;
 };
-
+}
 #endif  // ROS__IMAGE_FILTERING_ROS_HPP_

@@ -6,7 +6,7 @@
 /////////////////////////////
 // Flip
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct FlipParams {
     int flip_code;
 };
@@ -27,5 +27,5 @@ inline void Flip::apply_filter(const cv::Mat& original,
         this->filter_params.flip_code;  // 0: x-axis, 1: y-axis, -1: both
     cv::flip(original, filtered, flip_code);
 }
-
+}
 #endif  // LIB__FILTERS__FLIP_HPP_

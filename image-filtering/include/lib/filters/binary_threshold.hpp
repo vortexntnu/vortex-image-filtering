@@ -6,6 +6,7 @@
 /////////////////////////////
 // Binary Threshold
 /////////////////////////////
+namespace vortex::image_filtering {
 
 struct BinaryThresholdParams {
     double threshold;
@@ -14,15 +15,16 @@ struct BinaryThresholdParams {
 };
 
 class BinaryThreshold : public Filter {
-   public:
-    explicit BinaryThreshold(BinaryThresholdParams params)
-        : filter_params(params) {}
-    void apply_filter(const cv::Mat& original,
-                      cv::Mat& filtered) const override;
+    public:
+        explicit BinaryThreshold(BinaryThresholdParams params)
+            : filter_params(params) {}
+        void apply_filter(const cv::Mat& original,
+                        cv::Mat& filtered) const override;
 
-   private:
-    BinaryThresholdParams filter_params;
+    private:
+        BinaryThresholdParams filter_params;
 };
+
 
 inline void BinaryThreshold::apply_filter(const cv::Mat& original,
                                           cv::Mat& filtered) const {
@@ -52,5 +54,5 @@ inline void BinaryThreshold::apply_filter(const cv::Mat& original,
     const int type = invert ? cv::THRESH_BINARY_INV : cv::THRESH_BINARY;
     cv::threshold(src8, filtered, thresh, maxval, type);
 }
-
+}
 #endif  // LIB__FILTERS__BINARY_THRESHOLD_HPP_

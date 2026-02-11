@@ -8,6 +8,7 @@
 #include <string>
 #include <utility>
 
+namespace vortex::image_filtering {
 enum class FilterType {
     NoFilter,
     Flip,
@@ -73,5 +74,5 @@ inline std::string_view filtertype_to_string(FilterType t) {
                     "this add the string and filter type to kFilterMap"));
     return "unknown";
 }
-
+}
 #endif  // LIB__TYPEDEF_HPP_

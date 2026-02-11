@@ -8,7 +8,7 @@
 /////////////////////////////
 // Erosion
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct ErosionParams {
     int kernel_size;  // odd > 1
 };
@@ -27,6 +27,7 @@ inline void Erosion::apply_filter(const cv::Mat& original,
                                   cv::Mat& filtered) const {
     apply_erosion(original, filtered, this->filter_params.kernel_size,
                   cv::MORPH_RECT);
+}
 }
 
 #endif  // LIB__FILTERS__EROSION_HPP_

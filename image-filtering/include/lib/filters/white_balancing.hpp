@@ -6,7 +6,7 @@
 /////////////////////////////
 // White Balance
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct WhiteBalanceParams {
     double contrast_percentage;
 };
@@ -28,5 +28,5 @@ inline void WhiteBalance::apply_filter(const cv::Mat& original,
     balance->setP(contrast_percentage);
     balance->balanceWhite(original, filtered);
 }
-
+}
 #endif  // LIB__FILTERS__WHITE_BALANCING_HPP_

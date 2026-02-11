@@ -1,4 +1,3 @@
-
 #ifndef LIB__FILTERS__DILATION_HPP_
 #define LIB__FILTERS__DILATION_HPP_
 
@@ -9,24 +8,28 @@
 // Dilation
 /////////////////////////////
 
-struct DilationParams {
-    int kernel_size = 3;
-};
 
-class Dilation : public Filter {
-   public:
-    explicit Dilation(DilationParams params) : filter_params(params) {}
-    void apply_filter(const cv::Mat& original,
-                      cv::Mat& filtered) const override;
+namespace vortex::image_filtering{
 
-   private:
-    DilationParams filter_params;
-};
+    struct DilationParams {
+        int kernel_size = 3;
+    };
 
-inline void Dilation::apply_filter(const cv::Mat& original,
-                                   cv::Mat& filtered) const {
-    apply_dilation(original, filtered, this->filter_params.kernel_size,
-                   cv::MORPH_RECT);
+    class Dilation : public Filter {
+    public:
+        explicit Dilation(DilationParams params) : filter_params(params) {}
+        void apply_filter(const cv::Mat& original,
+                        cv::Mat& filtered) const override;
+
+    private:
+        DilationParams filter_params;
+    };
+
+
+    inline void Dilation::apply_filter(const cv::Mat& original,
+                                    cv::Mat& filtered) const {
+        apply_dilation(original, filtered, this->filter_params.kernel_size,
+                    cv::MORPH_RECT);
+    }
 }
-
 #endif  // LIB__FILTERS__DILATION_HPP_

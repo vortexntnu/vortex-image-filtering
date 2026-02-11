@@ -8,7 +8,7 @@
 /////////////////////////////
 // Sharpening
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct SharpeningParams {};
 
 class Sharpening : public Filter {
@@ -27,5 +27,5 @@ inline void Sharpening::apply_filter(const cv::Mat& original,
     cv::Mat kernel = (cv::Mat_<float>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
     cv::filter2D(original, filtered, -1, kernel);
 }
-
+}
 #endif  // LIB__FILTERS__SHARPENING_HPP_

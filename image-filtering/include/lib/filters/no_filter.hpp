@@ -7,7 +7,7 @@
 /////////////////////////////
 // No filter
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct NoFilterParams {};
 
 class NoFilter : public Filter {
@@ -17,5 +17,5 @@ class NoFilter : public Filter {
         original.copyTo(filtered);
     };
 };
-
+}
 #endif  // LIB__FILTERS__NO_FILTER_HPP_

@@ -4,6 +4,8 @@
 #include <ros/image_filtering_ros_utils.hpp>
 using std::placeholders::_1;
 
+using namespace vortex::image_filtering;
+
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {
     std::string image_topic = this->get_parameter("sub_topic").as_string();
     if (image_topic_ != image_topic) {

@@ -7,7 +7,7 @@
 /////////////////////////////
 // Overlap (blend/composite)
 /////////////////////////////
-
+namespace vortex::image_filtering {
 struct OverlapParams {
     double percentage_threshold;  // 0..100 (percent)
 };
@@ -65,5 +65,5 @@ inline void Overlap::apply_filter(const cv::Mat& original,
     // Update history (write to cached previous)
     prev = original.clone();
 }
-
+}
 #endif  // LIB__FILTERS__OVERLAP_HPP_
