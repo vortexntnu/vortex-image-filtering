@@ -2,6 +2,7 @@
 #define LIB__FILTERS__BINARY_THRESHOLD_HPP_
 
 #include "abstract_filter_class.hpp"
+#include <opencv2/imgproc.hpp>
 
 /////////////////////////////
 // Binary Threshold

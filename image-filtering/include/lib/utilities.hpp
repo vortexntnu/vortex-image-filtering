@@ -1,13 +1,7 @@
 #ifndef LIB__UTILITIES_HPP_
 #define LIB__UTILITIES_HPP_
 
-#include <numeric>
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/xphoto.hpp>
-#include <string>
 
 namespace vortex::image_filtering {
 // Auto-choose a gamma so dark images get lifted and bright images get toned

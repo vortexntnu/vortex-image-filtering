@@ -9,8 +9,8 @@ using namespace vortex::image_filtering;
 ImageFilteringNode::ImageFilteringNode(const rclcpp::NodeOptions& options)
     : Node("image_filtering_node", options) {
     declare_common_ros_params();
-    initialize_parameter_handler();
     set_filter_params();
+    initialize_parameter_handler();
     check_and_subscribe_to_image_topic();
     check_and_publish_to_output_topic();
 }
@@ -23,6 +23,12 @@ void ImageFilteringNode::set_filter_params() {
     switch (filter_type) {
         case FilterType::NoFilter: {
             filter_ptr = std::make_unique<NoFilter>();
+            break;
+        }
+
+        case FilterType::Sharpening: {
+            SharpeningParams params{}; // Doesn't currently have any parameters
+            filter_ptr = std::make_unique<Sharpening>(params);
             break;
         }
 

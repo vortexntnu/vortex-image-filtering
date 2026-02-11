@@ -12,6 +12,7 @@ namespace vortex::image_filtering {
 enum class FilterType {
     NoFilter,
     Flip,
+    Sharpening,
     Unsharpening,
     Erosion,
     Dilation,
@@ -28,6 +29,7 @@ enum class FilterType {
 static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"no_filter", FilterType::NoFilter},
     {"flip", FilterType::Flip},
+    {"sharpening", FilterType::Sharpening},
     {"unsharpening", FilterType::Unsharpening},
     {"erosion", FilterType::Erosion},
     {"dilation", FilterType::Dilation},

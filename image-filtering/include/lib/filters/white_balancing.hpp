@@ -2,7 +2,7 @@
 #define LIB__FILTERS__WHITE_BALANCING_HPP_
 
 #include "abstract_filter_class.hpp"
-
+#include <opencv2/xphoto.hpp>
 /////////////////////////////
 // White Balance
 /////////////////////////////

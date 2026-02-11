@@ -83,11 +83,11 @@ This new file needs to be added to [all_filters.hpp](image-filtering/include/lib
 #ifndef LIB__FILTERS__EXAMPLE_HPP_
 #define LIB__FILTERS__EXAMPLE_HPP_
 
+// Add your filter to the top of this file:
+#include "lib/filters/your_filter.hpp"
+
 #include "lib/filters/example.hpp"
 #include "lib/filters/no_filter.hpp"
-              ...
-// Add this
-#include "lib/filters/your_filter.hpp"
 
 
 #endif // LIB__FILTERS__EXAMPLE_HPP_
