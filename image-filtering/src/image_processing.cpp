@@ -241,7 +241,7 @@ void remove_grid_filter(const FilterParams& params, const cv::Mat& original, cv:
     CV_Assert(original.type() == CV_8UC3);
 
     // rotation and cropping of the image
-    cv::Point2f center(original.cols * 0.5f, img_u8.rows * 0.5f);
+    cv::Point2f center(original.cols * 0.5f, original.rows * 0.5f);
     cv::Mat rotation_matrix =
         cv::getRotationMatrix2D(center, params.remove_grid.rotation, 1.0);
 
