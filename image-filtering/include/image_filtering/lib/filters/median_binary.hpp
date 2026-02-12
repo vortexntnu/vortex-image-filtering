@@ -25,9 +25,8 @@ class MedianBinary : public Filter {
 
 inline void MedianBinary::apply_filter(const cv::Mat& original,
                                        cv::Mat& filtered) const {
-
     odd_int kernel_size = odd_int(this->filter_params_.kernel_size);
-    apply_median(original, filtered, int(kernel_size));
+    apply_median(original, filtered, static_cast<int>(kernel_size));
     apply_fixed_threshold(filtered, filtered, this->filter_params_.threshold,
                           this->filter_params_.invert);
 }

@@ -48,23 +48,22 @@ void apply_fixed_threshold(const cv::Mat& img,
                            cv::Mat& filtered,
                            int thresh,
                            bool invert = false);
- 
-// For values that is required to be odd and biger than one
+
+// For values that is required to be odd and bigger than one
 struct odd_int {
     int value;
- 
+
     explicit odd_int(int v) : value(v) {
         if (v <= 1 || (v % 2) == 0) {
             throw std::invalid_argument("odd_int must be odd and > 1");
         }
     }
- 
+
     // Allow passing to APIs that expect int without changing call sites
     operator int() const noexcept { return value; }
- 
 
     int get() const noexcept { return value; }
 };
- }  // namespace vortex::image_filtering_
+}  // namespace vortex::image_filtering
 
 #endif  // IMAGE_FILTERING__LIB__UTILITIES_HPP_
