@@ -2,7 +2,7 @@
 #define LIB__FILTERS__EROSION_HPP_
 
 #include "abstract_filter_class.hpp"
-#include "lib/utilities.hpp"
+#include "image_filtering/lib/utilities.hpp"
 
 /////////////////////////////
 // Erosion

@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <opencv2/imgproc.hpp>
 #include "abstract_filter_class.hpp"
-#include "lib/utilities.hpp"
+#include "image_filtering/lib/utilities.hpp"
 /////////////////////////////
 // Otsu Segmentation
 /////////////////////////////

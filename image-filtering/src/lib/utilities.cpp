@@ -1,5 +1,5 @@
 
-#include <lib/utilities.hpp>
+#include <image_filtering/lib/utilities.hpp>
 
 namespace {  // Making these functions private for this file
 

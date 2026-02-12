@@ -1,5 +1,5 @@
 
-#include <ros/image_filtering_ros.hpp>
+#include <image_filtering/ros/image_filtering_ros.hpp>
 
 using std::placeholders::_1;
 namespace vortex::image_filtering {

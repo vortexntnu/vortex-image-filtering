@@ -11,9 +11,9 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
-#include "lib/filters/all_filters.hpp"
+#include "image_filtering/lib/filters/all_filters.hpp"
+#include "image_filtering/lib/typedef.hpp"
 
-#include "lib/typedef.hpp"
 namespace vortex::image_filtering {
 class ImageFilteringNode : public rclcpp::Node {
    public:

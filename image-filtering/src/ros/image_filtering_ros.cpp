@@ -1,5 +1,5 @@
 #include <rclcpp_components/register_node_macro.hpp>
-#include <ros/image_filtering_ros.hpp>
+#include <image_filtering/ros/image_filtering_ros.hpp>
 
 namespace vortex::image_filtering {
 
