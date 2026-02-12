@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__EBUS_HPP_
-#define LIB__FILTERS__EBUS_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__EBUS_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__EBUS_HPP_
 
 #include "abstract_filter_class.hpp"
 #include "image_filtering/lib/utilities.hpp"
@@ -49,4 +49,4 @@ inline void Ebus::apply_filter(const cv::Mat& original,
 }
 }  // namespace vortex::image_filtering
 
-#endif  // LIB__FILTERS__EBUS_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__EBUS_HPP_

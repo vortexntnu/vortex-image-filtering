@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__SHARPENING_HPP_
-#define LIB__FILTERS__SHARPENING_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__SHARPENING_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__SHARPENING_HPP_
 
 #include "abstract_filter_class.hpp"
 #include "opencv2/imgproc.hpp"
@@ -27,4 +27,4 @@ inline void Sharpening::apply_filter(const cv::Mat& original,
     cv::filter2D(original, filtered, -1, kernel);
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__SHARPENING_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__SHARPENING_HPP_

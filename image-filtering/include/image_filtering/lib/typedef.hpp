@@ -1,5 +1,5 @@
-#ifndef LIB__TYPEDEF_HPP_
-#define LIB__TYPEDEF_HPP_
+#ifndef IMAGE_FILTERING__LIB__TYPEDEF_HPP_
+#define IMAGE_FILTERING__LIB__TYPEDEF_HPP_
 
 #include <fmt/color.h>
 #include <spdlog/spdlog.h>
@@ -77,4 +77,4 @@ inline std::string_view filtertype_to_string(FilterType t) {
     return "unknown";
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__TYPEDEF_HPP_
+#endif  // IMAGE_FILTERING__LIB__TYPEDEF_HPP_

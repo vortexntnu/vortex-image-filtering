@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__NO_FILTER_HPP_
-#define LIB__FILTERS__NO_FILTER_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__NO_FILTER_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__NO_FILTER_HPP_
 
 #include "abstract_filter_class.hpp"
 
@@ -17,4 +17,4 @@ class NoFilter : public Filter {
     };
 };
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__NO_FILTER_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__NO_FILTER_HPP_

@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__DILATION_HPP_
-#define LIB__FILTERS__DILATION_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__DILATION_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__DILATION_HPP_
 
 #include "abstract_filter_class.hpp"
 #include "image_filtering/lib/utilities.hpp"
@@ -30,4 +30,4 @@ inline void Dilation::apply_filter(const cv::Mat& original,
                    cv::MORPH_RECT);
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__DILATION_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__DILATION_HPP_

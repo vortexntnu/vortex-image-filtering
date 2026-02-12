@@ -1,5 +1,5 @@
-#ifndef ROS__IMAGE_FILTERING_ROS_HPP_
-#define ROS__IMAGE_FILTERING_ROS_HPP_
+#ifndef IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_
+#define IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_
 
 #include <cv_bridge/cv_bridge.h>
 #include <fmt/color.h>
@@ -132,4 +132,4 @@ class ImageFilteringNode : public rclcpp::Node {
     std::unique_ptr<Filter> filter_ptr_;
 };
 }  // namespace vortex::image_filtering
-#endif  // ROS__IMAGE_FILTERING_ROS_HPP_
+#endif  // IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_

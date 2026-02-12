@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__BINARY_THRESHOLD_HPP_
-#define LIB__FILTERS__BINARY_THRESHOLD_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__BINARY_THRESHOLD_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__BINARY_THRESHOLD_HPP_
 
 #include <opencv2/imgproc.hpp>
 #include "abstract_filter_class.hpp"
@@ -55,4 +55,4 @@ inline void BinaryThreshold::apply_filter(const cv::Mat& original,
     cv::threshold(src8, filtered, thresh, maxval, type);
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__BINARY_THRESHOLD_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__BINARY_THRESHOLD_HPP_

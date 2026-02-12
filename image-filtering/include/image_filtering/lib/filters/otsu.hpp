@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__OTSU_HPP_
-#define LIB__FILTERS__OTSU_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__OTSU_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__OTSU_HPP_
 
 #include <spdlog/spdlog.h>
 #include <opencv2/imgproc.hpp>
@@ -64,4 +64,4 @@ inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
     }
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__OTSU_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__OTSU_HPP_

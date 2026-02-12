@@ -1,5 +1,5 @@
-#ifndef LIB__FILTERS__UNSHARPENING_HPP_
-#define LIB__FILTERS__UNSHARPENING_HPP_
+#ifndef IMAGE_FILTERING__LIB__FILTERS__UNSHARPENING_HPP_
+#define IMAGE_FILTERING__LIB__FILTERS__UNSHARPENING_HPP_
 
 #include "abstract_filter_class.hpp"
 #include "opencv2/imgproc.hpp"
@@ -36,4 +36,4 @@ inline void Unsharpening::apply_filter(const cv::Mat& original,
     addWeighted(original, 1, mask, 3, 0, filtered);
 }
 }  // namespace vortex::image_filtering
-#endif  // LIB__FILTERS__UNSHARPENING_HPP_
+#endif  // IMAGE_FILTERING__LIB__FILTERS__UNSHARPENING_HPP_

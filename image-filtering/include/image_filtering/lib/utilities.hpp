@@ -1,5 +1,5 @@
-#ifndef LIB__UTILITIES_HPP_
-#define LIB__UTILITIES_HPP_
+#ifndef IMAGE_FILTERING__LIB__UTILITIES_HPP_
+#define IMAGE_FILTERING__LIB__UTILITIES_HPP_
 
 #include <opencv2/xphoto.hpp>
 
@@ -49,4 +49,4 @@ void apply_fixed_threshold(const cv::Mat& img,
                            int thresh,
                            bool invert = false);
 }  // namespace vortex::image_filtering
-#endif  // LIB__UTILITIES_HPP_
+#endif  // IMAGE_FILTERING__LIB__UTILITIES_HPP_

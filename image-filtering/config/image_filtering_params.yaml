@@ -40,4 +40,3 @@
         threshold: 20. # in percent
         maxval: 255.
         invert: true
-        
