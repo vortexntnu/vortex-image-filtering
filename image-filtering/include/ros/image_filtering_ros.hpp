@@ -118,7 +118,7 @@ class ImageFilteringNode : public rclcpp::Node {
      * @brief The image topic to subscribe to
      *
      */
-    std::string image_topic_;
+    std::string image_sub_topic_;
 
     /**
      * @brief The output topic to publish to

@@ -40,6 +40,4 @@
         threshold: 20. # in percent
         maxval: 255.
         invert: true
-
-# Filter params should reflect the FilterParams struct
-# defined in /include/image_filters/image_processing.hpp
+        
