@@ -230,12 +230,12 @@ void ImageFilteringNode::image_callback(
     try {
         filter_ptr_->apply_filter(input_image, filtered_image);
     } catch (const cv::Exception& e) {
-        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(255, 0, 0)),
                                   "OpenCV error while applying filter: {}",
                                   e.what()));
         filtered_image = input_image.clone();  // fallback to no filter
     } catch (const std::exception& e) {
-        spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
+        spdlog::error(fmt::format(fmt::fg(fmt::rgb(255, 0, 0)),
                                   "Error while applying filter: {}", e.what()));
         filtered_image = input_image.clone();
     }

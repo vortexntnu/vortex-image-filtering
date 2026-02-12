@@ -33,7 +33,7 @@
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
       median_binary: # finds the median of each n x n square around each pixel
-        kernel_size: 3 # must be odd >= 1
+        kernel_size: 3 # must be odd > 1
         threshold: 100 # [0, 255]
         invert: false
       binary:
