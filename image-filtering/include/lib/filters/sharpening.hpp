@@ -12,12 +12,12 @@ struct SharpeningParams {};
 
 class Sharpening : public Filter {
    public:
-    explicit Sharpening(SharpeningParams params) : filter_params(params) {}
+    explicit Sharpening(SharpeningParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    SharpeningParams filter_params;
+    SharpeningParams filter_params_;
 };
 
 inline void Sharpening::apply_filter(const cv::Mat& original,

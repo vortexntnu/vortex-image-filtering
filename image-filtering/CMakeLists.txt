@@ -21,24 +21,23 @@ find_package(fmt REQUIRED)
 
 
 # ---- Core library (no ROS) ----
-set(CORE_LIB "${PROJECT_NAME}_core")
+set(LIB "${PROJECT_NAME}_core")
 
-add_library(${CORE_LIB} SHARED
+add_library(${LIB} SHARED
   src/lib/utilities.cpp
-  # src/lib/other_core_files.cpp
 )
 
-target_link_libraries(${CORE_LIB} PUBLIC
+target_link_libraries(${LIB} PUBLIC
   ${OpenCV_LIBS}
 )
 
-target_include_directories(${CORE_LIB} PUBLIC
+target_include_directories(${LIB} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
   ${OpenCV_INCLUDE_DIRS}
 )
 
-ament_target_dependencies(${CORE_LIB} PUBLIC
+ament_target_dependencies(${LIB} PUBLIC
   spdlog
   fmt
 )
@@ -52,7 +51,7 @@ add_library(${ROS_LIB} SHARED
 )
 
 target_link_libraries(${ROS_LIB} PUBLIC
-  ${CORE_LIB}
+  ${LIB}
 )
 
 target_include_directories(${ROS_LIB} PUBLIC
@@ -78,14 +77,14 @@ rclcpp_components_register_node(
 
 
 # Export BOTH targets
-ament_export_targets(export_${CORE_LIB} HAS_LIBRARY_TARGET)
+ament_export_targets(export_${LIB} HAS_LIBRARY_TARGET)
 ament_export_targets(export_${ROS_LIB} HAS_LIBRARY_TARGET)
 ament_export_include_directories(include)
 ament_export_dependencies(OpenCV spdlog fmt)
 ament_export_dependencies(rclcpp rclcpp_components cv_bridge sensor_msgs)
 
-install(TARGETS ${CORE_LIB}
-  EXPORT export_${CORE_LIB}
+install(TARGETS ${LIB}
+  EXPORT export_${LIB}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin

@@ -1,7 +1,6 @@
 
-#include <rclcpp_components/register_node_macro.hpp>
 #include <ros/image_filtering_ros.hpp>
-#include <ros/image_filtering_ros_utils.hpp>
+
 using std::placeholders::_1;
 namespace vortex::image_filtering {
 void ImageFilteringNode::check_and_subscribe_to_image_topic() {

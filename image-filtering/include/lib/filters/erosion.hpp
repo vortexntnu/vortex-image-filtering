@@ -14,17 +14,17 @@ struct ErosionParams {
 
 class Erosion : public Filter {
    public:
-    explicit Erosion(ErosionParams params) : filter_params(params) {}
+    explicit Erosion(ErosionParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    ErosionParams filter_params;
+    ErosionParams filter_params_;
 };
 
 inline void Erosion::apply_filter(const cv::Mat& original,
                                   cv::Mat& filtered) const {
-    apply_erosion(original, filtered, this->filter_params.kernel_size,
+    apply_erosion(original, filtered, this->filter_params_.kernel_size,
                   cv::MORPH_RECT);
 }
 }  // namespace vortex::image_filtering

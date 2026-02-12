@@ -129,7 +129,7 @@ class ImageFilteringNode : public rclcpp::Node {
      * @brief Pointer to the filter object
      *
      */
-    std::unique_ptr<Filter> filter_ptr;
+    std::unique_ptr<Filter> filter_ptr_;
 };
 }  // namespace vortex::image_filtering
 #endif  // ROS__IMAGE_FILTERING_ROS_HPP_

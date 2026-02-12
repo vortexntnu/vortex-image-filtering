@@ -16,17 +16,17 @@ struct DilationParams {
 
 class Dilation : public Filter {
    public:
-    explicit Dilation(DilationParams params) : filter_params(params) {}
+    explicit Dilation(DilationParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    DilationParams filter_params;
+    DilationParams filter_params_;
 };
 
 inline void Dilation::apply_filter(const cv::Mat& original,
                                    cv::Mat& filtered) const {
-    apply_dilation(original, filtered, this->filter_params.kernel_size,
+    apply_dilation(original, filtered, this->filter_params_.kernel_size,
                    cv::MORPH_RECT);
 }
 }  // namespace vortex::image_filtering

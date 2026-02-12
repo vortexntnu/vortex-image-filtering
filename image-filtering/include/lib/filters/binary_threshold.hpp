@@ -18,21 +18,21 @@ struct BinaryThresholdParams {
 class BinaryThreshold : public Filter {
    public:
     explicit BinaryThreshold(BinaryThresholdParams params)
-        : filter_params(params) {}
+        : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    BinaryThresholdParams filter_params;
+    BinaryThresholdParams filter_params_;
 };
 
 inline void BinaryThreshold::apply_filter(const cv::Mat& original,
                                           cv::Mat& filtered) const {
     CV_Assert(!original.empty());
 
-    const double thresh = this->filter_params.threshold;
-    const double maxval = this->filter_params.maxval;
-    const bool invert = this->filter_params.invert;
+    const double thresh = this->filter_params_.threshold;
+    const double maxval = this->filter_params_.maxval;
+    const bool invert = this->filter_params_.invert;
 
     // 1) Ensure single-channel
     cv::Mat gray;

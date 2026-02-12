@@ -13,17 +13,17 @@ struct UnsharpeningParams {
 
 class Unsharpening : public Filter {
    public:
-    explicit Unsharpening(UnsharpeningParams params) : filter_params(params) {}
+    explicit Unsharpening(UnsharpeningParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    UnsharpeningParams filter_params;
+    UnsharpeningParams filter_params_;
 };
 
 inline void Unsharpening::apply_filter(const cv::Mat& original,
                                        cv::Mat& filtered) const {
-    int blur_size = this->filter_params.blur_size;
+    int blur_size = this->filter_params_.blur_size;
     // Create a blurred version of the image
     cv::Mat blurred;
     GaussianBlur(original, blurred,

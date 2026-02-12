@@ -23,25 +23,25 @@ struct OtsuSegmentationParams {
 class OtsuSegmentation : public Filter {
    public:
     explicit OtsuSegmentation(OtsuSegmentationParams params)
-        : filter_params(params) {}
+        : filter_params_(params) {}
     void apply_filter(const cv::Mat& original, cv::Mat& output) const override;
 
    private:
-    OtsuSegmentationParams filter_params;
+    OtsuSegmentationParams filter_params_;
 };
 
 inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
                                            cv::Mat& filtered) const {
-    bool gamma_auto_correction = this->filter_params.gamma_auto_correction;
+    bool gamma_auto_correction = this->filter_params_.gamma_auto_correction;
     double gamma_auto_correction_weight =
-        this->filter_params.gamma_auto_correction_weight;
+        this->filter_params_.gamma_auto_correction_weight;
 
-    bool otsu_segmentation = this->filter_params.otsu_segmentation;
+    bool otsu_segmentation = this->filter_params_.otsu_segmentation;
 
     if (original.type() == CV_8UC3) {  // if the image type is bgr8
-        to_weighted_gray(original, filtered, this->filter_params.gsc_weight_b,
-                         this->filter_params.gsc_weight_g,
-                         this->filter_params.gsc_weight_r);
+        to_weighted_gray(original, filtered, this->filter_params_.gsc_weight_b,
+                         this->filter_params_.gsc_weight_g,
+                         this->filter_params_.gsc_weight_r);
     } else if (original.type() == CV_8UC1) {
         original.copyTo(filtered);
     }  // if its mono8
@@ -57,9 +57,9 @@ inline void OtsuSegmentation::apply_filter(const cv::Mat& original,
 
         // Apply erosion followed by dilation (opening)
 
-        apply_erosion(filtered, filtered, this->filter_params.erosion_size,
+        apply_erosion(filtered, filtered, this->filter_params_.erosion_size,
                       cv::MORPH_CROSS);
-        apply_dilation(filtered, filtered, this->filter_params.dilation_size,
+        apply_dilation(filtered, filtered, this->filter_params_.dilation_size,
                        cv::MORPH_CROSS);
     }
 }

@@ -13,17 +13,17 @@ struct WhiteBalanceParams {
 
 class WhiteBalance : public Filter {
    public:
-    explicit WhiteBalance(WhiteBalanceParams params) : filter_params(params) {}
+    explicit WhiteBalance(WhiteBalanceParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    WhiteBalanceParams filter_params;
+    WhiteBalanceParams filter_params_;
 };
 
 inline void WhiteBalance::apply_filter(const cv::Mat& original,
                                        cv::Mat& filtered) const {
-    double contrast_percentage = this->filter_params.contrast_percentage;
+    double contrast_percentage = this->filter_params_.contrast_percentage;
     cv::Ptr<cv::xphoto::SimpleWB> balance = cv::xphoto::createSimpleWB();
     balance->setP(contrast_percentage);
     balance->balanceWhite(original, filtered);

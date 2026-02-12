@@ -1,6 +1,5 @@
 #include <rclcpp_components/register_node_macro.hpp>
 #include <ros/image_filtering_ros.hpp>
-#include <ros/image_filtering_ros_utils.hpp>
 
 namespace vortex::image_filtering {
 
@@ -20,13 +19,13 @@ void ImageFilteringNode::set_filter_params() {
 
     switch (filter_type) {
         case FilterType::NoFilter: {
-            filter_ptr = std::make_unique<NoFilter>();
+            filter_ptr_ = std::make_unique<NoFilter>();
             break;
         }
 
         case FilterType::Sharpening: {
             SharpeningParams params{};  // Doesn't currently have any parameters
-            filter_ptr = std::make_unique<Sharpening>(params);
+            filter_ptr_ = std::make_unique<Sharpening>(params);
             break;
         }
 
@@ -35,7 +34,7 @@ void ImageFilteringNode::set_filter_params() {
             params.blur_size =
                 declare_and_get<int>("filter_params.unsharpening.blur_size");
 
-            filter_ptr = std::make_unique<Unsharpening>(params);
+            filter_ptr_ = std::make_unique<Unsharpening>(params);
             break;
         }
 
@@ -44,7 +43,7 @@ void ImageFilteringNode::set_filter_params() {
             params.flip_code =
                 declare_and_get<int>("filter_params.flip.flip_code");
 
-            filter_ptr = std::make_unique<Flip>(params);
+            filter_ptr_ = std::make_unique<Flip>(params);
             break;
         }
 
@@ -53,7 +52,7 @@ void ImageFilteringNode::set_filter_params() {
             params.kernel_size =
                 declare_and_get<int>("filter_params.erosion.size");
 
-            filter_ptr = std::make_unique<Erosion>(params);
+            filter_ptr_ = std::make_unique<Erosion>(params);
             break;
         }
 
@@ -62,7 +61,7 @@ void ImageFilteringNode::set_filter_params() {
             params.kernel_size =
                 declare_and_get<int>("filter_params.dilation.size");
 
-            filter_ptr = std::make_unique<Dilation>(params);
+            filter_ptr_ = std::make_unique<Dilation>(params);
             break;
         }
 
@@ -71,7 +70,7 @@ void ImageFilteringNode::set_filter_params() {
             params.contrast_percentage = declare_and_get<double>(
                 "filter_params.white_balancing.contrast_percentage");
 
-            filter_ptr = std::make_unique<WhiteBalance>(params);
+            filter_ptr_ = std::make_unique<WhiteBalance>(params);
             break;
         }
 
@@ -84,7 +83,7 @@ void ImageFilteringNode::set_filter_params() {
             params.mask_weight =
                 declare_and_get<int>("filter_params.ebus.mask_weight");
 
-            filter_ptr = std::make_unique<Ebus>(params);
+            filter_ptr_ = std::make_unique<Ebus>(params);
             break;
         }
 
@@ -107,7 +106,7 @@ void ImageFilteringNode::set_filter_params() {
             params.dilation_size =
                 declare_and_get<int>("filter_params.otsu.dilation_size");
 
-            filter_ptr = std::make_unique<OtsuSegmentation>(params);
+            filter_ptr_ = std::make_unique<OtsuSegmentation>(params);
             break;
         }
 
@@ -116,7 +115,7 @@ void ImageFilteringNode::set_filter_params() {
             params.percentage_threshold = declare_and_get<double>(
                 "filter_params.overlap.percentage_threshold");
 
-            filter_ptr = std::make_unique<Overlap>(params);
+            filter_ptr_ = std::make_unique<Overlap>(params);
             break;
         }
 
@@ -129,7 +128,7 @@ void ImageFilteringNode::set_filter_params() {
             params.invert =
                 declare_and_get<bool>("filter_params.median_binary.invert");
 
-            filter_ptr = std::make_unique<MedianBinary>(params);
+            filter_ptr_ = std::make_unique<MedianBinary>(params);
             break;
         }
 
@@ -142,7 +141,7 @@ void ImageFilteringNode::set_filter_params() {
             params.invert =
                 declare_and_get<bool>("filter_params.binary.invert");
 
-            filter_ptr = std::make_unique<BinaryThreshold>(params);
+            filter_ptr_ = std::make_unique<BinaryThreshold>(params);
             break;
         }
 
@@ -163,7 +162,7 @@ void ImageFilteringNode::set_filter_params() {
                     filter_type_string));
             }
 
-            filter_ptr = std::make_unique<NoFilter>();
+            filter_ptr_ = std::make_unique<NoFilter>();
             filter_type = FilterType::NoFilter;
 
             return;
@@ -229,7 +228,7 @@ void ImageFilteringNode::image_callback(
     cv::Mat filtered_image;
 
     try {
-        filter_ptr->apply_filter(input_image, filtered_image);
+        filter_ptr_->apply_filter(input_image, filtered_image);
     } catch (const cv::Exception& e) {
         spdlog::error(fmt::format(fmt::fg(fmt::rgb(31, 161, 221)),
                                   "OpenCV error while applying filter: {}",

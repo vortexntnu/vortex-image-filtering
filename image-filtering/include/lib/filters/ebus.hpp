@@ -16,19 +16,19 @@ struct EbusParams {
 };
 class Ebus : public Filter {
    public:
-    explicit Ebus(EbusParams params) : filter_params(params) {}
+    explicit Ebus(EbusParams params) : filter_params_(params) {}
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    EbusParams filter_params;
+    EbusParams filter_params_;
 };
 
 inline void Ebus::apply_filter(const cv::Mat& original,
                                cv::Mat& filtered) const {
-    int blur_size = this->filter_params.blur_size;
-    int mask_weight = this->filter_params.mask_weight;
-    int erosion_size = this->filter_params.erosion_size;
+    int blur_size = this->filter_params_.blur_size;
+    int mask_weight = this->filter_params_.mask_weight;
+    int erosion_size = this->filter_params_.erosion_size;
     // Erode image to make blacks more black
     cv::Mat eroded;
 

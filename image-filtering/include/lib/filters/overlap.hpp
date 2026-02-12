@@ -15,17 +15,17 @@ struct OverlapParams {
 class Overlap : public Filter {
    public:
     explicit Overlap(OverlapParams params)
-        : filter_params(params), has_prev(false) {}
+        : filter_params_(params), has_prev_(false) {}
 
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
 
    private:
-    OverlapParams filter_params;
+    OverlapParams filter_params_;
 
     // Cached previous mono8 frame
-    mutable cv::Mat prev;
-    mutable bool has_prev;
+    mutable cv::Mat prev_;
+    mutable bool has_prev_;
 };
 
 inline void Overlap::apply_filter(const cv::Mat& original,
@@ -34,20 +34,20 @@ inline void Overlap::apply_filter(const cv::Mat& original,
     CV_Assert(!original.empty());
     CV_Assert(original.type() == CV_8UC1);
 
-    double thr_percent = filter_params.percentage_threshold;
+    double thr_percent = filter_params_.percentage_threshold;
 
     // First frame (or size/type change): passthrough + cache
-    if (!has_prev || prev.empty() || prev.size() != original.size() ||
-        prev.type() != original.type()) {
+    if (!has_prev_ || prev_.empty() || prev_.size() != original.size() ||
+        prev_.type() != original.type()) {
         original.copyTo(filtered);
-        prev = original.clone();
-        has_prev = true;
+        prev_ = original.clone();
+        has_prev_ = true;
         return;
     }
 
     // Absolute difference (still mono8)
     cv::Mat diff8u;
-    cv::absdiff(original, prev, diff8u);
+    cv::absdiff(original, prev_, diff8u);
 
     // Convert to percent of 8-bit range (0..100)
     cv::Mat percent32f;
@@ -63,7 +63,7 @@ inline void Overlap::apply_filter(const cv::Mat& original,
     filtered.setTo(0, mask8u);
 
     // Update history (write to cached previous)
-    prev = original.clone();
+    prev_ = original.clone();
 }
 }  // namespace vortex::image_filtering
 #endif  // LIB__FILTERS__OVERLAP_HPP_
