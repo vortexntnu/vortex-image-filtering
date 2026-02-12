@@ -20,8 +20,8 @@ find_package(fmt REQUIRED)
 
 
 
-# ---- Core library (no ROS) ----
-set(LIB "${PROJECT_NAME}_core")
+# ---- Library (no ROS) ----
+set(LIB "${PROJECT_NAME}")
 
 add_library(${LIB} SHARED
   src/lib/utilities.cpp
@@ -42,7 +42,7 @@ ament_target_dependencies(${LIB} PUBLIC
   fmt
 )
 
-# ---- ROS library (depends on core) ----
+# ---- ROS library ----
 set(ROS_LIB "${PROJECT_NAME}_component")
 
 add_library(${ROS_LIB} SHARED
