@@ -4,7 +4,7 @@
   <name>image_filtering</name>
   <version>0.0.1</version>
   <description>The image filtering package</description>
-  <maintainer email="jorgen.fjermedal@hotmail.com">Jorgen Fjermedal</maintainer>
+  <maintainer email="thopau18@gmail.com">Thomas Paulen</maintainer>
   <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

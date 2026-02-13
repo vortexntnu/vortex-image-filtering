@@ -1,0 +1,80 @@
+#ifndef IMAGE_FILTERING__LIB__TYPEDEF_HPP_
+#define IMAGE_FILTERING__LIB__TYPEDEF_HPP_
+
+#include <fmt/color.h>
+#include <spdlog/spdlog.h>
+#include <map>
+#include <numeric>
+#include <string>
+#include <utility>
+
+namespace vortex::image_filtering {
+enum class FilterType {
+    NoFilter,
+    Flip,
+    Sharpening,
+    Unsharpening,
+    Erosion,
+    Dilation,
+    WhiteBalancing,
+    Ebus,
+    Otsu,
+    Overlap,
+    MedianBinary,
+    Binary,
+
+    Unknown
+};
+
+static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
+    {"no_filter", FilterType::NoFilter},
+    {"flip", FilterType::Flip},
+    {"sharpening", FilterType::Sharpening},
+    {"unsharpening", FilterType::Unsharpening},
+    {"erosion", FilterType::Erosion},
+    {"dilation", FilterType::Dilation},
+    {"white_balancing", FilterType::WhiteBalancing},
+    {"ebus", FilterType::Ebus},
+    {"otsu", FilterType::Otsu},
+    {"overlap", FilterType::Overlap},
+    {"median_binary", FilterType::MedianBinary},
+    {"binary", FilterType::Binary},
+
+    {"unknown", FilterType::Unknown}};
+
+inline std::string to_lower(std::string s) {
+    for (char& ch : s) {
+        ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+    }
+    return s;
+}
+
+inline FilterType parse_filter_type(std::string s) {
+    s = to_lower(std::move(s));
+
+    for (auto [name, type] : kFilterMap) {
+        if (s == name)
+            return type;
+    }
+    spdlog::warn(
+        fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                    "No string connected to that filter type: '{}'. This might "
+                    "be misspelling or you need to add the filter type to "
+                    "kFilterMap in image_processing.hpp",
+                    s));
+    return FilterType::Unknown;
+}
+
+inline std::string_view filtertype_to_string(FilterType t) {
+    for (auto [name, type] : kFilterMap) {
+        if (t == type)
+            return name;
+    }
+    spdlog::warn(
+        fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
+                    " No string connected to your filter type. To fix "
+                    "this add the string and filter type to kFilterMap"));
+    return "unknown";
+}
+}  // namespace vortex::image_filtering
+#endif  // IMAGE_FILTERING__LIB__TYPEDEF_HPP_

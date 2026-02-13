@@ -1,8 +1,10 @@
 /**:
   ros__parameters:
-    sub_topic: "/downwards_camera/image_raw"
+    sub_topic: "/fls_publisher/display_mono"
     pub_topic: "/filtered_image"
+    input_encoding: "mono8"
     output_encoding: "mono8"
+
     filter_params:
       filter_type: "otsu"
       flip:
@@ -12,9 +14,9 @@
       erosion:
         size: 1
       dilation:
-        size: 1
+        size: 3
       white_balancing:
-        contrast_percentage: 0.1
+        contrast_percentage: 10.0
       ebus:
         erosion_size: 2
         blur_size: 30
@@ -26,8 +28,15 @@
         gamma_auto_correction: true
         gamma_auto_correction_weight: 4.0
         otsu_segmentation: true
-        erosion_size: 10
-        dilation_size: 10
-
-# Filter params should reflect the FilterParams struct
-# defined in /include/image_filters/image_processing.hpp
+        erosion_size: 2
+        dilation_size: 2
+      overlap:
+        percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
+      median_binary: # finds the median of each n x n square around each pixel
+        kernel_size: 3 # must be odd > 1
+        threshold: 100 # [0, 255]
+        invert: false
+      binary:
+        threshold: 20. # in percent
+        maxval: 255.
+        invert: true
