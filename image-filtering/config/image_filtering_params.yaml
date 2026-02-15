@@ -40,3 +40,5 @@
         threshold: 20. # in percent
         maxval: 255.
         invert: true
+      temporal_noise:
+        dontknow: 10

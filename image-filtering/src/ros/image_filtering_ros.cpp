@@ -144,6 +144,14 @@ void ImageFilteringNode::set_filter_params() {
             filter_ptr_ = std::make_unique<BinaryThreshold>(params);
             break;
         }
+        case FilterType::TemporalNoise: {
+            TemporalNoiseParams params;
+            params.dontknow =
+                declare_and_get<int>("filter_params.temporal_noise.dontknow");
+
+            filter_ptr_ = std::make_unique<TemporalNoise>(params);
+            break;
+        }
 
         default:;
             if (filter_type == FilterType::Unknown) {
