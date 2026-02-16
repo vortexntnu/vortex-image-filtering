@@ -1,9 +1,9 @@
 /**:
   ros__parameters:
-    sub_topic: "/fls_publisher/display_mono"
+    sub_topic: "/cam/image_color"
     pub_topic: "/filtered_image"
-    input_encoding: "mono8"
-    output_encoding: "mono8"
+    input_encoding: "rgb8"
+    output_encoding: "rgb8"
 
     filter_params:
       filter_type: "remove_grid"
@@ -35,8 +35,8 @@
         threshold_binary: 30.0
         inpaint_radius: 1.0
         rotation: 0
-        height: 50
-        width: 50
+        height: 400
+        width: 400
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
       median_binary: # finds the median of each n x n square around each pixel
