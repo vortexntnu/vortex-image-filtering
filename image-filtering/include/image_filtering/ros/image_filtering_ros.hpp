@@ -1,7 +1,9 @@
-#ifndef IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
-#define IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
+#ifndef IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_
+#define IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_
 
 #include <cv_bridge/cv_bridge.h>
+#include <fmt/color.h>
+#include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 #include <memory>
 #include <rclcpp/parameter_event_handler.hpp>
@@ -9,8 +11,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>
 #include <string>
-#include "image_processing.hpp"
+#include "image_filtering/lib/filters/all_filters.hpp"
+#include "image_filtering/lib/typedef.hpp"
 
+namespace vortex::image_filtering {
 class ImageFilteringNode : public rclcpp::Node {
    public:
     explicit ImageFilteringNode(const rclcpp::NodeOptions& options);
@@ -36,10 +40,28 @@ class ImageFilteringNode : public rclcpp::Node {
     void check_and_subscribe_to_image_topic();
 
     /**
+     * @brief Check and start publishing to output topic if output topic is
+     * changed, or not already started. Then shut down the old one and start
+     * publishing to the new.
+     */
+    void check_and_publish_to_output_topic();
+
+    /**
      * @brief Declare the ros2 parameters used by the node.
      *
      */
-    void declare_parameters();
+    void declare_common_ros_params();
+
+    /**
+     * @brief Declare a ros parameter if it isn't declared yet and return it
+     */
+    template <typename T>
+    T declare_and_get(const std::string& name) {
+        if (!this->has_parameter(name)) {
+            this->declare_parameter<T>(name);
+        }
+        return this->get_parameter(name).get_value<T>();
+    }
 
     /**
      * @brief Set the filter parameters for the FilterParams struct.
@@ -96,19 +118,18 @@ class ImageFilteringNode : public rclcpp::Node {
      * @brief The image topic to subscribe to
      *
      */
-    std::string image_topic_;
+    std::string image_sub_topic_;
 
     /**
-     * @brief The filter parameters
+     * @brief The output topic to publish to
      *
      */
-    FilterParams filter_params_;
-
+    std::string pub_topic_;
     /**
-     * @brief filter to apply
+     * @brief Pointer to the filter object
      *
      */
-    std::string filter_;
+    std::unique_ptr<Filter> filter_ptr_;
 };
-
-#endif  // IMAGE_FILTERS__IMAGE_FILTERING_ROS_HPP_
+}  // namespace vortex::image_filtering
+#endif  // IMAGE_FILTERING__ROS__IMAGE_FILTERING_ROS_HPP_
