@@ -1,9 +1,11 @@
 #ifndef IMAGE_FILTERING__LIB__FILTERS__REMOVE_GRID_HPP_
 #define IMAGE_FILTERING__LIB__FILTERS__REMOVE_GRID_HPP_
 
+#include <spdlog/spdlog.h>
+#include <algorithm>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/photo.hpp>
-#include <spdlog/spdlog.h>
+#include <vector>
 
 #include "abstract_filter_class.hpp"
 
@@ -23,8 +25,7 @@ struct RemoveGridParams {
 
 class RemoveGrid : public Filter {
    public:
-    explicit RemoveGrid(RemoveGridParams params)
-        : params_(params) {}
+    explicit RemoveGrid(RemoveGridParams params) : params_(params) {}
 
     void apply_filter(const cv::Mat& original,
                       cv::Mat& filtered) const override;
@@ -55,13 +56,12 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
 
     cv::Mat rotated;
     cv::warpAffine(original, rotated, rotation_matrix, original.size(),
-                   cv::INTER_NEAREST,
-                   cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
     // ----------------------------
     // Center crop
     // ----------------------------
-    int crop_w = std::min(params_.width,  rotated.cols);
+    int crop_w = std::min(params_.width, rotated.cols);
     int crop_h = std::min(params_.height, rotated.rows);
 
     int x = (rotated.cols - crop_w) / 2;
@@ -77,10 +77,11 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cropped.convertTo(cropped_f, CV_32F, 1.0 / 255.0);
 
     std::vector<cv::Mat> ch(3);
-    cv::split(cropped_f, ch);   // BGR
+    cv::split(cropped_f, ch);  // BGR
 
     cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;
-    for (auto& c : ch) c /= sum;
+    for (auto& c : ch)
+        c /= sum;
 
     cv::Mat grid_mask = (ch[1] > params_.threshold_green);
 
@@ -98,8 +99,8 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     // Inpaint grid
     // ----------------------------
     cv::Mat inpainted;
-    cv::inpaint(cropped, dilated, inpainted,
-                params_.inpaint_radius, cv::INPAINT_TELEA);
+    cv::inpaint(cropped, dilated, inpainted, params_.inpaint_radius,
+                cv::INPAINT_TELEA);
 
     // ----------------------------
     // Binary threshold
@@ -107,9 +108,7 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::Mat gray, thresh;
     cv::cvtColor(inpainted, gray, cv::COLOR_BGR2GRAY);
 
-    cv::threshold(gray, thresh,
-                  params_.threshold_binary,
-                  255,
+    cv::threshold(gray, thresh, params_.threshold_binary, 255,
                   cv::THRESH_BINARY);
 
     cv::Mat thresh_bgr;
@@ -125,8 +124,7 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::invertAffineTransform(rotation_matrix, inv_rot);
 
     cv::warpAffine(rotated_out, filtered, inv_rot, original.size(),
-                   cv::INTER_LINEAR,
-                   cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+                   cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 }
 
 }  // namespace vortex::image_filtering

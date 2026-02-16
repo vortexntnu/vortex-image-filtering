@@ -157,14 +157,14 @@ void ImageFilteringNode::set_filter_params() {
             params.inpaint_radius = declare_and_get<double>(
                 "filter_params.remove_grid.inpaint_radius");
 
-            params.rotation = declare_and_get<int>(
-                "filter_params.remove_grid.rotation");
+            params.rotation =
+                declare_and_get<int>("filter_params.remove_grid.rotation");
 
-            params.width = declare_and_get<int>(
-                "filter_params.remove_grid.width");
+            params.width =
+                declare_and_get<int>("filter_params.remove_grid.width");
 
-            params.height = declare_and_get<int>(
-                "filter_params.remove_grid.height");
+            params.height =
+                declare_and_get<int>("filter_params.remove_grid.height");
 
             filter_ptr_ = std::make_unique<RemoveGrid>(params);
             break;
