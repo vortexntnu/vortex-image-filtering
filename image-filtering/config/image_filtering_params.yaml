@@ -6,7 +6,7 @@
     output_encoding: "mono8"
 
     filter_params:
-      filter_type: "otsu"
+      filter_type: "temporal_noise"
       flip:
         flip_code: 1
       unsharpening:
@@ -41,4 +41,8 @@
         maxval: 255.
         invert: true
       temporal_noise:
-        dontknow: 10
+        blur_sigma: 4.0
+        gamma_auto_correction_weight: 4.0
+        erotion_size: 2
+        dilation_size: 4
+
