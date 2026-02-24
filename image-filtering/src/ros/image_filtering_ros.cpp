@@ -146,16 +146,14 @@ void ImageFilteringNode::set_filter_params() {
         }
         case FilterType::TemporalNoise: {
             TemporalNoiseParams params;
-            params.blur_sigma = 
-                declare_and_get<double>("filter_params.temporal_noise.blur_sigma");
-            params.gamma_auto_correction_weight = 
-                declare_and_get<double>("filter_params.temporal_noise.gamma_auto_correction_weight");
-            params.erotion_size =
-                declare_and_get<int>("filter_params.temporal_noise.erotion_size");
-            params.dilation_size =
-                declare_and_get<int>("filter_params.temporal_noise.dilation_size");
-            
-
+            params.blur_sigma = declare_and_get<double>(
+                "filter_params.temporal_noise.blur_sigma");
+            params.power_law_weight = declare_and_get<double>(
+                "filter_params.temporal_noise.power_law_weight");
+            params.erotion_size = declare_and_get<int>(
+                "filter_params.temporal_noise.erotion_size");
+            params.dilation_size = declare_and_get<int>(
+                "filter_params.temporal_noise.dilation_size");
 
             filter_ptr_ = std::make_unique<TemporalNoise>(params);
             break;
