@@ -146,8 +146,8 @@ void ImageFilteringNode::set_filter_params() {
         }
         case FilterType::TemporalNoise: {
             TemporalNoiseParams params;
-            params.blur_sigma = declare_and_get<double>(
-                "filter_params.temporal_noise.blur_sigma");
+            params.median_kernel_size = declare_and_get<int>(
+                "filter_params.temporal_noise.median_kernel_size");
             params.power_law_weight = declare_and_get<double>(
                 "filter_params.temporal_noise.power_law_weight");
             params.erotion_size = declare_and_get<int>(

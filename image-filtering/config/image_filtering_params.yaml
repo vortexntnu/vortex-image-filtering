@@ -41,7 +41,7 @@
         maxval: 255.
         invert: true
       temporal_noise:
-        blur_sigma: 4.0
+        median_kernel_size: 3
         power_law_weight: 4.0 # Weight for the gamma function
         erotion_size: 2
         dilation_size: 4
