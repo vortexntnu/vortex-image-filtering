@@ -16,7 +16,7 @@ namespace vortex::image_filtering {
 
 struct RemoveGridParams {
     double threshold_green;
-    double threshold_binary;
+    int threshold_binary;
     double inpaint_radius;
     int rotation;
     int height;
@@ -63,6 +63,18 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     // ----------------------------
     int crop_w = std::min(params_.width, rotated.cols);
     int crop_h = std::min(params_.height, rotated.rows);
+    if (crop_w != params_.width || crop_h != params_.height) {
+        spdlog::warn(
+            "RemoveGrid: requested crop size (width={}, height={}) exceeds "
+            "rotated image size (width={}, height={}; clamping to ) "
+            "(width={}, height={})",
+            params_.width,
+            params_.height,
+            rotated.cols,
+            rotated.rows,
+            crop_w,
+            crop_h);
+    }
 
     int x = (rotated.cols - crop_w) / 2;
     int y = (rotated.rows - crop_h) / 2;
@@ -105,26 +117,30 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     // ----------------------------
     // Binary threshold
     // ----------------------------
-    cv::Mat gray, thresh;
-    cv::cvtColor(inpainted, gray, cv::COLOR_BGR2GRAY);
-
-    cv::threshold(gray, thresh, params_.threshold_binary, 255,
-                  cv::THRESH_BINARY);
-
-    cv::Mat thresh_bgr;
+    cv::Mat thresh, thresh_bgr;
+    apply_fixed_threshold(inpainted, thresh, this->params_.threshold_binary, false);    
     cv::cvtColor(thresh, thresh_bgr, cv::COLOR_GRAY2BGR);
-
-    cv::Mat rotated_out = rotated.clone();
-    thresh_bgr.copyTo(rotated_out(roi));
 
     // ----------------------------
     // Undo rotation
     // ----------------------------
+    cv::Mat roi_thresh_bgr = cv::Mat::zeros(original.size(), original.type());
+    thresh_bgr.copyTo(roi_thresh_bgr(roi));
+
+    cv::Mat roi_mask = cv::Mat::zeros(original.size(), CV_8U);
+    roi_mask(roi).setTo(255);
+
     cv::Mat inv_rot;
     cv::invertAffineTransform(rotation_matrix, inv_rot);
 
-    cv::warpAffine(rotated_out, filtered, inv_rot, original.size(),
-                   cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+    cv::Mat rotated_back, rotated_mask;
+    cv::warpAffine(roi_thresh_bgr, rotated_back, inv_rot, original.size(),
+                cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+    cv::warpAffine(roi_mask, rotated_mask, inv_rot, original.size(),
+                cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
+
+    filtered = original.clone();
+    rotated_back.copyTo(filtered, rotated_mask);
 }
 
 }  // namespace vortex::image_filtering
