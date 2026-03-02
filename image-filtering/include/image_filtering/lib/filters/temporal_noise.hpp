@@ -35,7 +35,6 @@ class TemporalNoise : public Filter {
 
 inline void TemporalNoise::apply_filter(const cv::Mat& original,
                                         cv::Mat& filtered) const {
-    // const double sigma = filter_params_.blur_sigma;
     const double power_law_weight = filter_params_.power_law_weight;
     const int erosion_size = filter_params_.erotion_size;
     const int dilation_size = filter_params_.dilation_size;
