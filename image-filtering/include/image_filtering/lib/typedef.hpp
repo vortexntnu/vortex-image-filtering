@@ -22,6 +22,7 @@ enum class FilterType {
     Overlap,
     MedianBinary,
     Binary,
+    TemporalNoise,
 
     Unknown
 };
@@ -39,6 +40,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"overlap", FilterType::Overlap},
     {"median_binary", FilterType::MedianBinary},
     {"binary", FilterType::Binary},
+    {"temporal_noise", FilterType::TemporalNoise},
 
     {"unknown", FilterType::Unknown}};
 
