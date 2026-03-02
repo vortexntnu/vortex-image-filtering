@@ -23,6 +23,7 @@ enum class FilterType {
     MedianBinary,
     Binary,
     RemoveGrid,
+    TemporalNoise,
 
     Unknown
 };
@@ -41,6 +42,7 @@ static constexpr std::pair<std::string_view, FilterType> kFilterMap[] = {
     {"median_binary", FilterType::MedianBinary},
     {"binary", FilterType::Binary},
     {"remove_grid", FilterType::RemoveGrid},
+    {"temporal_noise", FilterType::TemporalNoise},
 
     {"unknown", FilterType::Unknown}};
 

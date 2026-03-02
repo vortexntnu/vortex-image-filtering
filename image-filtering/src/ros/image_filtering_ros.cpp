@@ -144,6 +144,26 @@ void ImageFilteringNode::set_filter_params() {
             filter_ptr_ = std::make_unique<BinaryThreshold>(params);
             break;
         }
+        case FilterType::TemporalNoise: {
+            TemporalNoiseParams params;
+            params.median_kernel_size = declare_and_get<int>(
+                "filter_params.temporal_noise.median_kernel_size");
+            params.power_law_weight = declare_and_get<double>(
+                "filter_params.temporal_noise.power_law_weight");
+            params.erotion_size = declare_and_get<int>(
+                "filter_params.temporal_noise.erotion_size");
+            params.dilation_size = declare_and_get<int>(
+                "filter_params.temporal_noise.dilation_size");
+            params.canny_high =
+                declare_and_get<int>("filter_params.temporal_noise.canny_high");
+            params.canny_low =
+                declare_and_get<int>("filter_params.temporal_noise.canny_low");
+            params.edge_protection_radius = declare_and_get<int>(
+                "filter_params.temporal_noise.edge_protection_radius");
+
+            filter_ptr_ = std::make_unique<TemporalNoise>(params);
+            break;
+        }
 
         case FilterType::RemoveGrid: {
             RemoveGridParams params;
