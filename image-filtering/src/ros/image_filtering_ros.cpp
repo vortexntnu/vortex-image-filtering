@@ -154,6 +154,12 @@ void ImageFilteringNode::set_filter_params() {
                 "filter_params.temporal_noise.erotion_size");
             params.dilation_size = declare_and_get<int>(
                 "filter_params.temporal_noise.dilation_size");
+            params.canny_high =
+                declare_and_get<int>("filter_params.temporal_noise.canny_high");
+            params.canny_low =
+                declare_and_get<int>("filter_params.temporal_noise.canny_low");
+            params.edge_protection_radius = declare_and_get<int>(
+                "filter_params.temporal_noise.edge_protection_radius");
 
             filter_ptr_ = std::make_unique<TemporalNoise>(params);
             break;
