@@ -27,8 +27,7 @@ class RemoveGrid : public Filter {
    public:
     explicit RemoveGrid(RemoveGridParams params) : params_(params) {}
 
-    void apply_filter(const cv::Mat& original,
-                      cv::Mat& filtered) const override;
+    void apply_filter(const cv::Mat& original, cv::Mat& filtered) const override;
 
    private:
     RemoveGridParams params_;
@@ -48,39 +47,40 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     }
 
     // ----------------------------
-    // Rotation
+    // Rotate directly into cropped output 
     // ----------------------------
-    cv::Point2f center(original.cols * 0.5f, original.rows * 0.5f);
-    cv::Mat rotation_matrix =
-        cv::getRotationMatrix2D(center, params_.rotation, 1.0);
+    int crop_w = std::min(params_.width, original.cols);
+    int crop_h = std::min(params_.height, original.rows);
 
-    cv::Mat rotated;
-    cv::warpAffine(original, rotated, rotation_matrix, original.size(),
-                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
-
-    // ----------------------------
-    // Center crop
-    // ----------------------------
-    int crop_w = std::min(params_.width, rotated.cols);
-    int crop_h = std::min(params_.height, rotated.rows);
     if (crop_w != params_.width || crop_h != params_.height) {
         spdlog::warn(
             "RemoveGrid: requested crop size (width={}, height={}) exceeds "
-            "rotated image size (width={}, height={}; clamping to ) "
+            "original image size (width={}, height={}); clamping to "
             "(width={}, height={})",
             params_.width,
             params_.height,
-            rotated.cols,
-            rotated.rows,
+            original.cols,
+            original.rows,
             crop_w,
             crop_h);
     }
 
-    int x = (rotated.cols - crop_w) / 2;
-    int y = (rotated.rows - crop_h) / 2;
+    const cv::Point2f center_src(original.cols * 0.5f, original.rows * 0.5f);   // center of source image
+    const cv::Point2f center_dst(crop_w * 0.5f, crop_h * 0.5f);     // center of destination image
 
-    cv::Rect roi(x, y, crop_w, crop_h);
-    cv::Mat cropped = rotated(roi);
+    cv::Mat M = cv::getRotationMatrix2D(center_src, params_.rotation, 1.0);     // affine matrix
+    // Ensure type for at<double>
+    if (M.type() != CV_64F) {
+        M.convertTo(M, CV_64F);
+    }
+
+    // Shift translation so original center maps to cropped center
+    M.at<double>(0, 2) += (center_dst.x - center_src.x);
+    M.at<double>(1, 2) += (center_dst.y - center_src.y);
+
+    cv::Mat cropped;
+    cv::warpAffine(original, cropped, M, cv::Size(crop_w, crop_h),
+                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
     // ----------------------------
     // Extract green grid mask
@@ -97,7 +97,7 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
 
     cv::Mat grid_mask = (ch[1] > params_.threshold_green);
 
-    cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
+    static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
     cv::Mat dilated;
     cv::dilate(grid_mask, dilated, kernel);
 
@@ -107,6 +107,11 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     dilated.col(0).setTo(0);
     dilated.col(dilated.cols - 1).setTo(0);
 
+    if (cv::countNonZero(dilated) == 0) {
+        original.copyTo(filtered);   // or original.copyTo(filtered);
+        return;
+    }
+
     // ----------------------------
     // Inpaint grid
     // ----------------------------
@@ -115,32 +120,34 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
                 cv::INPAINT_TELEA);
 
     // ----------------------------
-    // Binary threshold
+    // Binary threshold (on cropped ROI)
     // ----------------------------
-    cv::Mat thresh, thresh_bgr;
-    apply_fixed_threshold(inpainted, thresh, this->params_.threshold_binary, false);    
-    cv::cvtColor(thresh, thresh_bgr, cv::COLOR_GRAY2BGR);
+    cv::Mat thresh_gray;
+    apply_fixed_threshold(inpainted, thresh_gray, params_.threshold_binary, false);
+
+    cv::Mat thresh_bgr;
+    cv::cvtColor(thresh_gray, thresh_bgr, cv::COLOR_GRAY2BGR);
 
     // ----------------------------
-    // Undo rotation
+    // Undo rotation & merge (using M)
     // ----------------------------
-    cv::Mat roi_thresh_bgr = cv::Mat::zeros(original.size(), original.type());
-    thresh_bgr.copyTo(roi_thresh_bgr(roi));
+    cv::Mat invM;
+    cv::invertAffineTransform(M, invM);
 
-    cv::Mat roi_mask = cv::Mat::zeros(original.size(), CV_8U);
-    roi_mask(roi).setTo(255);
+    // Warp ROI result back into full-size overlay
+    cv::Mat overlay_full;
+    cv::warpAffine(thresh_bgr, overlay_full, invM, original.size(),
+                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    cv::Mat inv_rot;
-    cv::invertAffineTransform(rotation_matrix, inv_rot);
+    // Warp a mask the same way (so black pixels are copied too)
+    cv::Mat local_mask(thresh_bgr.rows, thresh_bgr.cols, CV_8U, cv::Scalar(255));
+    cv::Mat mask_full;
+    cv::warpAffine(local_mask, mask_full, invM, original.size(),
+                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
 
-    cv::Mat rotated_back, rotated_mask;
-    cv::warpAffine(roi_thresh_bgr, rotated_back, inv_rot, original.size(),
-                cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
-    cv::warpAffine(roi_mask, rotated_mask, inv_rot, original.size(),
-                cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
-
+    // Merge into the original image
     filtered = original.clone();
-    rotated_back.copyTo(filtered, rotated_mask);
+    overlay_full.copyTo(filtered, mask_full);
 }
 
 }  // namespace vortex::image_filtering
