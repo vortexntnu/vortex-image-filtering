@@ -165,6 +165,31 @@ void ImageFilteringNode::set_filter_params() {
             break;
         }
 
+        case FilterType::RemoveGrid: {
+            RemoveGridParams params;
+
+            params.threshold_green = declare_and_get<double>(
+                "filter_params.remove_grid.threshold_green");
+
+            params.threshold_binary = declare_and_get<double>(
+                "filter_params.remove_grid.threshold_binary");
+
+            params.inpaint_radius = declare_and_get<double>(
+                "filter_params.remove_grid.inpaint_radius");
+
+            params.rotation =
+                declare_and_get<int>("filter_params.remove_grid.rotation");
+
+            params.width =
+                declare_and_get<int>("filter_params.remove_grid.width");
+
+            params.height =
+                declare_and_get<int>("filter_params.remove_grid.height");
+
+            filter_ptr_ = std::make_unique<RemoveGrid>(params);
+            break;
+        }
+
         default:;
             if (filter_type == FilterType::Unknown) {
                 spdlog::warn(fmt::format(fmt::fg(fmt::rgb(200, 180, 50)),
