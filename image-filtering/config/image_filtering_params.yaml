@@ -32,7 +32,7 @@
         dilation_size: 2
       remove_grid:
         threshold_green: 0.5
-        threshold_binary: 30.0
+        threshold_binary: 30
         inpaint_radius: 1.0
         rotation: 0
         height: 400

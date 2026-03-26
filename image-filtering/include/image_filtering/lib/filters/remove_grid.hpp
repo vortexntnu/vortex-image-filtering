@@ -9,9 +9,9 @@
 
 #include "abstract_filter_class.hpp"
 
-/////////////////////////////
-// Remove grid filter
-/////////////////////////////
+
+
+
 namespace vortex::image_filtering {
 
 struct RemoveGridParams {
@@ -46,16 +46,14 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
         return;
     }
 
-    // ----------------------------
     // Rotate directly into cropped output 
-    // ----------------------------
     int crop_w = std::min(params_.width, original.cols);
     int crop_h = std::min(params_.height, original.rows);
 
     if (crop_w != params_.width || crop_h != params_.height) {
         spdlog::warn(
-            "RemoveGrid: requested crop size (width={}, height={}) exceeds "
-            "original image size (width={}, height={}); clamping to "
+            "RemoveGrid: requested crop size (width={}, height={}) does not fit "
+            "within original image size (width={}, height={}); clamping to "
             "(width={}, height={})",
             params_.width,
             params_.height,
@@ -82,21 +80,19 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::warpAffine(original, cropped, M, cv::Size(crop_w, crop_h),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    // ----------------------------
     // Extract green grid mask
-    // ----------------------------
     cv::Mat cropped_f;
     cropped.convertTo(cropped_f, CV_32F, 1.0 / 255.0);
 
-    std::vector<cv::Mat> ch(3);
+    std::vector<cv::Mat> ch(3); // make a vector for BGR
     cv::split(cropped_f, ch);  // BGR
 
-    cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;
+    cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;    // avoid division by zero
     for (auto& c : ch)
-        c /= sum;
+        c /= sum;   // normalized color values
 
-    cv::Mat grid_mask = (ch[1] > params_.threshold_green);
-
+    // mask the green channel
+    cv::Mat grid_mask = (ch[1] > params_.threshold_green); 
     static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
     cv::Mat dilated;
     cv::dilate(grid_mask, dilated, kernel);
@@ -108,29 +104,24 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     dilated.col(dilated.cols - 1).setTo(0);
 
     if (cv::countNonZero(dilated) == 0) {
-        original.copyTo(filtered);   // or original.copyTo(filtered);
+        // If no grid detected, leave image unchanged
+        original.copyTo(filtered);
         return;
     }
 
-    // ----------------------------
     // Inpaint grid
-    // ----------------------------
     cv::Mat inpainted;
     cv::inpaint(cropped, dilated, inpainted, params_.inpaint_radius,
                 cv::INPAINT_TELEA);
 
-    // ----------------------------
     // Binary threshold (on cropped ROI)
-    // ----------------------------
     cv::Mat thresh_gray;
     apply_fixed_threshold(inpainted, thresh_gray, params_.threshold_binary, false);
 
     cv::Mat thresh_bgr;
     cv::cvtColor(thresh_gray, thresh_bgr, cv::COLOR_GRAY2BGR);
 
-    // ----------------------------
     // Undo rotation & merge (using M)
-    // ----------------------------
     cv::Mat invM;
     cv::invertAffineTransform(M, invM);
 
