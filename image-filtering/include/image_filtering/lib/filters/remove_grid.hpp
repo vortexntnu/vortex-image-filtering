@@ -9,9 +9,6 @@
 
 #include "abstract_filter_class.hpp"
 
-
-
-
 namespace vortex::image_filtering {
 
 struct RemoveGridParams {
@@ -27,7 +24,8 @@ class RemoveGrid : public Filter {
    public:
     explicit RemoveGrid(RemoveGridParams params) : params_(params) {}
 
-    void apply_filter(const cv::Mat& original, cv::Mat& filtered) const override;
+    void apply_filter(const cv::Mat& original,
+                      cv::Mat& filtered) const override;
 
    private:
     RemoveGridParams params_;
@@ -46,27 +44,27 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
         return;
     }
 
-    // Rotate directly into cropped output 
+    // Rotate directly into cropped output
     int crop_w = std::min(params_.width, original.cols);
     int crop_h = std::min(params_.height, original.rows);
 
     if (crop_w != params_.width || crop_h != params_.height) {
         spdlog::warn(
-            "RemoveGrid: requested crop size (width={}, height={}) does not fit "
+            "RemoveGrid: requested crop size (width={}, height={}) does not "
+            "fit "
             "within original image size (width={}, height={}); clamping to "
             "(width={}, height={})",
-            params_.width,
-            params_.height,
-            original.cols,
-            original.rows,
-            crop_w,
+            params_.width, params_.height, original.cols, original.rows, crop_w,
             crop_h);
     }
 
-    const cv::Point2f center_src(original.cols * 0.5f, original.rows * 0.5f);   // center of source image
-    const cv::Point2f center_dst(crop_w * 0.5f, crop_h * 0.5f);     // center of destination image
+    const cv::Point2f center_src(
+        original.cols * 0.5f, original.rows * 0.5f);  // center of source image
+    const cv::Point2f center_dst(crop_w * 0.5f,
+                                 crop_h * 0.5f);  // center of destination image
 
-    cv::Mat M = cv::getRotationMatrix2D(center_src, params_.rotation, 1.0);     // affine matrix
+    cv::Mat M = cv::getRotationMatrix2D(center_src, params_.rotation,
+                                        1.0);  // affine matrix
     // Ensure type for at<double>
     if (M.type() != CV_64F) {
         M.convertTo(M, CV_64F);
@@ -84,15 +82,15 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::Mat cropped_f;
     cropped.convertTo(cropped_f, CV_32F, 1.0 / 255.0);
 
-    std::vector<cv::Mat> ch(3); // make a vector for BGR
-    cv::split(cropped_f, ch);  // BGR
+    std::vector<cv::Mat> ch(3);  // make a vector for BGR
+    cv::split(cropped_f, ch);    // BGR
 
-    cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;    // avoid division by zero
+    cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;  // avoid division by zero
     for (auto& c : ch)
-        c /= sum;   // normalized color values
+        c /= sum;  // normalized color values
 
     // mask the green channel
-    cv::Mat grid_mask = (ch[1] > params_.threshold_green); 
+    cv::Mat grid_mask = (ch[1] > params_.threshold_green);
     static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
     cv::Mat dilated;
     cv::dilate(grid_mask, dilated, kernel);
@@ -116,7 +114,8 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
 
     // Binary threshold (on cropped ROI)
     cv::Mat thresh_gray;
-    apply_fixed_threshold(inpainted, thresh_gray, params_.threshold_binary, false);
+    apply_fixed_threshold(inpainted, thresh_gray, params_.threshold_binary,
+                          false);
 
     cv::Mat thresh_bgr;
     cv::cvtColor(thresh_gray, thresh_bgr, cv::COLOR_GRAY2BGR);
@@ -131,7 +130,8 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
     // Warp a mask the same way (so black pixels are copied too)
-    cv::Mat local_mask(thresh_bgr.rows, thresh_bgr.cols, CV_8U, cv::Scalar(255));
+    cv::Mat local_mask(thresh_bgr.rows, thresh_bgr.cols, CV_8U,
+                       cv::Scalar(255));
     cv::Mat mask_full;
     cv::warpAffine(local_mask, mask_full, invM, original.size(),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
