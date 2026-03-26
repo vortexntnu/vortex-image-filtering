@@ -10,6 +10,7 @@
 #include "image_filtering/lib/filters/no_filter.hpp"
 #include "image_filtering/lib/filters/otsu.hpp"
 #include "image_filtering/lib/filters/overlap.hpp"
+#include "image_filtering/lib/filters/remove_grid.hpp"
 #include "image_filtering/lib/filters/sharpening.hpp"
 #include "image_filtering/lib/filters/temporal_noise.hpp"
 #include "image_filtering/lib/filters/unsharpening.hpp"
