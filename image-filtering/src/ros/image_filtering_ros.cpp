@@ -171,7 +171,7 @@ void ImageFilteringNode::set_filter_params() {
             params.threshold_green = declare_and_get<double>(
                 "filter_params.remove_grid.threshold_green");
 
-            params.threshold_binary = declare_and_get<double>(
+            params.threshold_binary = declare_and_get<int>(
                 "filter_params.remove_grid.threshold_binary");
 
             params.inpaint_radius = declare_and_get<double>(
