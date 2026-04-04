@@ -12,11 +12,18 @@
 namespace vortex::image_filtering {
 
 struct RemoveGridParams {
-    double threshold_binary;
     double inpaint_radius;
+    int threshold_binary;
+    bool use_binary_threshold;
     int rotation;
     int height;
     int width;
+    int hsv_hue_low;
+    int hsv_hue_high;
+    int hsv_sat_low;
+    int hsv_sat_high;
+    int hsv_val_low;
+    int hsv_val_high;
 };
 
 class RemoveGrid : public Filter {
@@ -43,7 +50,7 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
         return;
     }
 
-    // Rotate directly into cropped output
+    // Rotate/crop to ROI
     int crop_w = std::min(params_.width, original.cols);
     int crop_h = std::min(params_.height, original.rows);
 
@@ -57,19 +64,13 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
             crop_h);
     }
 
-    const cv::Point2f center_src(
-        original.cols * 0.5f, original.rows * 0.5f);  // center of source image
-    const cv::Point2f center_dst(crop_w * 0.5f,
-                                 crop_h * 0.5f);  // center of destination image
+    const cv::Point2f center_src(original.cols * 0.5f, original.rows * 0.5f);
+    const cv::Point2f center_dst(crop_w * 0.5f, crop_h * 0.5f);
 
-    cv::Mat M = cv::getRotationMatrix2D(center_src, params_.rotation,
-                                        1.0);  // affine matrix
-    // Ensure type for at<double>
-    if (M.type() != CV_64F) {
+    cv::Mat M = cv::getRotationMatrix2D(center_src, params_.rotation, 1.0);
+    if (M.type() != CV_64F)
         M.convertTo(M, CV_64F);
-    }
 
-    // Shift translation so original center maps to cropped center
     M.at<double>(0, 2) += (center_dst.x - center_src.x);
     M.at<double>(1, 2) += (center_dst.y - center_src.y);
 
@@ -77,74 +78,62 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::warpAffine(original, cropped, M, cv::Size(crop_w, crop_h),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    // Extract green grid mask
-    cv::Mat cropped_f;
-    cropped.convertTo(cropped_f, CV_32F, 1.0 / 255.0);
-
-    std::vector<cv::Mat> ch(3);  // make a vector for BGR
-    cv::split(cropped_f, ch);    // BGR
-
-    cv::Mat sum = ch[0] + ch[1] + ch[2] + 1e-6f;  // avoid division by zero
-    for (auto& c : ch)
-        c /= sum;  // normalized color values
-
-    // Otsu threshold on normalized green channel
-    cv::Mat green8;
-    cv::Mat greenTemp;
-    greenTemp = ch[1] * 255;
-    greenTemp.convertTo(green8, CV_8U);
+    // Detect yellow grid bars via HSV hue range (input is rgb8)
+    cv::Mat hsv;
+    cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
     cv::Mat grid_mask;
+    cv::inRange(hsv,
+                cv::Scalar(params_.hsv_hue_low, params_.hsv_sat_low,
+                           params_.hsv_val_low),
+                cv::Scalar(params_.hsv_hue_high, params_.hsv_sat_high,
+                           params_.hsv_val_high),
+                grid_mask);
 
-    //cv::threshold(green8, grid_mask, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
-    //cv::adaptiveThreshold(green8, grid_mask, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 11, 2);
-    cv::adaptiveThreshold(green8, grid_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
-
+    // Dilate mask to fully cover grid bar edges
     static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
     cv::Mat dilated;
     cv::dilate(grid_mask, dilated, kernel);
 
-    // prevent border leak
+    // Prevent border leak
     dilated.row(0).setTo(0);
     dilated.row(dilated.rows - 1).setTo(0);
     dilated.col(0).setTo(0);
     dilated.col(dilated.cols - 1).setTo(0);
 
     if (cv::countNonZero(dilated) == 0) {
-        // If no grid detected, leave image unchanged
         original.copyTo(filtered);
         return;
     }
 
+    // Optionally apply binary threshold before inpainting
+    cv::Mat inpaint_src;
+    if (params_.use_binary_threshold) {
+        cv::Mat thresh_gray;
+        apply_fixed_threshold(cropped, thresh_gray, params_.threshold_binary,
+                              false);
+        cv::cvtColor(thresh_gray, inpaint_src, cv::COLOR_GRAY2BGR);
+    } else {
+        inpaint_src = cropped;
+    }
+
     // Inpaint grid
     cv::Mat inpainted;
-    cv::inpaint(cropped, dilated, inpainted, params_.inpaint_radius,
+    cv::inpaint(inpaint_src, dilated, inpainted, params_.inpaint_radius,
                 cv::INPAINT_TELEA);
 
-    // Binary threshold (on cropped ROI)
-    cv::Mat thresh_gray;
-    apply_fixed_threshold(inpainted, thresh_gray, params_.threshold_binary,
-                          false);
-
-    cv::Mat thresh_bgr;
-    cv::cvtColor(thresh_gray, thresh_bgr, cv::COLOR_GRAY2BGR);
-
-    // Undo rotation & merge (using M)
+    // Warp inpainted ROI back into full-size image
     cv::Mat invM;
     cv::invertAffineTransform(M, invM);
 
-    // Warp ROI result back into full-size overlay
     cv::Mat overlay_full;
-    cv::warpAffine(thresh_bgr, overlay_full, invM, original.size(),
+    cv::warpAffine(inpainted, overlay_full, invM, original.size(),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    // Warp a mask the same way (so black pixels are copied too)
-    cv::Mat local_mask(thresh_bgr.rows, thresh_bgr.cols, CV_8U,
-                       cv::Scalar(255));
+    cv::Mat local_mask(inpainted.rows, inpainted.cols, CV_8U, cv::Scalar(255));
     cv::Mat mask_full;
     cv::warpAffine(local_mask, mask_full, invM, original.size(),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
 
-    // Merge into the original image
     filtered = original.clone();
     overlay_full.copyTo(filtered, mask_full);
 }

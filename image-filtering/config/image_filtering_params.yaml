@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    sub_topic: "/cam/image_color"
+    sub_topic: "/realsense_d555/color/image_rect"
     pub_topic: "/filtered_image"
     input_encoding: "rgb8"
     output_encoding: "rgb8"
@@ -31,11 +31,18 @@
         erosion_size: 2
         dilation_size: 2
       remove_grid:
-        threshold_binary: 30.0
         inpaint_radius: 1.0
+        threshold_binary: 90
+        use_binary_threshold: true
         rotation: 0
         height: 400
-        width: 400
+        width: 800
+        hsv_hue_low: 9
+        hsv_hue_high: 40
+        hsv_sat_low: 50
+        hsv_sat_high: 255
+        hsv_val_low: 50
+        hsv_val_high: 255
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
       median_binary: # finds the median of each n x n square around each pixel
