@@ -12,8 +12,7 @@
 namespace vortex::image_filtering {
 
 struct RemoveGridParams {
-    double threshold_green;
-    int threshold_binary;
+    double threshold_binary;
     double inpaint_radius;
     int rotation;
     int height;
@@ -89,8 +88,17 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     for (auto& c : ch)
         c /= sum;  // normalized color values
 
-    // mask the green channel
-    cv::Mat grid_mask = (ch[1] > params_.threshold_green);
+    // Otsu threshold on normalized green channel
+    cv::Mat green8;
+    cv::Mat greenTemp;
+    greenTemp = ch[1] * 255;
+    greenTemp.convertTo(green8, CV_8U);
+    cv::Mat grid_mask;
+
+    //cv::threshold(green8, grid_mask, 0, 255, cv::THRESH_BINARY | cv::THRESH_OTSU);
+    //cv::adaptiveThreshold(green8, grid_mask, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 11, 2);
+    cv::adaptiveThreshold(green8, grid_mask, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, 11, 2);
+
     static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
     cv::Mat dilated;
     cv::dilate(grid_mask, dilated, kernel);

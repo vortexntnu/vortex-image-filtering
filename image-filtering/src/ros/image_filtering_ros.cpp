@@ -168,9 +168,6 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::RemoveGrid: {
             RemoveGridParams params;
 
-            params.threshold_green = declare_and_get<double>(
-                "filter_params.remove_grid.threshold_green");
-
             params.threshold_binary = declare_and_get<double>(
                 "filter_params.remove_grid.threshold_binary");
 
