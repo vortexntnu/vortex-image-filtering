@@ -51,8 +51,8 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     }
 
     // Rotate/crop to ROI
-    int crop_w = std::min(params_.width, original.cols);
-    int crop_h = std::min(params_.height, original.rows);
+    const int crop_w = std::min(params_.width, original.cols);
+    const int crop_h = std::min(params_.height, original.rows);
 
     if (crop_w != params_.width || crop_h != params_.height) {
         spdlog::warn(

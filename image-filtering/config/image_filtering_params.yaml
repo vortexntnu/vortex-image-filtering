@@ -31,17 +31,17 @@
         erosion_size: 2
         dilation_size: 2
       remove_grid:
-        inpaint_radius: 1.0
-        threshold_binary: 90
+        inpaint_radius: 1.0 # Increase when it get blurry close
+        threshold_binary: 90 # Adjust depending on how many black patches obstructs around the marker
         use_binary_threshold: true
         rotation: 0
         height: 400
-        width: 800
-        hsv_hue_low: 9
-        hsv_hue_high: 40
-        hsv_sat_low: 50
+        width: 400
+        hsv_hue_low: 9 # This value is calibrated for yellow-green grids. Increase this value to ~40 if the grid is more orange
+        hsv_hue_high: 40 # Increase this value to ~80 if more orange
+        hsv_sat_low: 50 # Adjust together with value depending on brightness
         hsv_sat_high: 255
-        hsv_val_low: 50
+        hsv_val_low: 50 # Adjust together with saturation depending on brightness
         hsv_val_high: 255
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
