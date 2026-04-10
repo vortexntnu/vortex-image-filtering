@@ -1,10 +1,12 @@
 /**:
   ros__parameters:
-    sub_topic: "/downwards_camera/image_raw"
+    sub_topic: "/cam/image_color"
     pub_topic: "/filtered_image"
-    output_encoding: "mono8"
+    input_encoding: "rgb8"
+    output_encoding: "rgb8"
+
     filter_params:
-      filter_type: "otsu"
+      filter_type: "remove_grid"
       flip:
         flip_code: 1
       unsharpening:
@@ -12,9 +14,9 @@
       erosion:
         size: 1
       dilation:
-        size: 1
+        size: 3
       white_balancing:
-        contrast_percentage: 0.1
+        contrast_percentage: 10.0
       ebus:
         erosion_size: 2
         blur_size: 30
@@ -26,8 +28,30 @@
         gamma_auto_correction: true
         gamma_auto_correction_weight: 4.0
         otsu_segmentation: true
-        erosion_size: 10
-        dilation_size: 10
-
-# Filter params should reflect the FilterParams struct
-# defined in /include/image_filters/image_processing.hpp
+        erosion_size: 2
+        dilation_size: 2
+      remove_grid:
+        threshold_green: 0.5
+        threshold_binary: 30
+        inpaint_radius: 1.0
+        rotation: 0
+        height: 400
+        width: 400
+      overlap:
+        percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
+      median_binary: # finds the median of each n x n square around each pixel
+        kernel_size: 3 # must be odd > 1
+        threshold: 100 # [0, 255]
+        invert: false
+      binary:
+        threshold: 20. # in percent
+        maxval: 255.
+        invert: true
+      temporal_noise:
+        median_kernel_size: 3
+        power_law_weight: 4.0 # Weight for the gamma function
+        erotion_size: 2
+        dilation_size: 4
+        canny_high: 90 # upper weight for canny edge detection
+        canny_low: 30 # lower weight  ---------- || ----------
+        edge_protection_radius: 2 # Radius for protecting edges
