@@ -39,9 +39,9 @@
         width: 400
         hsv_hue_low: 9 # This value is calibrated for yellow-green grids. Increase this value to ~40 if the grid is more orange
         hsv_hue_high: 40 # Increase this value to ~80 if more orange
-        hsv_sat_low: 50 # Adjust together with value depending on brightness
+        hsv_sat_low: 50 # Adjust together with hsv_val_high depending on brightness
         hsv_sat_high: 255
-        hsv_val_low: 50 # Adjust together with saturation depending on brightness
+        hsv_val_low: 50 # Adjust together with hsv_sat_low depending on brightness
         hsv_val_high: 255
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
