@@ -168,14 +168,14 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::RemoveGrid: {
             RemoveGridParams params;
 
-            params.threshold_green = declare_and_get<double>(
-                "filter_params.remove_grid.threshold_green");
+            params.inpaint_radius = declare_and_get<double>(
+                "filter_params.remove_grid.inpaint_radius");
 
             params.threshold_binary = declare_and_get<int>(
                 "filter_params.remove_grid.threshold_binary");
 
-            params.inpaint_radius = declare_and_get<double>(
-                "filter_params.remove_grid.inpaint_radius");
+            params.use_binary_threshold = declare_and_get<bool>(
+                "filter_params.remove_grid.use_binary_threshold");
 
             params.rotation =
                 declare_and_get<int>("filter_params.remove_grid.rotation");
@@ -185,6 +185,19 @@ void ImageFilteringNode::set_filter_params() {
 
             params.height =
                 declare_and_get<int>("filter_params.remove_grid.height");
+
+            params.hsv_hue_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_hue_low");
+            params.hsv_hue_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_hue_high");
+            params.hsv_sat_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_sat_low");
+            params.hsv_sat_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_sat_high");
+            params.hsv_val_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_val_low");
+            params.hsv_val_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_val_high");
 
             filter_ptr_ = std::make_unique<RemoveGrid>(params);
             break;
