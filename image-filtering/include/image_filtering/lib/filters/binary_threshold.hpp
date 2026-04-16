@@ -30,7 +30,7 @@ inline void BinaryThreshold::apply_filter(const cv::Mat& original,
                                           cv::Mat& filtered) const {
     CV_Assert(!original.empty());
 
-    const double thresh = this->filter_params_.threshold * 255.0 / 100.0;
+    const double thresh = this->filter_params_.threshold * 255.0 / 100.0; // Params is in percent while cv::threshold takes in values from 0 to 255
     const double maxval = this->filter_params_.maxval;
     const bool invert = this->filter_params_.invert;
 
