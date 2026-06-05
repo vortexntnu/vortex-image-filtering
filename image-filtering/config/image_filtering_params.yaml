@@ -17,6 +17,26 @@
         size: 3
       white_balancing:
         contrast_percentage: 10.0
+      gray_world:
+        max_gain: 4.0  # caps per-channel gain to [1/max_gain, max_gain]; guards against black/white flicker
+      shades_of_gray:
+        norm_p: 6.0  # 1 = gray-world, larger -> white-patch; 6 is a robust sweet spot
+        max_gain: 4.0
+      white_patch:
+        percentile: 0.97  # [0, 1] channel white reference; <1 is robust to noise
+        max_gain: 4.0
+      underwater_compensation:
+        alpha: 1.0  # strength of green->red(/blue) reconstruction (1.0 = Ancuti 2018)
+        compensate_blue: false  # also reconstruct blue (deeper / very blue water)
+        max_gain: 4.0
+      fixed_gain:  # constant, scene-independent per-channel gains (calibrate once)
+        gain_r: 1.8  # red is most attenuated underwater -> boost most
+        gain_g: 1.0
+        gain_b: 1.2
+        offset: 0.0  # constant added to every channel, in 8-bit units
+      clahe:
+        clip_limit: 2.0  # higher -> more contrast (and more noise)
+        tile_grid_size: 8  # image split into tile_grid_size x tile_grid_size tiles
       ebus:
         erosion_size: 2
         blur_size: 30
