@@ -74,6 +74,76 @@ void ImageFilteringNode::set_filter_params() {
             break;
         }
 
+        case FilterType::GrayWorld: {
+            GrayWorldWhiteBalanceParams params;
+            params.max_gain =
+                declare_and_get<double>("filter_params.gray_world.max_gain");
+
+            filter_ptr_ = std::make_unique<GrayWorldWhiteBalance>(params);
+            break;
+        }
+
+        case FilterType::ShadesOfGray: {
+            ShadesOfGrayParams params;
+            params.norm_p =
+                declare_and_get<double>("filter_params.shades_of_gray.norm_p");
+            params.max_gain = declare_and_get<double>(
+                "filter_params.shades_of_gray.max_gain");
+
+            filter_ptr_ = std::make_unique<ShadesOfGray>(params);
+            break;
+        }
+
+        case FilterType::WhitePatch: {
+            WhitePatchParams params;
+            params.percentile =
+                declare_and_get<double>("filter_params.white_patch.percentile");
+            params.max_gain =
+                declare_and_get<double>("filter_params.white_patch.max_gain");
+
+            filter_ptr_ = std::make_unique<WhitePatch>(params);
+            break;
+        }
+
+        case FilterType::UnderwaterRedCompensation: {
+            UnderwaterRedCompensationParams params;
+            params.alpha = declare_and_get<double>(
+                "filter_params.underwater_compensation.alpha");
+            params.compensate_blue = declare_and_get<bool>(
+                "filter_params.underwater_compensation.compensate_blue");
+            params.max_gain = declare_and_get<double>(
+                "filter_params.underwater_compensation.max_gain");
+
+            filter_ptr_ = std::make_unique<UnderwaterRedCompensation>(params);
+            break;
+        }
+
+        case FilterType::FixedGain: {
+            FixedGainParams params;
+            params.gain_r =
+                declare_and_get<double>("filter_params.fixed_gain.gain_r");
+            params.gain_g =
+                declare_and_get<double>("filter_params.fixed_gain.gain_g");
+            params.gain_b =
+                declare_and_get<double>("filter_params.fixed_gain.gain_b");
+            params.offset =
+                declare_and_get<double>("filter_params.fixed_gain.offset");
+
+            filter_ptr_ = std::make_unique<FixedGain>(params);
+            break;
+        }
+
+        case FilterType::Clahe: {
+            ClaheLabParams params;
+            params.clip_limit =
+                declare_and_get<double>("filter_params.clahe.clip_limit");
+            params.tile_grid_size =
+                declare_and_get<int>("filter_params.clahe.tile_grid_size");
+
+            filter_ptr_ = std::make_unique<ClaheLab>(params);
+            break;
+        }
+
         case FilterType::Ebus: {
             EbusParams params;
             params.erosion_size =
@@ -168,14 +238,14 @@ void ImageFilteringNode::set_filter_params() {
         case FilterType::RemoveGrid: {
             RemoveGridParams params;
 
-            params.threshold_green = declare_and_get<double>(
-                "filter_params.remove_grid.threshold_green");
+            params.inpaint_radius = declare_and_get<double>(
+                "filter_params.remove_grid.inpaint_radius");
 
             params.threshold_binary = declare_and_get<int>(
                 "filter_params.remove_grid.threshold_binary");
 
-            params.inpaint_radius = declare_and_get<double>(
-                "filter_params.remove_grid.inpaint_radius");
+            params.use_binary_threshold = declare_and_get<bool>(
+                "filter_params.remove_grid.use_binary_threshold");
 
             params.rotation =
                 declare_and_get<int>("filter_params.remove_grid.rotation");
@@ -185,6 +255,19 @@ void ImageFilteringNode::set_filter_params() {
 
             params.height =
                 declare_and_get<int>("filter_params.remove_grid.height");
+
+            params.hsv_hue_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_hue_low");
+            params.hsv_hue_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_hue_high");
+            params.hsv_sat_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_sat_low");
+            params.hsv_sat_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_sat_high");
+            params.hsv_val_low =
+                declare_and_get<int>("filter_params.remove_grid.hsv_val_low");
+            params.hsv_val_high =
+                declare_and_get<int>("filter_params.remove_grid.hsv_val_high");
 
             filter_ptr_ = std::make_unique<RemoveGrid>(params);
             break;
