@@ -4,6 +4,7 @@
 #include <spdlog/spdlog.h>
 #include <algorithm>
 #include <codecvt>
+#include <cstdlib>
 #include <fstream>
 #include <opencv2/aruco.hpp>
 #include <opencv2/imgproc.hpp>
@@ -27,7 +28,7 @@ struct RemoveGridParams {
     int hsv_val_low;
     int hsv_val_high;
     bool hsv_tuning;
-    int increment;
+    int attempts;
 };
 
 class RemoveGrid : public Filter {
@@ -82,11 +83,11 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::warpAffine(original, cropped, M, cv::Size(crop_w, crop_h),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    // when tuning: construct a grid containing all combinations of HSV
-    // parameters
+    // when tuning: do random search of HSV parameters
     if (params_.hsv_tuning) {
         std::ofstream outputFile(
-            "/home/sophia/stonefish_ws/successful_hsv_params.csv",
+            "/home/vortex/workspaces/isaac_ros-dev/"
+            "detected-aruco-markers-unique/successful_hsv_params.csv",
             std::ios::app);  // test
 
         if (!outputFile.is_open()) {
@@ -100,110 +101,110 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
 
         static auto detector_params = cv::aruco::DetectorParameters::create();
 
-        for (int hsv_val_low = params_.hsv_val_low;
-             hsv_val_low < params_.hsv_val_high;
-             hsv_val_low += params_.increment) {
-            for (int hsv_sat_low = params_.hsv_sat_low;
-                 hsv_sat_low < params_.hsv_sat_high;
-                 hsv_sat_low += params_.increment) {
-                for (int hsv_hue_low = params_.hsv_hue_low; hsv_hue_low < 45;
-                     hsv_hue_low += params_.increment) {
-                    for (int hsv_hue_high = params_.hsv_hue_high;
-                         hsv_hue_high < 85; hsv_hue_high += params_.increment) {
-                        std::cout << "Checking HSV value \n";
-                        std::cout << "Hue Low: " << hsv_hue_low << "\n";
-                        std::cout << "Hue High: " << hsv_hue_high << "\n";
-                        std::cout << "Sat Low: " << hsv_sat_low << "\n";
-                        std::cout << "Val Low: " << hsv_val_low << "\n\n";
+        for (int i = 0; i < params_.attempts; i++) {
+            int hsv_val_low =
+                rand() % (params_.hsv_val_high - params_.hsv_val_low) +
+                params_.hsv_val_low;
+            int hsv_hue_low =
+                rand() % (params_.hsv_hue_high - params_.hsv_hue_low) +
+                params_.hsv_hue_low;
+            int hsv_sat_low =
+                rand() % (params_.hsv_sat_high - params_.hsv_sat_low) +
+                params_.hsv_sat_low;
+            int hsv_hue_high =
+                rand() % (params_.hsv_hue_high - hsv_hue_low) + hsv_hue_low;
 
-                        // Detect yellow grid bars via HSV hue range (input is
-                        // rgb8)
-                        cv::Mat hsv;
-                        cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
-                        cv::Mat grid_mask;
-                        cv::inRange(
-                            hsv,
-                            cv::Scalar(hsv_hue_low, hsv_sat_low, hsv_val_low),
-                            cv::Scalar(hsv_hue_high, params_.hsv_sat_high,
-                                       params_.hsv_val_high),
-                            grid_mask);
+            // std::cout << "Checking HSV value \n";
+            // std::cout << "Hue Low: " << hsv_hue_low << "\n";
+            // std::cout << "Hue High: " << hsv_hue_high << "\n";
+            // std::cout << "Sat Low: " << hsv_sat_low << "\n";
+            // std::cout << "Val Low: " << hsv_val_low << "\n\n";
 
-                        // Dilate mask to fully cover grid bar edges
-                        static const cv::Mat kernel =
-                            cv::Mat::ones(3, 3, CV_8U);
-                        cv::Mat dilated;
-                        cv::dilate(grid_mask, dilated, kernel);
+            // Detect yellow grid bars via HSV hue range (input is
+            // rgb8)
+            cv::Mat hsv;
+            cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
+            cv::Mat grid_mask;
+            cv::inRange(hsv, cv::Scalar(hsv_hue_low, hsv_sat_low, hsv_val_low),
+                        cv::Scalar(hsv_hue_high, params_.hsv_sat_high,
+                                   params_.hsv_val_high),
+                        grid_mask);
 
-                        // Prevent border leak
-                        dilated.row(0).setTo(0);
-                        dilated.row(dilated.rows - 1).setTo(0);
-                        dilated.col(0).setTo(0);
-                        dilated.col(dilated.cols - 1).setTo(0);
+            // Dilate mask to fully cover grid bar edges
+            static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
+            cv::Mat dilated;
+            cv::dilate(grid_mask, dilated, kernel);
 
-                        if (cv::countNonZero(dilated) == 0) {
-                            original.copyTo(filtered);
-                            continue;
-                        }
+            // Prevent border leak
+            dilated.row(0).setTo(0);
+            dilated.row(dilated.rows - 1).setTo(0);
+            dilated.col(0).setTo(0);
+            dilated.col(dilated.cols - 1).setTo(0);
 
-                        // Optionally apply binary threshold before inpainting
-                        cv::Mat inpaint_src;
-                        if (params_.use_binary_threshold) {
-                            cv::Mat thresh_gray;
-                            apply_fixed_threshold(cropped, thresh_gray,
-                                                  params_.threshold_binary,
-                                                  false);
-                            cv::cvtColor(thresh_gray, inpaint_src,
-                                         cv::COLOR_GRAY2BGR);
-                        } else {
-                            inpaint_src = cropped;
-                        }
+            if (cv::countNonZero(dilated) == 0) {
+                original.copyTo(filtered);
+                continue;
+            }
 
-                        // Inpaint grid
-                        cv::Mat inpainted;
-                        cv::inpaint(inpaint_src, dilated, inpainted,
-                                    params_.inpaint_radius, cv::INPAINT_TELEA);
+            // Optionally apply binary threshold before inpainting
+            cv::Mat inpaint_src;
+            if (params_.use_binary_threshold) {
+                cv::Mat thresh_gray;
+                apply_fixed_threshold(cropped, thresh_gray,
+                                      params_.threshold_binary, false);
+                cv::cvtColor(thresh_gray, inpaint_src, cv::COLOR_GRAY2BGR);
+            } else {
+                inpaint_src = cropped;
+            }
 
-                        // Warp inpainted ROI back into full-size image
-                        cv::Mat invM;
-                        cv::invertAffineTransform(M, invM);
+            // Inpaint grid
+            cv::Mat inpainted;
+            cv::inpaint(inpaint_src, dilated, inpainted, params_.inpaint_radius,
+                        cv::INPAINT_TELEA);
 
-                        cv::Mat overlay_full;
-                        cv::warpAffine(inpainted, overlay_full, invM,
-                                       original.size(), cv::INTER_NEAREST,
-                                       cv::BORDER_CONSTANT,
-                                       cv::Scalar(0, 0, 0));
+            // Warp inpainted ROI back into full-size image
+            cv::Mat invM;
+            cv::invertAffineTransform(M, invM);
 
-                        cv::Mat local_mask(inpainted.rows, inpainted.cols,
-                                           CV_8U, cv::Scalar(255));
-                        cv::Mat mask_full;
-                        cv::warpAffine(local_mask, mask_full, invM,
-                                       original.size(), cv::INTER_NEAREST,
-                                       cv::BORDER_CONSTANT, cv::Scalar(0));
+            cv::Mat overlay_full;
+            cv::warpAffine(inpainted, overlay_full, invM, original.size(),
+                           cv::INTER_NEAREST, cv::BORDER_CONSTANT,
+                           cv::Scalar(0, 0, 0));
 
-                        filtered = original.clone();
-                        overlay_full.copyTo(filtered, mask_full);
+            cv::Mat local_mask(inpainted.rows, inpainted.cols, CV_8U,
+                               cv::Scalar(255));
+            cv::Mat mask_full;
+            cv::warpAffine(local_mask, mask_full, invM, original.size(),
+                           cv::INTER_NEAREST, cv::BORDER_CONSTANT,
+                           cv::Scalar(0));
 
-                        std::vector<int> ids;
-                        std::vector<std::vector<cv::Point2f>> corners;
-                        std::vector<std::vector<cv::Point2f>> rejected;
+            filtered = original.clone();
+            overlay_full.copyTo(filtered, mask_full);
 
-                        cv::aruco::detectMarkers(filtered, dictionary, corners,
-                                                 ids, detector_params,
-                                                 rejected);
+            std::vector<int> ids;
+            std::vector<std::vector<cv::Point2f>> corners;
+            std::vector<std::vector<cv::Point2f>> rejected;
 
-                        // write to file
-                        if (!ids.empty()) {
-                            outputFile << hsv_hue_low << "," << hsv_hue_high
-                                       << "," << hsv_sat_low << ","
-                                       << params_.hsv_sat_high << ","
-                                       << hsv_val_low << ","
-                                       << params_.hsv_val_high << "\n";
-                        }
+            cv::aruco::detectMarkers(filtered, dictionary, corners, ids,
+                                     detector_params, rejected);
+
+            // write to file
+            if (!ids.empty()) {
+                /* outputFile << hsv_hue_low << "," << hsv_hue_high
+                            << "," << hsv_sat_low << ","
+                            << params_.hsv_sat_high << ","
+                            << hsv_val_low << ","
+                            << params_.hsv_val_high << "\n"; */
+                for (size_t j = 0; j < ids.size(); ++j) {
+                    if (ids[j] == 0) {
+                        continue;
                     }
+                    outputFile << "\n" << ids[j] << ",";
                 }
             }
         }
 
+        /* std::cout << "Finished 100 guesses\n"; */
         /* std::cout << "Finished \n";
         while (true)
             ; */
