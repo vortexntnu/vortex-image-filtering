@@ -1,6 +1,6 @@
 /**:
   ros__parameters:
-    sub_topic: "/realsense_d555/color/image_rect"
+    sub_topic: "/camera/camera/color/image_raw" #"/realsense_d555/color/image_rect"
     pub_topic: "/filtered_image"
     input_encoding: "rgb8"
     output_encoding: "rgb8"
@@ -63,6 +63,8 @@
         hsv_sat_high: 255
         hsv_val_low: 50 # Adjust together with hsv_sat_low depending on brightness
         hsv_val_high: 255
+        hsv_tuning: true # When true, optimal values for the filter will be written to a file
+        increment: 10 # The increments each hsv-threshold increases with for each loop (tuning)
       overlap:
         percentage_threshold: 20.0 # Percentage (0-100) to cap the pixel intensity difference
       median_binary: # finds the median of each n x n square around each pixel

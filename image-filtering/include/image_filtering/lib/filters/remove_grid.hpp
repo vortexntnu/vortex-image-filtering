@@ -3,10 +3,12 @@
 
 #include <spdlog/spdlog.h>
 #include <algorithm>
+#include <codecvt>
+#include <fstream>
+#include <opencv2/aruco.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/photo.hpp>
 #include <vector>
-
 #include "abstract_filter_class.hpp"
 
 namespace vortex::image_filtering {
@@ -24,6 +26,8 @@ struct RemoveGridParams {
     int hsv_sat_high;
     int hsv_val_low;
     int hsv_val_high;
+    bool hsv_tuning;
+    int increment;
 };
 
 class RemoveGrid : public Filter {
@@ -78,64 +82,194 @@ inline void RemoveGrid::apply_filter(const cv::Mat& original,
     cv::warpAffine(original, cropped, M, cv::Size(crop_w, crop_h),
                    cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 
-    // Detect yellow grid bars via HSV hue range (input is rgb8)
-    cv::Mat hsv;
-    cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
-    cv::Mat grid_mask;
-    cv::inRange(hsv,
-                cv::Scalar(params_.hsv_hue_low, params_.hsv_sat_low,
-                           params_.hsv_val_low),
-                cv::Scalar(params_.hsv_hue_high, params_.hsv_sat_high,
-                           params_.hsv_val_high),
-                grid_mask);
+    // when tuning: construct a grid containing all combinations of HSV
+    // parameters
+    if (params_.hsv_tuning) {
+        std::ofstream outputFile(
+            "/home/sophia/stonefish_ws/successful_hsv_params.csv",
+            std::ios::app);  // test
 
-    // Dilate mask to fully cover grid bar edges
-    static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
-    cv::Mat dilated;
-    cv::dilate(grid_mask, dilated, kernel);
+        if (!outputFile.is_open()) {
+            spdlog::error(
+                "RemoveGrid: failed to open successful_hsv_params.csv");
+            return;
+        }
 
-    // Prevent border leak
-    dilated.row(0).setTo(0);
-    dilated.row(dilated.rows - 1).setTo(0);
-    dilated.col(0).setTo(0);
-    dilated.col(dilated.cols - 1).setTo(0);
+        static auto dictionary =
+            cv::aruco::getPredefinedDictionary(cv::aruco::DICT_ARUCO_ORIGINAL);
 
-    if (cv::countNonZero(dilated) == 0) {
-        original.copyTo(filtered);
-        return;
-    }
+        static auto detector_params = cv::aruco::DetectorParameters::create();
 
-    // Optionally apply binary threshold before inpainting
-    cv::Mat inpaint_src;
-    if (params_.use_binary_threshold) {
-        cv::Mat thresh_gray;
-        apply_fixed_threshold(cropped, thresh_gray, params_.threshold_binary,
-                              false);
-        cv::cvtColor(thresh_gray, inpaint_src, cv::COLOR_GRAY2BGR);
+        for (int hsv_val_low = params_.hsv_val_low;
+             hsv_val_low < params_.hsv_val_high;
+             hsv_val_low += params_.increment) {
+            for (int hsv_sat_low = params_.hsv_sat_low;
+                 hsv_sat_low < params_.hsv_sat_high;
+                 hsv_sat_low += params_.increment) {
+                for (int hsv_hue_low = params_.hsv_hue_low; hsv_hue_low < 45;
+                     hsv_hue_low += params_.increment) {
+                    for (int hsv_hue_high = params_.hsv_hue_high;
+                         hsv_hue_high < 85; hsv_hue_high += params_.increment) {
+                        std::cout << "Checking HSV value \n";
+                        std::cout << "Hue Low: " << hsv_hue_low << "\n";
+                        std::cout << "Hue High: " << hsv_hue_high << "\n";
+                        std::cout << "Sat Low: " << hsv_sat_low << "\n";
+                        std::cout << "Val Low: " << hsv_val_low << "\n\n";
+
+                        // Detect yellow grid bars via HSV hue range (input is
+                        // rgb8)
+                        cv::Mat hsv;
+                        cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
+                        cv::Mat grid_mask;
+                        cv::inRange(
+                            hsv,
+                            cv::Scalar(hsv_hue_low, hsv_sat_low, hsv_val_low),
+                            cv::Scalar(hsv_hue_high, params_.hsv_sat_high,
+                                       params_.hsv_val_high),
+                            grid_mask);
+
+                        // Dilate mask to fully cover grid bar edges
+                        static const cv::Mat kernel =
+                            cv::Mat::ones(3, 3, CV_8U);
+                        cv::Mat dilated;
+                        cv::dilate(grid_mask, dilated, kernel);
+
+                        // Prevent border leak
+                        dilated.row(0).setTo(0);
+                        dilated.row(dilated.rows - 1).setTo(0);
+                        dilated.col(0).setTo(0);
+                        dilated.col(dilated.cols - 1).setTo(0);
+
+                        if (cv::countNonZero(dilated) == 0) {
+                            original.copyTo(filtered);
+                            continue;
+                        }
+
+                        // Optionally apply binary threshold before inpainting
+                        cv::Mat inpaint_src;
+                        if (params_.use_binary_threshold) {
+                            cv::Mat thresh_gray;
+                            apply_fixed_threshold(cropped, thresh_gray,
+                                                  params_.threshold_binary,
+                                                  false);
+                            cv::cvtColor(thresh_gray, inpaint_src,
+                                         cv::COLOR_GRAY2BGR);
+                        } else {
+                            inpaint_src = cropped;
+                        }
+
+                        // Inpaint grid
+                        cv::Mat inpainted;
+                        cv::inpaint(inpaint_src, dilated, inpainted,
+                                    params_.inpaint_radius, cv::INPAINT_TELEA);
+
+                        // Warp inpainted ROI back into full-size image
+                        cv::Mat invM;
+                        cv::invertAffineTransform(M, invM);
+
+                        cv::Mat overlay_full;
+                        cv::warpAffine(inpainted, overlay_full, invM,
+                                       original.size(), cv::INTER_NEAREST,
+                                       cv::BORDER_CONSTANT,
+                                       cv::Scalar(0, 0, 0));
+
+                        cv::Mat local_mask(inpainted.rows, inpainted.cols,
+                                           CV_8U, cv::Scalar(255));
+                        cv::Mat mask_full;
+                        cv::warpAffine(local_mask, mask_full, invM,
+                                       original.size(), cv::INTER_NEAREST,
+                                       cv::BORDER_CONSTANT, cv::Scalar(0));
+
+                        filtered = original.clone();
+                        overlay_full.copyTo(filtered, mask_full);
+
+                        std::vector<int> ids;
+                        std::vector<std::vector<cv::Point2f>> corners;
+                        std::vector<std::vector<cv::Point2f>> rejected;
+
+                        cv::aruco::detectMarkers(filtered, dictionary, corners,
+                                                 ids, detector_params,
+                                                 rejected);
+
+                        // write to file
+                        if (!ids.empty()) {
+                            outputFile << hsv_hue_low << "," << hsv_hue_high
+                                       << "," << hsv_sat_low << ","
+                                       << params_.hsv_sat_high << ","
+                                       << hsv_val_low << ","
+                                       << params_.hsv_val_high << "\n";
+                        }
+                    }
+                }
+            }
+        }
+
+        /* std::cout << "Finished \n";
+        while (true)
+            ; */
+
     } else {
-        inpaint_src = cropped;
+        // Detect yellow grid bars via HSV hue range (input is rgb8)
+        cv::Mat hsv;
+        cv::cvtColor(cropped, hsv, cv::COLOR_RGB2HSV);
+        cv::Mat grid_mask;
+        cv::inRange(hsv,
+                    cv::Scalar(params_.hsv_hue_low, params_.hsv_sat_low,
+                               params_.hsv_val_low),
+                    cv::Scalar(params_.hsv_hue_high, params_.hsv_sat_high,
+                               params_.hsv_val_high),
+                    grid_mask);
+
+        // Dilate mask to fully cover grid bar edges
+        static const cv::Mat kernel = cv::Mat::ones(3, 3, CV_8U);
+        cv::Mat dilated;
+        cv::dilate(grid_mask, dilated, kernel);
+
+        // Prevent border leak
+        dilated.row(0).setTo(0);
+        dilated.row(dilated.rows - 1).setTo(0);
+        dilated.col(0).setTo(0);
+        dilated.col(dilated.cols - 1).setTo(0);
+
+        if (cv::countNonZero(dilated) == 0) {
+            original.copyTo(filtered);
+            return;
+        }
+
+        // Optionally apply binary threshold before inpainting
+        cv::Mat inpaint_src;
+        if (params_.use_binary_threshold) {
+            cv::Mat thresh_gray;
+            apply_fixed_threshold(cropped, thresh_gray,
+                                  params_.threshold_binary, false);
+            cv::cvtColor(thresh_gray, inpaint_src, cv::COLOR_GRAY2BGR);
+        } else {
+            inpaint_src = cropped;
+        }
+
+        // Inpaint grid
+        cv::Mat inpainted;
+        cv::inpaint(inpaint_src, dilated, inpainted, params_.inpaint_radius,
+                    cv::INPAINT_TELEA);
+
+        // Warp inpainted ROI back into full-size image
+        cv::Mat invM;
+        cv::invertAffineTransform(M, invM);
+
+        cv::Mat overlay_full;
+        cv::warpAffine(inpainted, overlay_full, invM, original.size(),
+                       cv::INTER_NEAREST, cv::BORDER_CONSTANT,
+                       cv::Scalar(0, 0, 0));
+
+        cv::Mat local_mask(inpainted.rows, inpainted.cols, CV_8U,
+                           cv::Scalar(255));
+        cv::Mat mask_full;
+        cv::warpAffine(local_mask, mask_full, invM, original.size(),
+                       cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
+
+        filtered = original.clone();
+        overlay_full.copyTo(filtered, mask_full);
     }
-
-    // Inpaint grid
-    cv::Mat inpainted;
-    cv::inpaint(inpaint_src, dilated, inpainted, params_.inpaint_radius,
-                cv::INPAINT_TELEA);
-
-    // Warp inpainted ROI back into full-size image
-    cv::Mat invM;
-    cv::invertAffineTransform(M, invM);
-
-    cv::Mat overlay_full;
-    cv::warpAffine(inpainted, overlay_full, invM, original.size(),
-                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
-
-    cv::Mat local_mask(inpainted.rows, inpainted.cols, CV_8U, cv::Scalar(255));
-    cv::Mat mask_full;
-    cv::warpAffine(local_mask, mask_full, invM, original.size(),
-                   cv::INTER_NEAREST, cv::BORDER_CONSTANT, cv::Scalar(0));
-
-    filtered = original.clone();
-    overlay_full.copyTo(filtered, mask_full);
 }
 
 }  // namespace vortex::image_filtering

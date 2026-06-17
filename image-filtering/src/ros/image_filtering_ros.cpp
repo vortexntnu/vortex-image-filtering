@@ -268,6 +268,10 @@ void ImageFilteringNode::set_filter_params() {
                 declare_and_get<int>("filter_params.remove_grid.hsv_val_low");
             params.hsv_val_high =
                 declare_and_get<int>("filter_params.remove_grid.hsv_val_high");
+            params.hsv_tuning =
+                declare_and_get<bool>("filter_params.remove_grid.hsv_tuning");
+            params.increment =
+                declare_and_get<int>("filter_params.remove_grid.increment");
 
             filter_ptr_ = std::make_unique<RemoveGrid>(params);
             break;
